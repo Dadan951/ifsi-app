@@ -16,7 +16,9 @@ const SIZES = {
   xl:  { outer: 'w-24 h-24', text: 'text-4xl',    ring: 'ring-4' },
 };
 
-export default function UserAvatar({ name, avatar, size = 'md', className = '' }) {
+// shape="circle" (défaut, sidebar) | shape="square" (page profil)
+// fit="cover" (défaut) | fit="contain" (image entière visible)
+export default function UserAvatar({ name, avatar, size = 'md', shape = 'circle', fit = 'cover', className = '' }) {
   const initial = name?.charAt(0)?.toUpperCase() || '?';
 
   const gradient = useMemo(() => {
@@ -25,15 +27,18 @@ export default function UserAvatar({ name, avatar, size = 'md', className = '' }
   }, [name]);
 
   const s = SIZES[size] || SIZES.md;
+  const radius = shape === 'square' ? 'rounded-2xl' : 'rounded-full';
 
-  // Si une photo de profil existe, l'afficher
   if (avatar) {
     return (
       <div
-        className={`${s.outer} rounded-full overflow-hidden flex-shrink-0 ring-white ${s.ring} shadow-md ${className}`}
+        className={`${s.outer} ${radius} overflow-hidden flex-shrink-0 ring-white ${s.ring} shadow-md bg-slate-900 ${className}`}
         aria-label={`Avatar de ${name}`}
       >
-        <img src={avatar} alt={name} className="w-full h-full object-cover" />
+        <img
+          src={avatar} alt={name}
+          className={`w-full h-full ${fit === 'contain' ? 'object-contain' : 'object-cover'}`}
+        />
       </div>
     );
   }
@@ -41,7 +46,7 @@ export default function UserAvatar({ name, avatar, size = 'md', className = '' }
   return (
     <div
       className={`
-        ${s.outer} rounded-full flex items-center justify-center
+        ${s.outer} ${radius} flex items-center justify-center
         font-bold text-white flex-shrink-0 select-none
         ring-white ${s.ring} shadow-md
         ${className}
