@@ -351,21 +351,22 @@ export default function Dashboard() {
                   className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
                 >
                   {quickActions.map((a, i) => (
-                    <motion.div key={i} variants={item}>
+                    <motion.div key={i} variants={item} className="h-full">
                       <TiltCard>
-                        <Link to={a.to} className="block rounded-2xl overflow-hidden focus:outline-none">
+                        <Link to={a.to} className="block rounded-2xl overflow-hidden focus:outline-none h-full">
                           <motion.div
-                            className={`bg-gradient-to-br ${a.grad} p-6 shadow-xl ${a.shadow}`}
+                            className={`bg-gradient-to-br ${a.grad} p-5 shadow-xl ${a.shadow} flex flex-col`}
+                            style={{ minHeight: '160px', height: '100%' }}
                             whileHover={{ scale: 1.04, boxShadow: '0 20px 40px -8px rgba(0,0,0,0.25)' }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ type: 'spring', stiffness: 350, damping: 22 }}
                           >
-                            <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4">
+                            <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 flex-shrink-0">
                               {a.icon}
                             </div>
-                            <p className="text-sm font-bold text-white">{a.label}</p>
-                            <p className="text-xs text-white/65 mt-0.5 mb-4">{a.desc}</p>
-                            <div className="flex items-center gap-1 text-white/80">
+                            <p className="text-sm font-bold text-white leading-tight h-10 flex items-start">{a.label}</p>
+                            <p className="text-xs text-white/65 mt-0.5 mb-3">{a.desc}</p>
+                            <div className="flex items-center gap-1 text-white/80 mt-auto">
                               <span className="text-xs font-semibold">Commencer</span>
                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                             </div>
