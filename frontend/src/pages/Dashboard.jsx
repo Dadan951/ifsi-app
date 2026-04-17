@@ -135,10 +135,12 @@ export default function Dashboard() {
     axios.post(`${API_URL}/auth/ping`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
-      setStreak(res.data.streak);
-      setWeeklyData(res.data.weeklyActivity);
+      if (typeof res.data.streak === 'number') setStreak(res.data.streak);
+      if (Array.isArray(res.data.weeklyActivity)) setWeeklyData(res.data.weeklyActivity);
       refreshUser();
-    }).catch(() => {});
+    }).catch(err => {
+      console.error('Ping failed:', err?.response?.data || err.message);
+    });
   }, []); // eslint-disable-line
 
   /* Rotate tips */
