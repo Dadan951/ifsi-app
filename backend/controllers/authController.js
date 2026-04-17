@@ -71,36 +71,30 @@ exports.ping = async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    // Charger l'utilisateur
     const user = await User.findById(userId);
     const lastDate = user.progress?.lastActivity
       ? new Date(user.progress.lastActivity).toISOString().split('T')[0]
       : null;
 
-    // Calculer le nouveau streak
     let newStreak = user.progress?.streak || 0;
-    let shouldUpdate = false;
 
     if (lastDate === today) {
-      // Déjà visité aujourd'hui — corriger si streak est 0 (données corrompues)
-      if (newStreak === 0) { newStreak = 1; shouldUpdate = true; }
+      // Même jour → rien ne change
     } else if (lastDate === yesterday) {
+      // Jour d'après → +1
       newStreak = newStreak + 1;
-      shouldUpdate = true;
+      await User.updateOne({ _id: userId }, {
+        $set: { 'progress.streak': newStreak, 'progress.lastActivity': new Date() }
+      });
     } else {
-      newStreak = 1;
-      shouldUpdate = true;
+      // Premier login ou trou > 1 jour → reset à 0
+      newStreak = 0;
+      await User.updateOne({ _id: userId }, {
+        $set: { 'progress.streak': 0, 'progress.lastActivity': new Date() }
+      });
     }
 
-    // Mettre à jour streak + lastActivity avec $set (fiable, pas de markModified)
-    if (shouldUpdate) {
-      await User.updateOne(
-        { _id: userId },
-        { $set: { 'progress.streak': newStreak, 'progress.lastActivity': new Date() } }
-      );
-    }
-
-    // Incrémenter ou créer l'entrée du jour dans dailyActivity
+    // Enregistrer l'activité du jour
     const hasToday = user.dailyActivity.some(e => e.date === today);
     if (hasToday) {
       await User.updateOne(
@@ -114,15 +108,15 @@ exports.ping = async (req, res) => {
       );
     }
 
-    // Recharger l'utilisateur final
+    // Recharger
     const updated = await User.findById(userId);
 
-    // Garder max 30 jours (si dépassé)
+    // Garder max 30 jours
     if (updated.dailyActivity.length > 30) {
       await User.updateOne({ _id: userId }, { $pop: { dailyActivity: -1 } });
     }
 
-    // Retourner les 7 derniers jours
+    // 7 derniers jours
     const weeklyActivity = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];

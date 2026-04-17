@@ -470,7 +470,7 @@ export default function Dashboard() {
                     {streak}
                   </motion.p>
                   <p className="text-xs text-blue-300 mt-1">
-                    jour{streak !== 1 ? 's' : ''} consécutif{streak !== 1 ? 's' : ''}
+                    {streak === 0 ? 'connecte-toi demain pour commencer !' : `jour${streak > 1 ? 's' : ''} consécutif${streak > 1 ? 's' : ''}`}
                   </p>
 
                   {/* Day dots */}
