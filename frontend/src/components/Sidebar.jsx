@@ -354,7 +354,7 @@ export default function Sidebar({ isAdmin = false, onClose }) {
             }`
           }
         >
-          <UserAvatar name={user?.name} size="sm" />
+          <UserAvatar name={user?.name} avatar={user?.avatar} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold text-slate-800 truncate">{user?.name}</p>
             <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>

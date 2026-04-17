@@ -83,8 +83,41 @@ export default function Profile() {
   const [pwForm,   setPwForm]   = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [infoLoading, setInfoLoading] = useState(false);
   const [pwLoading,   setPwLoading]   = useState(false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
   const [showPw, setShowPw] = useState({ current: false, next: false, confirm: false });
   const [toast, setToast] = useState({ msg: '', type: 'success' });
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return showToast('Fichier invalide, choisissez une image', 'error');
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        // Compresser à max 300x300px
+        const MAX = 300;
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+        canvas.width  = Math.round(img.width  * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const base64 = canvas.toDataURL('image/jpeg', 0.82);
+
+        setAvatarLoading(true);
+        try {
+          await axios.put(`${API_URL}/auth/avatar`, { avatar: base64 });
+          await refreshUser();
+          showToast('Photo de profil mise à jour ✓');
+        } catch (err) {
+          showToast(err.response?.data?.message || 'Erreur upload', 'error');
+        } finally { setAvatarLoading(false); }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
@@ -139,10 +172,26 @@ export default function Profile() {
             <div className="flex items-center gap-5 mb-7">
               <div className="relative flex-shrink-0">
                 <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-white/20">
-                  <UserAvatar name={user?.name} size="xl" />
+                  <UserAvatar name={user?.name} avatar={user?.avatar} size="xl" />
                 </div>
+
+                {/* Bouton changer la photo */}
+                <label className="absolute -bottom-2 -right-2 cursor-pointer group" title="Changer la photo">
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
+                    style={{ background: avatarLoading ? '#64748b' : 'linear-gradient(135deg,#0891b2,#164e8a)' }}>
+                    {avatarLoading
+                      ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+                      : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                          <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                    }
+                  </div>
+                </label>
+
                 {isAdmin && (
-                  <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-xl flex items-center justify-center shadow-lg"
+                  <div className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-xl flex items-center justify-center shadow-lg"
                     style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)' }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>

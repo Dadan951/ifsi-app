@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-// Palette de gradients bleus cohérents avec le thème
 const GRADIENTS = [
   ['#2563eb', '#4f46e5'],
   ['#0284c7', '#2563eb'],
@@ -17,7 +16,7 @@ const SIZES = {
   xl:  { outer: 'w-24 h-24', text: 'text-4xl',    ring: 'ring-4' },
 };
 
-export default function UserAvatar({ name, size = 'md', className = '' }) {
+export default function UserAvatar({ name, avatar, size = 'md', className = '' }) {
   const initial = name?.charAt(0)?.toUpperCase() || '?';
 
   const gradient = useMemo(() => {
@@ -26,6 +25,18 @@ export default function UserAvatar({ name, size = 'md', className = '' }) {
   }, [name]);
 
   const s = SIZES[size] || SIZES.md;
+
+  // Si une photo de profil existe, l'afficher
+  if (avatar) {
+    return (
+      <div
+        className={`${s.outer} rounded-full overflow-hidden flex-shrink-0 ring-white ${s.ring} shadow-md ${className}`}
+        aria-label={`Avatar de ${name}`}
+      >
+        <img src={avatar} alt={name} className="w-full h-full object-cover" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -38,7 +49,6 @@ export default function UserAvatar({ name, size = 'md', className = '' }) {
       style={{ background: `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})` }}
       aria-label={`Avatar de ${name}`}
     >
-      {/* Nurse cross overlay */}
       <span className={`${s.text} font-extrabold tracking-tight leading-none`}>
         {initial}
       </span>

@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     count: { type: Number, default: 0 },
     date: { type: String, default: '' }
   },
+  avatar: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now }
 });
 

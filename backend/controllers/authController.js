@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
 
     const user = await User.create({ name, email, password });
     const token = signToken(user._id);
-    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress } });
+    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar || '' } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
 
     const token = signToken(user._id);
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar || '' } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -43,7 +43,26 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   const user = req.user;
-  res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress } });
+  res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar || '' } });
+};
+
+exports.updateAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    if (!avatar) return res.status(400).json({ message: 'Image manquante' });
+    // Vérifier que c'est bien une image base64 (max ~500KB)
+    if (avatar.length > 700000) return res.status(400).json({ message: 'Image trop grande (max 500 KB)' });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true }
+    );
+    res.json({ message: 'Photo mise à jour', avatar: user.avatar,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 exports.ping = async (req, res) => {
@@ -94,7 +113,7 @@ exports.ping = async (req, res) => {
     res.json({
       streak: user.progress.streak,
       weeklyActivity,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress }
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar || '' }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -125,7 +144,7 @@ exports.updateProfile = async (req, res) => {
     await user.save();
     res.json({
       message: 'Profil mis à jour avec succès',
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress }
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, subscription: user.subscription, progress: user.progress, avatar: user.avatar || '' }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
