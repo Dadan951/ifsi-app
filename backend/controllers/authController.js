@@ -100,6 +100,8 @@ exports.ping = async (req, res) => {
       user.dailyActivity = user.dailyActivity.slice(-30);
     }
 
+    user.markModified('progress');
+    user.markModified('dailyActivity');
     await user.save();
 
     // Retourner les 7 derniers jours d'activité
