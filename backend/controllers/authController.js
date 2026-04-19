@@ -48,9 +48,12 @@ exports.register = async (req, res) => {
 
     // Envoi de l'email (non-bloquant — ne fait pas planter l'inscription si ça échoue)
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-      email.sendVerificationEmail(emailAddr, name.trim(), code).catch(err =>
-        console.error('[Email] Erreur envoi vérification:', err.message)
-      );
+      console.log('[Email] Tentative envoi vérification à:', emailAddr);
+      email.sendVerificationEmail(emailAddr, name.trim(), code)
+        .then(() => console.log('[Email] ✅ Envoyé à:', emailAddr))
+        .catch(err => console.error('[Email] ❌ Erreur:', err.message, '| Code:', err.code));
+    } else {
+      console.log('[Email] ⚠️ GMAIL_USER ou GMAIL_APP_PASSWORD manquant — code:', code);
     }
 
     res.status(201).json({ needsVerification: true, email: emailAddr });
