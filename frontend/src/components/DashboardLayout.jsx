@@ -16,7 +16,7 @@ export default function DashboardLayout({ children, isAdmin = false }) {
   useEffect(() => { setOpen(false); }, []);
 
   return (
-    <div className="flex min-h-screen bg-blue-50/50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-blue-50/50 dark:bg-slate-950">
       {/* Mobile overlay */}
       {open && (
         <div
@@ -35,7 +35,7 @@ export default function DashboardLayout({ children, isAdmin = false }) {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
         <header className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-white border-b border-blue-100 shadow-sm dark:bg-slate-900 dark:border-slate-700">
           <button
