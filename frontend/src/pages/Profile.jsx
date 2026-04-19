@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -324,6 +325,21 @@ export default function Profile() {
   const [toast,  setToast]  = useState({ msg: '', type: 'success' });
   const [preview, setPreview] = useState(null); // base64 de l'image à confirmer
 
+  /* ── Push notifications ─────────────────────────────────────────────── */
+  const push = usePushNotifications();
+  const handleTogglePush = async () => {
+    if (push.subscribed) {
+      const ok = await push.unsubscribe();
+      if (ok) showToast('Notifications désactivées', 'success');
+      else showToast(push.error || 'Erreur', 'error');
+    } else {
+      const ok = await push.subscribe();
+      if (ok) showToast('Notifications activées ! 🔔', 'success');
+      else if (push.permission === 'denied') showToast('Permission refusée dans le navigateur', 'error');
+      else showToast(push.error || 'Erreur', 'error');
+    }
+  };
+
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     e.target.value = '';
@@ -570,6 +586,54 @@ export default function Profile() {
                   </div>
                 </Card>
               </motion.div>
+
+              {/* Notification card */}
+              {push.supported && (
+                <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
+                  <Card className="p-5">
+                    <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-4">Notifications</h3>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: push.subscribed
+                            ? 'linear-gradient(135deg,#2563eb,#0891b2)'
+                            : 'linear-gradient(135deg,#94a3b8,#64748b)' }}>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-700">
+                            {push.subscribed ? 'Activées' : push.permission === 'denied' ? 'Bloquées' : 'Désactivées'}
+                          </p>
+                          <p className="text-xs text-slate-400 leading-relaxed mt-0.5">
+                            {push.subscribed
+                              ? 'Rappels de streak & nouveaux cours'
+                              : push.permission === 'denied'
+                              ? 'Autorisez dans les paramètres du navigateur'
+                              : 'Recevez des rappels même hors ligne'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      {push.permission !== 'denied' && (
+                        <button
+                          onClick={handleTogglePush}
+                          disabled={push.loading}
+                          className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
+                            push.subscribed ? 'bg-blue-500' : 'bg-slate-200'
+                          } ${push.loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                            push.subscribed ? 'translate-x-5' : 'translate-x-0'
+                          }`}/>
+                        </button>
+                      )}
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
             </div>
 
             {/* ── Right column ── */}

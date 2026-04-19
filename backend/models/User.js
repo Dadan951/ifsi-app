@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema({
     date: { type: String, default: '' }
   },
   avatar: { type: String, default: '' },
+  pushSubscription: { type: mongoose.Schema.Types.Mixed, default: null },
+  pushEnabled: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -25,6 +25,7 @@ app.use('/api/sheets', require('./routes/sheets'));
 app.use('/api/drugs',   require('./routes/drugs'));
 app.use('/api/annales', require('./routes/annales'));
 app.use('/api/tickets', require('./routes/tickets'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 app.get('/', (req, res) => {
   res.json({ message: '🚀 Serveur IFSI opérationnel !' });
