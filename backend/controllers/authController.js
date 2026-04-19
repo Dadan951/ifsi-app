@@ -47,13 +47,13 @@ exports.register = async (req, res) => {
     }
 
     // Envoi de l'email (non-bloquant — ne fait pas planter l'inscription si ça échoue)
-    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    if (process.env.RESEND_API_KEY) {
       console.log('[Email] Tentative envoi vérification à:', emailAddr);
       email.sendVerificationEmail(emailAddr, name.trim(), code)
         .then(() => console.log('[Email] ✅ Envoyé à:', emailAddr))
-        .catch(err => console.error('[Email] ❌ Erreur:', err.message, '| Code:', err.code));
+        .catch(err => console.error('[Email] ❌ Erreur:', err.message));
     } else {
-      console.log('[Email] ⚠️ GMAIL_USER ou GMAIL_APP_PASSWORD manquant — code:', code);
+      console.log('[Email] ⚠️ RESEND_API_KEY manquant — code:', code);
     }
 
     res.status(201).json({ needsVerification: true, email: emailAddr });
@@ -114,7 +114,7 @@ exports.resendCode = async (req, res) => {
     }
     await user.save();
 
-    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    if (process.env.RESEND_API_KEY) {
       const send = type === 'reset'
         ? email.sendResetEmail(emailAddr, user.name, code)
         : email.sendVerificationEmail(emailAddr, user.name, code);
@@ -146,7 +146,7 @@ exports.forgotPassword = async (req, res) => {
     user.resetExpires = expires;
     await user.save();
 
-    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    if (process.env.RESEND_API_KEY) {
       email.sendResetEmail(emailAddr, user.name, code).catch(err =>
         console.error('[Email] Erreur envoi reset:', err.message)
       );

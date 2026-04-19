@@ -1,19 +1,7 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    tls: { rejectUnauthorized: false },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
 }
 
 /* ── Template HTML de base ──────────────────────────────────────────────── */
@@ -90,8 +78,8 @@ exports.sendVerificationEmail = async (to, name, code) => {
       Si tu n'as pas demandé à créer un compte, ignore cet email.
     </p>`;
 
-  await createTransporter().sendMail({
-    from: `"NursePrep" <${process.env.GMAIL_USER}>`,
+  await getResend().emails.send({
+    from: 'NursePrep <onboarding@resend.dev>',
     to,
     subject: `${code} — Ton code de vérification NursePrep`,
     html: baseTemplate('Vérification de compte', content),
@@ -113,8 +101,8 @@ exports.sendResetEmail = async (to, name, code) => {
       Si tu n'as pas fait cette demande, ton compte est en sécurité — ignore cet email.
     </p>`;
 
-  await createTransporter().sendMail({
-    from: `"NursePrep" <${process.env.GMAIL_USER}>`,
+  await getResend().emails.send({
+    from: 'NursePrep <onboarding@resend.dev>',
     to,
     subject: `${code} — Réinitialisation de mot de passe NursePrep`,
     html: baseTemplate('Réinitialisation de mot de passe', content),
