@@ -273,9 +273,9 @@ export default function Exercises() {
   // Build structure: semester → caseType → UE → exercises
   const structure = {};
   exercises.forEach(ex => {
-    const sem  = ex.semester  || 'Non classé';
-    const ct   = ex.caseType  || 'Général';
-    const ue   = ex.category  || 'Autre';
+    const sem  = (ex.semester  || 'Non classé').trim();
+    const ct   = (ex.caseType  || 'Général').trim();
+    const ue   = (ex.category  || 'Autre').trim();
     if (!structure[sem]) structure[sem] = {};
     if (!structure[sem][ct]) structure[sem][ct] = {};
     if (!structure[sem][ct][ue]) structure[sem][ct][ue] = [];

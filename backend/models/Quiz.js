@@ -15,9 +15,9 @@ const questionSchema = new mongoose.Schema({
 const quizSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true },
   description: { type: String, default: '' },
-  semester: { type: String, default: '' },
-  category: { type: String, required: true },
-  chapter: { type: String, default: '' },
+  semester: { type: String, default: '', trim: true },
+  category: { type: String, required: true, trim: true },
+  chapter:  { type: String, default: '', trim: true },
   questions: [questionSchema],
   difficulty: { type: String, enum: ['easy', 'medium', 'hard'], default: 'medium' },
   duration: { type: Number, default: 15 },

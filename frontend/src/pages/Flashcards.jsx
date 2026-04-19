@@ -133,9 +133,9 @@ export default function Flashcards() {
 
   const structure = {};
   cards.forEach(c => {
-    const sem  = c.semester  || 'Non classé';
-    const ue   = c.category  || 'Autre';
-    const chap = c.chapter   || 'Général';
+    const sem  = (c.semester  || 'Non classé').trim();
+    const ue   = (c.category  || 'Autre').trim();
+    const chap = (c.chapter   || 'Général').trim();
     if (!structure[sem]) structure[sem] = {};
     if (!structure[sem][ue]) structure[sem][ue] = {};
     if (!structure[sem][ue][chap]) structure[sem][ue][chap] = [];

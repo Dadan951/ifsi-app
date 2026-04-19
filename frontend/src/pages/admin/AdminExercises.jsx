@@ -62,7 +62,7 @@ function StatCard({ label, value, icon, gradient, delay }) {
 }
 
 /* ─── ExModal ───────────────────────────────────────────────────────────────── */
-function ExModal({ item, onClose, onSave }) {
+function ExModal({ item, onClose, onSave, existingSemesters = [], existingCategories = [] }) {
   const [form, setForm] = useState(item ? { ...item, options: item.options || [] } : EMPTY);
   const [loading, setLoading] = useState(false);
 
@@ -180,11 +180,15 @@ function ExModal({ item, onClose, onSave }) {
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Semestre</label>
                 <input
+                  list="ex-sem-list"
                   value={form.semester || ''}
                   onChange={e => setForm({ ...form, semester: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
                   placeholder="Ex: Semestre 2"
                 />
+                <datalist id="ex-sem-list">
+                  {existingSemesters.map(s => <option key={s} value={s} />)}
+                </datalist>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Type de cas</label>
@@ -202,11 +206,15 @@ function ExModal({ item, onClose, onSave }) {
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Catégorie (UE) *</label>
                 <input
+                  list="ex-cat-list"
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
                   placeholder="Ex: UE 4.4"
                 />
+                <datalist id="ex-cat-list">
+                  {existingCategories.map(c => <option key={c} value={c} />)}
+                </datalist>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Difficulté</label>
@@ -570,6 +578,8 @@ export default function AdminExercises() {
           item={modal === 'new' ? null : modal}
           onClose={() => setModal(null)}
           onSave={handleSave}
+          existingSemesters={[...new Set(items.map(x => x.semester).filter(Boolean))].sort()}
+          existingCategories={[...new Set(items.map(x => x.category).filter(Boolean))].sort()}
         />
       )}
 

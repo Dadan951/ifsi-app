@@ -46,7 +46,7 @@ const EMPTY_QUIZ = {
   questions:[{ text:'', explanation:'', options:[{text:'',isCorrect:true},{text:'',isCorrect:false},{text:'',isCorrect:false},{text:'',isCorrect:false}] }]
 };
 
-function QuizModal({ quiz, onClose, onSave }) {
+function QuizModal({ quiz, onClose, onSave, existingSemesters = [], existingCategories = [], existingChapters = [] }) {
   const [form,    setForm]    = useState(quiz ? JSON.parse(JSON.stringify(quiz)) : EMPTY_QUIZ);
   const [loading, setLoading] = useState(false);
   const [tab,     setTab]     = useState(0);
@@ -87,9 +87,21 @@ function QuizModal({ quiz, onClose, onSave }) {
           {/* General info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2"><label className={labelCls}>Titre *</label><input value={form.title} onChange={e=>setForm({...form,title:e.target.value})} className={inputCls} placeholder="Titre du quiz"/></div>
-            <div><label className={labelCls}>Semestre</label><input value={form.semester||''} onChange={e=>setForm({...form,semester:e.target.value})} className={inputCls} placeholder="Ex: Semestre 1"/></div>
-            <div><label className={labelCls}>Catégorie (UE) *</label><input value={form.category} onChange={e=>setForm({...form,category:e.target.value})} className={inputCls} placeholder="Ex: UE 2.2"/></div>
-            <div><label className={labelCls}>Chapitre</label><input value={form.chapter} onChange={e=>setForm({...form,chapter:e.target.value})} className={inputCls} placeholder="Ex: Système cardio-vasculaire"/></div>
+            <div>
+              <label className={labelCls}>Semestre</label>
+              <input list="sem-list" value={form.semester||''} onChange={e=>setForm({...form,semester:e.target.value})} className={inputCls} placeholder="Ex: Semestre 1"/>
+              <datalist id="sem-list">{existingSemesters.map(s=><option key={s} value={s}/>)}</datalist>
+            </div>
+            <div>
+              <label className={labelCls}>Catégorie (UE) *</label>
+              <input list="cat-list" value={form.category} onChange={e=>setForm({...form,category:e.target.value})} className={inputCls} placeholder="Ex: UE 2.2"/>
+              <datalist id="cat-list">{existingCategories.map(c=><option key={c} value={c}/>)}</datalist>
+            </div>
+            <div>
+              <label className={labelCls}>Chapitre</label>
+              <input list="chap-list" value={form.chapter} onChange={e=>setForm({...form,chapter:e.target.value})} className={inputCls} placeholder="Ex: Système cardio-vasculaire"/>
+              <datalist id="chap-list">{existingChapters.map(c=><option key={c} value={c}/>)}</datalist>
+            </div>
             <div><label className={labelCls}>Difficulté</label>
               <select value={form.difficulty} onChange={e=>setForm({...form,difficulty:e.target.value})} className={inputCls}>
                 <option value="easy">Facile</option><option value="medium">Moyen</option><option value="hard">Difficile</option>
@@ -277,7 +289,14 @@ export default function AdminQuizzes() {
         </div>
       </div>
 
-      <AnimatePresence>{modal   &&<QuizModal quiz={modal==='new'?null:modal} onClose={()=>setModal(null)}   onSave={handleSave}/> }</AnimatePresence>
+      <AnimatePresence>{modal && <QuizModal
+        quiz={modal==='new'?null:modal}
+        onClose={()=>setModal(null)}
+        onSave={handleSave}
+        existingSemesters={[...new Set(quizzes.map(q=>q.semester).filter(Boolean))].sort()}
+        existingCategories={[...new Set(quizzes.map(q=>q.category).filter(Boolean))].sort()}
+        existingChapters={[...new Set(quizzes.map(q=>q.chapter).filter(Boolean))].sort()}
+      />}</AnimatePresence>
       <AnimatePresence>{deleting&&<DelModal  item={deleting} label={deleting.title} onClose={()=>setDeleting(null)} onConfirm={()=>handleDelete(deleting._id)}/>}</AnimatePresence>
     </DashboardLayout>
   );

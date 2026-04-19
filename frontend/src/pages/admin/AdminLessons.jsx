@@ -80,7 +80,7 @@ function StatCard({ label, value, icon, gradient, delay }) {
 }
 
 /* ─── Lesson Modal (preserves all file upload logic) ───────────────────────── */
-function LessonModal({ lesson, onClose, onSave }) {
+function LessonModal({ lesson, onClose, onSave, existingSemesters = [], existingCategories = [], existingChapters = [] }) {
   const [form, setForm] = useState(lesson
     ? { ...lesson, tags: (lesson.tags || []).join(', ') }
     : { ...EMPTY }
@@ -213,29 +213,41 @@ function LessonModal({ lesson, onClose, onSave }) {
             <div>
               <label className={labelCls}>Semestre</label>
               <input
+                list="les-sem-list"
                 value={form.semester || ''}
                 onChange={e => set('semester', e.target.value)}
                 placeholder="Ex: Semestre 1"
                 className={inputCls}
               />
+              <datalist id="les-sem-list">
+                {existingSemesters.map(s => <option key={s} value={s} />)}
+              </datalist>
             </div>
             <div>
               <label className={labelCls}>Catégorie (UE) *</label>
               <input
+                list="les-cat-list"
                 value={form.category}
                 onChange={e => set('category', e.target.value)}
                 placeholder="Ex: UE 2.4"
                 className={inputCls}
               />
+              <datalist id="les-cat-list">
+                {existingCategories.map(c => <option key={c} value={c} />)}
+              </datalist>
             </div>
             <div>
               <label className={labelCls}>Chapitre</label>
               <input
+                list="les-chap-list"
                 value={form.chapter}
                 onChange={e => set('chapter', e.target.value)}
                 placeholder="Ex: Chapitre 3"
                 className={inputCls}
               />
+              <datalist id="les-chap-list">
+                {existingChapters.map(c => <option key={c} value={c} />)}
+              </datalist>
             </div>
             <div>
               <label className={labelCls}>Difficulté</label>
@@ -667,6 +679,9 @@ export default function AdminLessons() {
             lesson={modal === 'new' ? null : modal}
             onClose={() => setModal(null)}
             onSave={handleSave}
+            existingSemesters={[...new Set(lessons.map(x => x.semester).filter(Boolean))].sort()}
+            existingCategories={[...new Set(lessons.map(x => x.category).filter(Boolean))].sort()}
+            existingChapters={[...new Set(lessons.map(x => x.chapter).filter(Boolean))].sort()}
           />
         )}
       </AnimatePresence>

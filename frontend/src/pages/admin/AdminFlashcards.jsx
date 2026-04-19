@@ -61,7 +61,7 @@ function StatCard({ label, value, icon, gradient, delay }) {
 }
 
 /* ── Flash modal ────────────────────────────────────────────────────── */
-function FlashModal({ item, onClose, onSave }) {
+function FlashModal({ item, onClose, onSave, existingSemesters = [], existingCategories = [], existingChapters = [] }) {
   const [form, setForm] = useState(item ? { ...item } : EMPTY);
   const [loading, setLoading] = useState(false);
 
@@ -122,29 +122,41 @@ function FlashModal({ item, onClose, onSave }) {
             <div>
               <label className={labelCls}>Semestre</label>
               <input
+                list="fc-sem-list"
                 value={form.semester || ''}
                 onChange={e => setForm({ ...form, semester: e.target.value })}
                 className={inputCls}
                 placeholder="Ex: Semestre 1"
               />
+              <datalist id="fc-sem-list">
+                {existingSemesters.map(s => <option key={s} value={s} />)}
+              </datalist>
             </div>
             <div>
               <label className={labelCls}>Catégorie (UE) *</label>
               <input
+                list="fc-cat-list"
                 value={form.category}
                 onChange={e => setForm({ ...form, category: e.target.value })}
                 className={inputCls}
                 placeholder="Ex: UE 2.4"
               />
+              <datalist id="fc-cat-list">
+                {existingCategories.map(c => <option key={c} value={c} />)}
+              </datalist>
             </div>
             <div className="col-span-2">
               <label className={labelCls}>Chapitre</label>
               <input
+                list="fc-chap-list"
                 value={form.chapter || ''}
                 onChange={e => setForm({ ...form, chapter: e.target.value })}
                 className={inputCls}
                 placeholder="Ex: Troubles du rythme"
               />
+              <datalist id="fc-chap-list">
+                {existingChapters.map(c => <option key={c} value={c} />)}
+              </datalist>
             </div>
           </div>
           <div>
@@ -401,6 +413,9 @@ export default function AdminFlashcards() {
             item={modal === 'new' ? null : modal}
             onClose={() => setModal(null)}
             onSave={handleSave}
+            existingSemesters={[...new Set(items.map(x => x.semester).filter(Boolean))].sort()}
+            existingCategories={[...new Set(items.map(x => x.category).filter(Boolean))].sort()}
+            existingChapters={[...new Set(items.map(x => x.chapter).filter(Boolean))].sort()}
           />
         )}
       </AnimatePresence>

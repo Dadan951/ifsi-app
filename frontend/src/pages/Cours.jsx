@@ -177,9 +177,9 @@ function CoursTab() {
   // Build 3-level structure
   const structure = {};
   lessons.forEach(l => {
-    const sem  = l.semester  || 'Non classé';
-    const ue   = l.category  || 'Autre';
-    const chap = l.chapter   || 'Général';
+    const sem  = (l.semester  || 'Non classé').trim();
+    const ue   = (l.category  || 'Autre').trim();
+    const chap = (l.chapter   || 'Général').trim();
     if (!structure[sem]) structure[sem] = {};
     if (!structure[sem][ue]) structure[sem][ue] = {};
     if (!structure[sem][ue][chap]) structure[sem][ue][chap] = [];
@@ -528,9 +528,9 @@ function FichesTab() {
 
   const structure = {};
   fiches.forEach(f => {
-    const sem  = f.semester  || 'Non classé';
-    const ue   = f.category  || 'Autre';
-    const chap = f.chapter   || 'Général';
+    const sem  = (f.semester  || 'Non classé').trim();
+    const ue   = (f.category  || 'Autre').trim();
+    const chap = (f.chapter   || 'Général').trim();
     if (!structure[sem]) structure[sem] = {};
     if (!structure[sem][ue]) structure[sem][ue] = {};
     if (!structure[sem][ue][chap]) structure[sem][ue][chap] = [];

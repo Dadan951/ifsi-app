@@ -202,9 +202,9 @@ export default function Annales() {
   // Build structure: year → semester → subject → [annales]
   const structure = {};
   annales.forEach(a => {
-    const yr  = a.year     || 'Autre';
-    const sem = a.semester || 'Non classé';
-    const sub = a.subject  || 'Général';
+    const yr  = (a.year     || 'Autre').trim();
+    const sem = (a.semester || 'Non classé').trim();
+    const sub = (a.subject  || 'Général').trim();
     if (!structure[yr]) structure[yr] = {};
     if (!structure[yr][sem]) structure[yr][sem] = {};
     if (!structure[yr][sem][sub]) structure[yr][sem][sub] = [];

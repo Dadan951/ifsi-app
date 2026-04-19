@@ -259,9 +259,9 @@ export default function Quiz() {
 
   const structure = {};
   quizzes.forEach(q => {
-    const sem  = q.semester  || 'Non classé';
-    const ue   = q.category  || 'Autre';
-    const chap = q.chapter   || 'Général';
+    const sem  = (q.semester  || 'Non classé').trim();
+    const ue   = (q.category  || 'Autre').trim();
+    const chap = (q.chapter   || 'Général').trim();
     if (!structure[sem]) structure[sem] = {};
     if (!structure[sem][ue]) structure[sem][ue] = {};
     if (!structure[sem][ue][chap]) structure[sem][ue][chap] = [];

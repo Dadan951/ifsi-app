@@ -71,7 +71,7 @@ const EMPTY = {
 };
 
 /* ─── AnnaleModal ───────────────────────────────────────────────────────────── */
-function AnnaleModal({ annale, onClose, onSave }) {
+function AnnaleModal({ annale, onClose, onSave, existingSemesters = [], existingCategories = [] }) {
   const [form, setForm]           = useState(annale ? { ...annale } : { ...EMPTY });
   const [selectedFile, setSelectedFile] = useState(null);
   const [removeFile, setRemoveFile]     = useState(false);
@@ -164,16 +164,26 @@ function AnnaleModal({ annale, onClose, onSave }) {
             </div>
             <div>
               <label className={labelCls}>Semestre *</label>
-              <input value={form.semester} onChange={e => set('semester', e.target.value)}
+              <input
+                list="ann-sem-list"
+                value={form.semester} onChange={e => set('semester', e.target.value)}
                 placeholder="Ex: Semestre 1" className={inputCls}/>
+              <datalist id="ann-sem-list">
+                {existingSemesters.map(s => <option key={s} value={s} />)}
+              </datalist>
             </div>
           </div>
 
           {/* Subject */}
           <div>
             <label className={labelCls}>Matière / Sujet *</label>
-            <input value={form.subject} onChange={e => set('subject', e.target.value)}
+            <input
+              list="ann-cat-list"
+              value={form.subject} onChange={e => set('subject', e.target.value)}
               placeholder="Ex: UE 2.4 — Processus traumatiques" className={inputCls}/>
+            <datalist id="ann-cat-list">
+              {existingCategories.map(c => <option key={c} value={c} />)}
+            </datalist>
           </div>
 
           {/* Description */}
@@ -415,6 +425,8 @@ export default function AdminAnnales() {
             annale={modal === 'new' ? null : modal}
             onClose={() => setModal(null)}
             onSave={handleSave}
+            existingSemesters={[...new Set(items.map(x => x.semester).filter(Boolean))].sort()}
+            existingCategories={[...new Set(items.map(x => x.subject).filter(Boolean))].sort()}
           />
         )}
       </AnimatePresence>
