@@ -46,9 +46,11 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Envoi de l'email (si configuré)
+    // Envoi de l'email (non-bloquant — ne fait pas planter l'inscription si ça échoue)
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-      await email.sendVerificationEmail(emailAddr, name.trim(), code);
+      email.sendVerificationEmail(emailAddr, name.trim(), code).catch(err =>
+        console.error('[Email] Erreur envoi vérification:', err.message)
+      );
     }
 
     res.status(201).json({ needsVerification: true, email: emailAddr });
@@ -110,8 +112,10 @@ exports.resendCode = async (req, res) => {
     await user.save();
 
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-      if (type === 'reset') await email.sendResetEmail(emailAddr, user.name, code);
-      else await email.sendVerificationEmail(emailAddr, user.name, code);
+      const send = type === 'reset'
+        ? email.sendResetEmail(emailAddr, user.name, code)
+        : email.sendVerificationEmail(emailAddr, user.name, code);
+      send.catch(err => console.error('[Email] Erreur renvoi code:', err.message));
     }
 
     res.json({ message: 'Code renvoyé' });
@@ -140,7 +144,9 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-      await email.sendResetEmail(emailAddr, user.name, code);
+      email.sendResetEmail(emailAddr, user.name, code).catch(err =>
+        console.error('[Email] Erreur envoi reset:', err.message)
+      );
     }
 
     res.json({ message: 'Si cet email existe, un code a été envoyé' });
