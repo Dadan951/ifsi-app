@@ -490,7 +490,7 @@ export default function Quiz() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {currentQuizzes.map((quiz, i) => (
                       <motion.div key={quiz._id}
-                        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}
                         whileHover={{ y: -4 }}
                         className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-100 transition-all cursor-pointer group"
                         onClick={() => navigate(`/dashboard/quiz/${quiz._id}`)}

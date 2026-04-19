@@ -437,7 +437,7 @@ export default function Annales() {
                       const fileLabel = FILE_TYPE_LABEL[annale.fileMimeType];
                       return (
                         <motion.div key={annale._id}
-                          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}
                           className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-100 transition-all group">
                           {/* Top gradient band */}
                           <div className="h-1.5" style={{ background: `linear-gradient(90deg,${yearPalette.from},${yearPalette.to})` }}/>

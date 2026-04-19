@@ -374,7 +374,7 @@ function CoursTab() {
               return (
                 <motion.button key={lesson._id}
                   onClick={() => openLesson(lesson)}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}
                   whileHover={{ y: -4 }} whileTap={{ y: 0 }}
                   className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:shadow-blue-100 transition-all text-left group relative">
                   {fetching && <div className="absolute inset-0 rounded-2xl bg-white/80 flex items-center justify-center z-10"><div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"/></div>}
