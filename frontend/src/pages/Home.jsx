@@ -306,7 +306,7 @@ export default function Home() {
       <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'py-2.5 shadow-lg shadow-blue-100/60 bg-white/96 backdrop-blur-md border-b border-blue-100' : 'py-4 bg-white/90 backdrop-blur-sm'}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center gap-6">
           <Link to="/" className="flex-shrink-0">
-            <NursesLogo size="sm" />
+            <img src="/logo512.png" alt="NursePrep" className="h-9 w-9 rounded-xl object-cover" />
           </Link>
 
           {/* Desktop nav */}
@@ -818,14 +818,19 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Légal</h4>
-                {['CGU', 'RGPD', 'Mentions légales', 'Contact'].map(l => (
-                  <a key={l} href="#" className="block text-xs text-slate-500 hover:text-white mb-2.5 transition">{l}</a>
+                {[
+                  { label: 'CGU', href: '/cgu' },
+                  { label: 'RGPD', href: '/rgpd' },
+                  { label: 'Mentions légales', href: '/mentions-legales' },
+                  { label: 'Contact', href: 'mailto:contact@nursesprep.fr' },
+                ].map(l => (
+                  <a key={l.label} href={l.href} className="block text-xs text-slate-500 hover:text-white mb-2.5 transition">{l.label}</a>
                 ))}
               </div>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between gap-2">
-            <p className="text-xs text-slate-600">© 2025 Nurses Prép — Tous droits réservés</p>
+            <p className="text-xs text-slate-600">© 2026 Nurses Prép — Tous droits réservés</p>
             <p className="text-xs text-slate-600">Made with care for IFSI students — France</p>
           </div>
         </div>
