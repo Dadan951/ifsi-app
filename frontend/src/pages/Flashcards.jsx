@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
@@ -15,9 +15,6 @@ const PALETTE = [
   { from: '#0f766e', to: '#0891b2', emoji: '🔬' },
   { from: '#be185d', to: '#9333ea', emoji: '📋' },
 ];
-
-const diffColors = { easy: 'bg-emerald-100 text-emerald-700', medium: 'bg-amber-100 text-amber-700', hard: 'bg-red-100 text-red-700' };
-const diffLabel  = { easy: 'Facile', medium: 'Moyen', hard: 'Difficile' };
 
 function ChevronRight({ className = '' }) {
   return (
@@ -43,85 +40,343 @@ function Breadcrumb({ items }) {
   );
 }
 
-/* ─── Flash Card (3D flip) ───────────────────────────────────────────────────── */
-function FlashCard({ card, idx, onReviewed }) {
-  const [flipped, setFlipped]   = useState(false);
-  const [reviewed, setReviewed] = useState(false);
-  const pal = PALETTE[idx % PALETTE.length];
+/* ─── Swipe Card ────────────────────────────────────────────────────────────── */
+function SwipeCard({ card, isTop, stackOffset, onSwipe, palette, swipeTrigger }) {
+  const [flipped, setFlipped] = useState(false);
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-180, 180], [-22, 22]);
+  const rightOpacity = useTransform(x, [0, 80], [0, 1]);
+  const leftOpacity  = useTransform(x, [-80, 0], [1, 0]);
+  const cardOpacity  = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
+  const swipingRef = useRef(false);
 
-  const handleReview = async (e) => {
-    e.stopPropagation();
-    if (reviewed) return;
-    setReviewed(true);
-    try {
-      await axios.post(`${API_URL}/flashcards/reviewed`);
-      onReviewed();
-    } catch {}
+  /* Trigger swipe from buttons */
+  useEffect(() => {
+    if (!swipeTrigger || !isTop || swipingRef.current) return;
+    if (!flipped) return;
+    swipingRef.current = true;
+    const target = swipeTrigger === 'right' ? 350 : -350;
+    animate(x, target, { duration: 0.35, ease: 'easeIn' }).then(() => {
+      onSwipe(swipeTrigger);
+    });
+  }, [swipeTrigger]); // eslint-disable-line
+
+  const handleDragEnd = (_, info) => {
+    if (!flipped || swipingRef.current) return;
+    const threshold = 100;
+    if (info.offset.x > threshold) {
+      swipingRef.current = true;
+      animate(x, 350, { duration: 0.3, ease: 'easeIn' }).then(() => onSwipe('right'));
+    } else if (info.offset.x < -threshold) {
+      swipingRef.current = true;
+      animate(x, -350, { duration: 0.3, ease: 'easeIn' }).then(() => onSwipe('left'));
+    } else {
+      animate(x, 0, { type: 'spring', stiffness: 300, damping: 25 });
+    }
   };
+
+  if (!isTop) {
+    return (
+      <div
+        className="absolute inset-0 rounded-3xl bg-white border border-slate-200"
+        style={{
+          transform: `translateY(${stackOffset * -10}px) scale(${1 - stackOffset * 0.06})`,
+          zIndex: 10 - stackOffset,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        }}
+      />
+    );
+  }
 
   return (
     <motion.div
-      className="cursor-pointer"
-      style={{ perspective: '1000px', height: 220 }}
-      whileHover={{ scale: 1.02 }}
-      onClick={() => setFlipped(f => !f)}
+      className="absolute inset-0 rounded-3xl cursor-pointer select-none"
+      style={{ x, rotate, opacity: cardOpacity, zIndex: 20 }}
+      drag={flipped ? 'x' : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.7}
+      onDragEnd={handleDragEnd}
+      onClick={() => { if (!flipped && !swipingRef.current) setFlipped(true); }}
     >
+      {/* 3D flip inner */}
       <div
-        className="relative w-full h-full transition-all duration-500"
-        style={{ transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+        className="w-full h-full relative"
+        style={{
+          transformStyle: 'preserve-3d',
+          transition: 'transform 0.55s cubic-bezier(.4,0,.2,1)',
+          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        }}
       >
-        {/* Front */}
-        <div className="absolute inset-0 rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md flex flex-col"
+        {/* ── FRONT ── */}
+        <div className="absolute inset-0 rounded-3xl bg-white border border-slate-200 shadow-xl flex flex-col overflow-hidden"
           style={{ backfaceVisibility: 'hidden' }}>
-          <div className="h-1.5 flex-shrink-0" style={{ background: `linear-gradient(90deg,${pal.from},${pal.to})` }}/>
-          <div className="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-white"
-              style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
+          <div className="h-1.5 flex-shrink-0" style={{ background: `linear-gradient(90deg,${palette.from},${palette.to})` }}/>
+          <div className="flex items-center justify-between px-5 pt-4 pb-2 flex-shrink-0">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full text-white"
+              style={{ background: `linear-gradient(135deg,${palette.from},${palette.to})` }}>
               {card.category}
             </span>
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${diffColors[card.difficulty]}`}>
-              {diffLabel[card.difficulty]}
-            </span>
+            <span className="text-3xl">{palette.emoji}</span>
           </div>
-          <div className="flex-1 flex items-center justify-center px-5 py-2">
-            <p className="text-sm font-bold text-slate-800 text-center leading-relaxed">{card.front}</p>
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-4">
+            <p className="text-lg font-bold text-slate-800 text-center leading-relaxed">{card.front}</p>
           </div>
-          <p className="text-xs text-slate-400 text-center pb-3 flex-shrink-0">Cliquer pour retourner →</p>
+          <div className="flex items-center justify-center gap-2 pb-5 flex-shrink-0">
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: palette.from }}/>
+            <p className="text-xs text-slate-400 font-medium">Toucher pour révéler la réponse</p>
+          </div>
         </div>
 
-        {/* Back */}
-        <div className="absolute inset-0 rounded-2xl overflow-hidden flex flex-col"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-2 right-2 w-24 h-24 rounded-full bg-white blur-2xl"/>
+        {/* ── BACK ── */}
+        <div className="absolute inset-0 rounded-3xl flex flex-col overflow-hidden"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: `linear-gradient(135deg,${palette.from},${palette.to})`,
+          }}>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10 blur-3xl"/>
+            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-black/10 blur-3xl"/>
           </div>
-          <div className="flex-1 flex items-center justify-center px-5 py-4 relative">
-            <p className="text-sm text-white text-center leading-relaxed whitespace-pre-line font-medium">{card.back}</p>
+          <div className="flex items-center justify-between px-5 pt-4 pb-2 flex-shrink-0 relative">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/20 text-white">Réponse</span>
+            <span className="text-3xl">{palette.emoji}</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center px-6 py-4 relative">
+            <p className="text-base text-white text-center leading-relaxed font-semibold whitespace-pre-line">{card.back}</p>
           </div>
           {card.hint && (
-            <p className="text-xs text-white/70 text-center px-4 mb-2 italic">💡 {card.hint}</p>
+            <p className="text-xs text-white/70 text-center px-5 pb-2 italic relative">💡 {card.hint}</p>
           )}
-          {!reviewed ? (
-            <button onClick={handleReview}
-              className="mx-4 mb-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition border border-white/20">
-              ✓ Marquer comme révisée
-            </button>
-          ) : (
-            <div className="mx-4 mb-4 py-2 bg-white/10 text-white/80 rounded-xl text-xs font-bold text-center border border-white/10">
-              ✓ Révisée
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-2 pb-5 flex-shrink-0 relative">
+            <p className="text-xs text-white/70 font-medium">Swipe ← ou → pour continuer</p>
+          </div>
         </div>
+      </div>
+
+      {/* ── Indicateurs swipe ── */}
+      <motion.div
+        className="absolute inset-0 rounded-3xl flex items-center justify-start pl-8 pointer-events-none"
+        style={{ opacity: rightOpacity, background: 'rgba(34,197,94,0.15)', border: '3px solid #22c55e' }}>
+        <span className="text-5xl font-black text-green-500" style={{ transform: 'rotate(12deg)' }}>✓</span>
+      </motion.div>
+      <motion.div
+        className="absolute inset-0 rounded-3xl flex items-center justify-end pr-8 pointer-events-none"
+        style={{ opacity: leftOpacity, background: 'rgba(239,68,68,0.15)', border: '3px solid #ef4444' }}>
+        <span className="text-5xl font-black text-red-500" style={{ transform: 'rotate(-12deg)' }}>✗</span>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── Result Screen ─────────────────────────────────────────────────────────── */
+function ResultScreen({ known, unknown, total, onRestart, onExit }) {
+  const pct = Math.round((known / total) * 100);
+  const stars = pct >= 80 ? 3 : pct >= 50 ? 2 : 1;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center py-8 px-4 text-center"
+    >
+      <div className="text-6xl mb-4">
+        {pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚'}
+      </div>
+      <div className="flex gap-1 mb-4">
+        {[1,2,3].map(i => (
+          <span key={i} className="text-3xl" style={{ filter: i <= stars ? 'none' : 'grayscale(1) opacity(0.3)' }}>⭐</span>
+        ))}
+      </div>
+      <h2 className="text-2xl font-bold text-slate-800 mb-1">
+        {pct >= 80 ? 'Excellent !' : pct >= 50 ? 'Bien joué !' : 'Continue à réviser !'}
+      </h2>
+      <p className="text-slate-400 text-sm mb-8">{total} cartes passées en revue</p>
+
+      <div className="flex gap-4 mb-8 w-full max-w-xs">
+        <div className="flex-1 bg-green-50 border border-green-200 rounded-2xl py-4 flex flex-col items-center">
+          <span className="text-3xl font-bold text-green-600">{known}</span>
+          <span className="text-xs text-green-500 font-medium mt-1">✓ Sus</span>
+        </div>
+        <div className="flex-1 bg-red-50 border border-red-200 rounded-2xl py-4 flex flex-col items-center">
+          <span className="text-3xl font-bold text-red-500">{unknown}</span>
+          <span className="text-xs text-red-400 font-medium mt-1">✗ À retravailler</span>
+        </div>
+        <div className="flex-1 bg-blue-50 border border-blue-200 rounded-2xl py-4 flex flex-col items-center">
+          <span className="text-3xl font-bold text-blue-600">{pct}%</span>
+          <span className="text-xs text-blue-400 font-medium mt-1">Score</span>
+        </div>
+      </div>
+
+      {/* Score bar */}
+      <div className="w-full max-w-xs mb-8">
+        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+            className="h-3 rounded-full"
+            style={{ background: pct >= 80 ? 'linear-gradient(90deg,#22c55e,#16a34a)' : pct >= 50 ? 'linear-gradient(90deg,#f59e0b,#d97706)' : 'linear-gradient(90deg,#ef4444,#dc2626)' }}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-3 w-full max-w-xs">
+        <button onClick={onRestart}
+          className="flex-1 py-3 rounded-2xl text-sm font-bold text-white transition hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg,#164e8a,#0891b2)', boxShadow: '0 4px 14px rgba(8,145,178,0.35)' }}>
+          🔄 Recommencer
+        </button>
+        <button onClick={onExit}
+          className="flex-1 py-3 rounded-2xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition hover:-translate-y-0.5">
+          ← Retour
+        </button>
       </div>
     </motion.div>
   );
 }
 
+/* ─── Swipe Game ────────────────────────────────────────────────────────────── */
+function SwipeGame({ cards, onExit, onReviewed }) {
+  const total = cards.length;
+  const [stack, setStack] = useState(() => [...cards].reverse());
+  const [known, setKnown]   = useState(0);
+  const [unknown, setUnknown] = useState(0);
+  const [done, setDone]     = useState(false);
+  const [swipeTrigger, setSwipeTrigger] = useState(null);
+  const triggerRef = useRef(null);
+
+  const done_count = total - stack.length;
+  const progress = (done_count / total) * 100;
+
+  const handleSwipe = useCallback((dir) => {
+    setSwipeTrigger(null);
+    if (dir === 'right') {
+      setKnown(k => k + 1);
+      axios.post(`${API_URL}/flashcards/reviewed`).catch(() => {});
+      onReviewed();
+    } else {
+      setUnknown(u => u + 1);
+    }
+    setStack(s => {
+      const next = s.slice(0, -1);
+      if (next.length === 0) setDone(true);
+      return next;
+    });
+  }, [onReviewed]);
+
+  const triggerSwipe = (dir) => {
+    setSwipeTrigger(dir);
+    // reset after a tick so it can trigger again
+    triggerRef.current = setTimeout(() => setSwipeTrigger(null), 600);
+  };
+
+  useEffect(() => () => clearTimeout(triggerRef.current), []);
+
+  const handleRestart = () => {
+    setStack([...cards].reverse());
+    setKnown(0);
+    setUnknown(0);
+    setDone(false);
+    setSwipeTrigger(null);
+  };
+
+  if (done) {
+    return <ResultScreen known={known} unknown={unknown} total={total} onRestart={handleRestart} onExit={onExit} />;
+  }
+
+  const topCard = stack[stack.length - 1];
+  const visibleStack = stack.slice(-3);
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Progress */}
+      <div className="w-full max-w-sm mb-3">
+        <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+          <span className="font-medium">{done_count} / {total} cartes</span>
+          <span>{Math.round(progress)}%</span>
+        </div>
+        <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
+          <motion.div
+            className="h-2.5 rounded-full"
+            style={{ background: 'linear-gradient(90deg,#164e8a,#0891b2)' }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4 }}
+          />
+        </div>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs font-bold text-red-400">✗ {unknown}</span>
+          <span className="text-xs font-bold text-green-500">✓ {known}</span>
+        </div>
+      </div>
+
+      {/* Hint */}
+      <p className="text-xs text-slate-400 mb-5 text-center">
+        👆 Touche pour retourner · <span className="text-red-400 font-bold">←</span> Je ne savais pas · <span className="text-green-500 font-bold">→</span> Je savais !
+      </p>
+
+      {/* Card Stack */}
+      <div className="relative w-full max-w-sm" style={{ height: 380 }}>
+        <AnimatePresence>
+          {visibleStack.map((card, i) => {
+            const isTop = card._id === topCard._id;
+            const offset = visibleStack.length - 1 - i;
+            return (
+              <SwipeCard
+                key={card._id + '-' + stack.length}
+                card={card}
+                isTop={isTop}
+                stackOffset={offset}
+                onSwipe={handleSwipe}
+                palette={PALETTE[cards.indexOf(card) % PALETTE.length]}
+                swipeTrigger={isTop ? swipeTrigger : null}
+              />
+            );
+          })}
+        </AnimatePresence>
+
+        {stack.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-slate-400 text-sm">Chargement...</p>
+          </div>
+        )}
+      </div>
+
+      {/* Buttons */}
+      <div className="flex items-center gap-8 mt-10">
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }}
+          onClick={() => triggerSwipe('left')}
+          className="w-16 h-16 rounded-full bg-red-100 hover:bg-red-200 text-red-500 flex items-center justify-center text-2xl shadow-md hover:shadow-lg transition-colors"
+        >
+          ✗
+        </motion.button>
+
+        <div className="text-center">
+          <p className="text-xs text-slate-400 font-medium">{stack.length} restante{stack.length > 1 ? 's' : ''}</p>
+        </div>
+
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }}
+          onClick={() => triggerSwipe('right')}
+          className="w-16 h-16 rounded-full bg-green-100 hover:bg-green-200 text-green-600 flex items-center justify-center text-2xl shadow-md hover:shadow-lg transition-colors"
+        >
+          ✓
+        </motion.button>
+      </div>
+
+      <p className="text-xs text-slate-300 mt-4">Retourne la carte avant de swiper</p>
+    </div>
+  );
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────────────── */
 export default function Flashcards() {
-  const [cards, setCards]             = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [view, setView]                 = useState('semesters');
+  const [cards, setCards]           = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [view, setView]             = useState('semesters');
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedUE, setSelectedUE]             = useState(null);
   const [selectedChapter, setSelectedChapter]   = useState(null);
@@ -142,14 +397,14 @@ export default function Flashcards() {
     structure[sem][ue][chap].push(c);
   });
 
-  const semesters   = Object.keys(structure).sort();
-  const ues         = selectedSemester ? Object.keys(structure[selectedSemester] || {}).sort() : [];
-  const chapters    = (selectedSemester && selectedUE) ? Object.keys(structure[selectedSemester]?.[selectedUE] || {}).sort() : [];
+  const semesters    = Object.keys(structure).sort();
+  const ues          = selectedSemester ? Object.keys(structure[selectedSemester] || {}).sort() : [];
+  const chapters     = (selectedSemester && selectedUE) ? Object.keys(structure[selectedSemester]?.[selectedUE] || {}).sort() : [];
   const currentCards = (selectedSemester && selectedUE && selectedChapter)
     ? (structure[selectedSemester]?.[selectedUE]?.[selectedChapter] || []) : [];
-  const totalInUE   = (selectedSemester && selectedUE)
+  const totalInUE    = (selectedSemester && selectedUE)
     ? Object.values(structure[selectedSemester]?.[selectedUE] || {}).flat().length : 0;
-  const totalCards  = cards.length;
+  const totalCards   = cards.length;
 
   if (loading) return (
     <DashboardLayout>
@@ -187,24 +442,6 @@ export default function Flashcards() {
               )}
             </div>
           </div>
-
-          {/* Progress bar for session */}
-          {reviewedCount > 0 && (
-            <div className="mb-4">
-              <div className="flex justify-between text-xs text-blue-300/70 mb-1.5">
-                <span>Progression de la session</span>
-                <span>{reviewedCount} / {totalCards} cartes</span>
-              </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((reviewedCount / totalCards) * 100, 100)}%` }}
-                  className="h-2 rounded-full"
-                  style={{ background: 'linear-gradient(90deg,#34d399,#10b981)' }}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* ── Content ── */}
@@ -345,10 +582,10 @@ export default function Flashcards() {
               </motion.div>
             )}
 
-            {/* CARDS */}
+            {/* SWIPE GAME */}
             {view === 'cards' && selectedSemester && selectedUE && selectedChapter && (
               <motion.div key="cards-view"
-                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}>
                 <Breadcrumb items={[
                   { label: 'Flashcards', onClick: () => { setSelectedSemester(null); setSelectedUE(null); setSelectedChapter(null); setView('semesters'); } },
@@ -356,36 +593,15 @@ export default function Flashcards() {
                   { label: selectedUE, onClick: () => { setSelectedChapter(null); setView('chapters'); } },
                   { label: selectedChapter }
                 ]}/>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-800">{selectedChapter}</h2>
-                    <p className="text-sm text-slate-400 mt-0.5">{currentCards.length} carte{currentCards.length > 1 ? 's' : ''}</p>
-                  </div>
-                  {reviewedCount > 0 && (
-                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl text-xs font-bold">
-                      ✓ {reviewedCount} révisée{reviewedCount > 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-
-                <div className="bg-blue-50/70 border border-blue-200 rounded-2xl px-4 py-3 mb-6 flex items-center gap-3">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
-                  </svg>
-                  <p className="text-xs text-blue-600 font-medium">Cliquez sur une carte pour la retourner et voir la réponse.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {currentCards.map((card, i) => (
-                    <motion.div key={card._id}
-                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                      transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}>
-                      <FlashCard card={card} idx={i} onReviewed={() => setReviewedCount(c => c + 1)}/>
-                    </motion.div>
-                  ))}
-                </div>
+                <SwipeGame
+                  key={selectedChapter}
+                  cards={currentCards}
+                  onExit={() => setView('chapters')}
+                  onReviewed={() => setReviewedCount(c => c + 1)}
+                />
               </motion.div>
             )}
+
           </AnimatePresence>
         </div>
       </div>
