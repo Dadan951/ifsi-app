@@ -452,7 +452,8 @@ export default function Quiz() {
                           onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
                           whileHover={{ y: -3 }}
                           whileTap={{ scale: 0.98 }}
-                          className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all text-left group flex items-center gap-4 shadow-sm"
+                          style={{ willChange: 'transform' }}
+                          className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-shadow transition-colors text-left group flex items-center gap-4 shadow-sm"
                         >
                           <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                             style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
