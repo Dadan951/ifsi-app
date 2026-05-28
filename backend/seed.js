@@ -7,12 +7,8 @@ const Exercise = require('./models/Exercise');
 const Lesson = require('./models/Lesson');
 
 async function seed() {
-  // Admin user
-  const adminExists = await User.findOne({ email: 'admin@ifsi.fr' });
-  if (!adminExists) {
-    await User.create({ name: 'Administrateur', email: 'admin@ifsi.fr', password: 'Admin1234!', role: 'admin' });
-    console.log('✅ Admin créé : admin@ifsi.fr / Admin1234!');
-  }
+  // ⚠️ Compte admin par défaut supprimé pour raison de sécurité.
+  // Le compte admin doit être créé manuellement via /admin/users.
 
   // Sample quizzes
   const quizCount = await Quiz.countDocuments();

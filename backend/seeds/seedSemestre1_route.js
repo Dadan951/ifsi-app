@@ -4,6 +4,7 @@
  * (protégée par adminOnly — appel unique puis à supprimer)
  */
 const Quiz   = require('../models/Quiz');
+const User   = require('../models/User');
 const part1  = require('./quizSemestre1_part1');
 const part2  = require('./quizSemestre1_part2');
 const part3  = require('./quizSemestre1_part3');
@@ -14,6 +15,9 @@ const ALL_QUIZZES = [...part1, ...part2, ...part3, ...part4, ...part5];
 
 module.exports = async (req, res) => {
   try {
+    // Supprimer l'ancien compte admin par défaut (sécurité)
+    const oldAdmin = await User.findOneAndDelete({ email: 'admin@ifsi.fr' });
+
     const deleted = await Quiz.deleteMany({ semester: 'Semestre 1', isPersonal: false });
 
     const inserted = await Quiz.insertMany(ALL_QUIZZES);
@@ -27,6 +31,7 @@ module.exports = async (req, res) => {
 
     res.json({
       success: true,
+      oldAdminDeleted: !!oldAdmin,
       deleted: deleted.deletedCount,
       inserted: inserted.length,
       totalQuestions,
