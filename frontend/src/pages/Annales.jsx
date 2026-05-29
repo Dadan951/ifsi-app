@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
+import { getCache, setCache } from '../utils/cache';
 
 /* ─── Palette ───────────────────────────────────────────────────────────────── */
 const PALETTE = [
@@ -196,7 +197,11 @@ export default function Annales() {
   const [selectedSubject, setSelectedSubject]   = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_URL}/annales`).then(r => setAnnales(r.data)).finally(() => setLoading(false));
+    const cached = getCache('annales_list');
+    if (cached) { setAnnales(cached); setLoading(false); }
+    axios.get(`${API_URL}/annales`).then(r => {
+      setAnnales(r.data); setCache('annales_list', r.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   // Build structure: year → semester → subject → [annales]

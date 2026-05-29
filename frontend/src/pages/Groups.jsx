@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
+import { getCache, setCache } from '../utils/cache';
 
 /* ─── Create group modal ─────────────────────────────────────────────────── */
 function CreateGroupModal({ onClose, onCreate }) {
@@ -228,10 +229,14 @@ export default function Groups() {
   const [search,         setSearch]         = useState('');
   const [filter,         setFilter]         = useState('all'); // all | mine
 
-  const load = async () => {
+  const load = async (force = false) => {
+    if (!force) {
+      const cached = getCache('groups_list');
+      if (cached) { setGroups(cached); setLoading(false); }
+    }
     try {
       const { data } = await axios.get(`${API_URL}/groups`);
-      setGroups(data);
+      setGroups(data); setCache('groups_list', data);
     } catch {}
     setLoading(false);
   };

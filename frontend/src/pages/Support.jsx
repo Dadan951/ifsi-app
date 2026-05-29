@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
+import { getCache, setCache } from '../utils/cache';
 
 /* ─── Config ────────────────────────────────────────────────────────────────── */
 const STATUS_CFG = {
@@ -105,8 +106,12 @@ export default function Support() {
 
   /* ── Data ── */
   const loadTickets = async () => {
-    try { const r = await axios.get(`${API_URL}/tickets/my`, { headers }); setTickets(r.data); }
-    catch(e) {}
+    const cached = getCache('tickets_list');
+    if (cached) { setTickets(cached); setLoading(false); }
+    try {
+      const r = await axios.get(`${API_URL}/tickets/my`, { headers });
+      setTickets(r.data); setCache('tickets_list', r.data);
+    } catch(e) {}
     setLoading(false);
   };
 

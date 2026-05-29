@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
+import { getCache, setCache } from '../utils/cache';
 import { API_URL, useAuth } from '../context/AuthContext';
 
 const TYPE_CONFIG = {
@@ -265,7 +266,11 @@ export default function Exercises() {
 
   useEffect(() => {
     if (isFree) { setLoading(false); return; }
-    axios.get(`${API_URL}/exercises`).then(r => setExercises(r.data)).finally(() => setLoading(false));
+    const cached = getCache('exercises_list');
+    if (cached) { setExercises(cached); setLoading(false); }
+    axios.get(`${API_URL}/exercises`).then(r => {
+      setExercises(r.data); setCache('exercises_list', r.data);
+    }).finally(() => setLoading(false));
   }, [isFree]);
 
   if (isFree) return <UpgradeWall/>;

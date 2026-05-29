@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL, useAuth } from '../context/AuthContext';
+import { getCache, setCache } from '../utils/cache';
 
 /* ─── Helpers ────────────────────────────────────────────────────────────────── */
 const DIFF_COLORS = { easy: 'bg-emerald-100 text-emerald-700', medium: 'bg-amber-100 text-amber-700', hard: 'bg-red-100 text-red-700' };
@@ -171,7 +172,11 @@ function CoursTab() {
   const [selectedChapter, setSelectedChapter]   = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_URL}/lessons?type=cours`).then(r => setLessons(r.data)).finally(() => setLoading(false));
+    const cached = getCache('lessons_cours');
+    if (cached) { setLessons(cached); setLoading(false); }
+    axios.get(`${API_URL}/lessons?type=cours`).then(r => {
+      setLessons(r.data); setCache('lessons_cours', r.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   // Build 3-level structure
@@ -523,7 +528,11 @@ function FichesTab() {
   const [selectedChapter, setSelectedChapter]   = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_URL}/lessons?type=fiche`).then(r => setFiches(r.data)).finally(() => setLoading(false));
+    const cached = getCache('lessons_fiches');
+    if (cached) { setFiches(cached); setLoading(false); }
+    axios.get(`${API_URL}/lessons?type=fiche`).then(r => {
+      setFiches(r.data); setCache('lessons_fiches', r.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   const structure = {};
@@ -843,8 +852,12 @@ function FichesPersoTab({ isPro }) {
 
   useEffect(() => {
     if (!isPro) { setFilesLoading(false); setSheetsLoading(false); return; }
-    axios.get(`${API_URL}/files`).then(r => setFiles(r.data)).finally(() => setFilesLoading(false));
-    axios.get(`${API_URL}/sheets`).then(r => setSheets(r.data)).finally(() => setSheetsLoading(false));
+    const cachedFiles  = getCache('user_files');
+    const cachedSheets = getCache('user_sheets');
+    if (cachedFiles)  { setFiles(cachedFiles);   setFilesLoading(false); }
+    if (cachedSheets) { setSheets(cachedSheets); setSheetsLoading(false); }
+    axios.get(`${API_URL}/files`).then(r => { setFiles(r.data);  setCache('user_files', r.data);  }).finally(() => setFilesLoading(false));
+    axios.get(`${API_URL}/sheets`).then(r => { setSheets(r.data); setCache('user_sheets', r.data); }).finally(() => setSheetsLoading(false));
     axios.get(`${API_URL}/sheets/gen-status`).then(r => setStatus(r.data)).catch(() => {});
   }, [isPro]);
 
