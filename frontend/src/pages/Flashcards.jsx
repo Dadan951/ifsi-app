@@ -82,7 +82,7 @@ function FlashCard({ card, palette, flipped, onFlip }) {
         <div className="absolute inset-0 rounded-3xl bg-white border border-blue-100 shadow-xl shadow-blue-100 p-6 flex flex-col"
           style={{ backfaceVisibility: 'hidden' }}>
           <div className="flex items-center justify-between mb-3 flex-shrink-0">
-            <span className="text-xs font-semibold px-3 py-1 rounded-full text-white"
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white leading-tight w-fit max-w-[75%] break-words"
               style={{ background: `linear-gradient(135deg,${palette.from},${palette.to})` }}>
               {card.category}
             </span>
@@ -115,7 +115,6 @@ function FlashCard({ card, palette, flipped, onFlip }) {
           <div
             ref={backRef}
             onScroll={handleScroll}
-            onClick={e => e.stopPropagation()}
             className="flex-1 overflow-y-auto flex flex-col"
           >
             <div className="my-auto py-1">
