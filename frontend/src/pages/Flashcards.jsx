@@ -111,17 +111,19 @@ function FlashCard({ card, palette, flipped, onFlip }) {
             <span className="text-xl">{palette.emoji}</span>
           </div>
 
-          {/* Réponse : commence toujours par le début, scroll si long */}
+          {/* Réponse : centrée si courte, scrollable depuis le début si longue */}
           <div
             ref={backRef}
             onScroll={handleScroll}
-            onClick={e => e.stopPropagation()} /* scroll sans retourner la carte */
-            className="flex-1 overflow-y-auto relative"
+            onClick={e => e.stopPropagation()}
+            className="flex-1 overflow-y-auto flex flex-col"
           >
-            <p className="text-sm font-semibold text-white text-center leading-relaxed whitespace-pre-line pb-1">
-              {card.back}
-            </p>
-            {card.hint && <p className="text-xs text-white/70 text-center mt-3 italic">💡 {card.hint}</p>}
+            <div className="my-auto py-1">
+              <p className="text-sm font-semibold text-white text-center leading-relaxed whitespace-pre-line">
+                {card.back}
+              </p>
+              {card.hint && <p className="text-xs text-white/70 text-center mt-3 italic">💡 {card.hint}</p>}
+            </div>
           </div>
 
           {/* Indicateur "↓ Défiler" — visible tant qu'on n'a pas atteint le bas */}
