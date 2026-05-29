@@ -1,5 +1,6 @@
-const Flashcard = require('../models/Flashcard');
-const User = require('../models/User');
+const Flashcard        = require('../models/Flashcard');
+const User             = require('../models/User');
+const FlashcardAttempt = require('../models/FlashcardAttempt');
 
 exports.getAll = async (req, res) => {
   try {
@@ -56,6 +57,71 @@ exports.markReviewed = async (req, res) => {
       $set: { 'progress.lastActivity': new Date() }
     });
     res.json({ message: 'Progression mise à jour' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── GET /api/flashcards/attempts ─────────────────────────────────────────
+// Tous les attempts de l'utilisateur (pour afficher les badges sur les chapitres)
+exports.getAttempts = async (req, res) => {
+  try {
+    const attempts = await FlashcardAttempt.find({ user: req.user._id });
+    res.json(attempts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── GET /api/flashcards/attempt?semester=&ue=&chapter= ────────────────────
+// Attempt pour un chapitre précis
+exports.getAttempt = async (req, res) => {
+  try {
+    const { semester, ue, chapter } = req.query;
+    const attempt = await FlashcardAttempt.findOne({
+      user: req.user._id, semester, ue, chapter
+    });
+    res.json(attempt || null);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── PUT /api/flashcards/attempt ───────────────────────────────────────────
+// Sauvegarde la progression (après chaque carte)
+exports.saveAttempt = async (req, res) => {
+  try {
+    const { semester, ue, chapter, currentIndex, known, unknown, total, unknownCards } = req.body;
+    const attempt = await FlashcardAttempt.findOneAndUpdate(
+      { user: req.user._id, semester, ue, chapter },
+      { $set: { currentIndex, known, unknown, total, unknownCards, status: 'in_progress' } },
+      { upsert: true, new: true }
+    );
+    res.json(attempt);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── POST /api/flashcards/attempt/complete ─────────────────────────────────
+// Marque le chapitre comme terminé
+exports.completeAttempt = async (req, res) => {
+  try {
+    const { semester, ue, chapter, known, unknown, total, unknownCards } = req.body;
+
+    await FlashcardAttempt.findOneAndUpdate(
+      { user: req.user._id, semester, ue, chapter },
+      { $set: { status: 'completed', currentIndex: 0, known, unknown, total, unknownCards, completedAt: new Date() } },
+      { upsert: true, new: true }
+    );
+
+    // Mise à jour stats utilisateur
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'progress.flashcardsReviewed': known },
+      $set: { 'progress.lastActivity': new Date() }
+    });
+
+    res.json({ message: 'Chapitre terminé' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
