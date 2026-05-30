@@ -4,20 +4,33 @@ import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
 
+/* ── Mélange aléatoire des options (Fisher-Yates) ───────────────────────── */
+function shuffleOptions(questions) {
+  return questions.map(q => {
+    const opts = [...q.options];
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    return { ...q, options: opts };
+  });
+}
+
 export default function QuizPlay() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [quiz, setQuiz]             = useState(null);
-  const [loading, setLoading]       = useState(true);
-  const [current, setCurrent]       = useState(0);
-  const [selected, setSelected]     = useState(null);
-  const [answered, setAnswered]     = useState(false);
-  const [score, setScore]           = useState(0);
-  const [done, setDone]             = useState(false);
-  const [answers, setAnswers]       = useState([]);
-  const [timeLeft, setTimeLeft]     = useState(null);
-  const [confirmExit, setConfirmExit] = useState(false);
+  const [quiz, setQuiz]                       = useState(null);
+  const [shuffledQuestions, setShuffledQuestions] = useState([]);
+  const [loading, setLoading]                 = useState(true);
+  const [current, setCurrent]                 = useState(0);
+  const [selected, setSelected]               = useState(null);
+  const [answered, setAnswered]               = useState(false);
+  const [score, setScore]                     = useState(0);
+  const [done, setDone]                       = useState(false);
+  const [answers, setAnswers]                 = useState([]);
+  const [timeLeft, setTimeLeft]               = useState(null);
+  const [confirmExit, setConfirmExit]         = useState(false);
 
   // États pour la gestion de la progression
   const [prevAttempt, setPrevAttempt]   = useState(null);   // attempt existant au chargement
@@ -34,6 +47,7 @@ export default function QuizPlay() {
       const q = quizRes.data;
       const a = progressRes.data;
       setQuiz(q);
+      setShuffledQuestions(shuffleOptions(q.questions));
       setTimeLeft(q.duration * 60);
       setPrevAttempt(a);
 
@@ -65,6 +79,7 @@ export default function QuizPlay() {
     setCurrent(0); setScore(0); setAnswers([]);
     setSelected(null); setAnswered(false);
     setTimeLeft(quiz.duration * 60);
+    setShuffledQuestions(shuffleOptions(quiz.questions)); // nouveau mélange à chaque recommencement
     setResumeModal(false);
     setErrorsModal(false);
     setReady(true);
@@ -150,7 +165,7 @@ export default function QuizPlay() {
     </DashboardLayout>
   );
 
-  const q        = quiz.questions[current];
+  const q        = shuffledQuestions[current] || quiz.questions[current];
   const total    = quiz.questions.length;
   const progress = ((current + (answered ? 1 : 0)) / total) * 100;
   const mins     = Math.floor(timeLeft / 60);
@@ -320,6 +335,7 @@ export default function QuizPlay() {
                   setCurrent(0); setSelected(null); setAnswered(false);
                   setScore(0); setDone(false); setAnswers([]);
                   setTimeLeft(quiz.duration * 60);
+                  setShuffledQuestions(shuffleOptions(quiz.questions));
                   setReady(true);
                 }}
                   className="flex-1 py-2.5 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition">
