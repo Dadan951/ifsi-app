@@ -454,10 +454,15 @@ export default function Dashboard() {
                         const fTotal  = Math.round((pr.flashcardsReviewed || 0) * coeff);
                         const eTotal  = Math.round((pr.exercisesCompleted || 0) * coeff);
 
-                        // Score moyen estimé (totalScore / quizCompleted si dispo)
+                        // Score moyen en % : totalScore = cumul des bonnes réponses, chaque quiz = 10 questions
+                        const QUESTIONS_PAR_QUIZ = 10;
                         const avgScore = pr.quizCompleted > 0
-                          ? Math.min(Math.round((pr.totalScore || 0) / (pr.quizCompleted * 10)), 100)
+                          ? Math.min(Math.round(((pr.totalScore || 0) / (pr.quizCompleted * QUESTIONS_PAR_QUIZ)) * 100), 100)
                           : 0;
+                        // Erreurs estimées sur la période : nb questions ratées
+                        const erreurs = pr.quizCompleted > 0
+                          ? Math.round(qTotal * QUESTIONS_PAR_QUIZ * (1 - avgScore / 100))
+                          : null;
 
                         const detailCards = [
                           {
@@ -467,10 +472,10 @@ export default function Dashboard() {
                             border: 'border-blue-100',
                             icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
                             rows: [
-                              { label: 'Réalisés',    val: qTotal,                          unit: 'quiz'    },
-                              { label: 'Score moyen', val: avgScore > 0 ? `${avgScore}%` : '—', unit: ''   },
-                              { label: 'Erreurs est.', val: avgScore > 0 ? `~${Math.round(qTotal * (1 - avgScore/100))}` : '—', unit: '' },
-                              { label: 'Objectif',    val: '50',                            unit: 'quiz'    },
+                              { label: 'Réalisés',     val: qTotal,                                     unit: 'quiz'      },
+                              { label: 'Score moyen',  val: avgScore > 0 ? `${avgScore}%` : '—',        unit: ''          },
+                              { label: 'Erreurs est.', val: erreurs !== null ? `~${erreurs}` : '—',     unit: erreurs !== null ? 'questions' : '' },
+                              { label: 'Objectif',     val: '50',                                       unit: 'quiz'      },
                             ],
                             pct: Math.min(Math.round(((pr.quizCompleted || 0) / 50) * 100), 100),
                           },
