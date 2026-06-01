@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
@@ -285,46 +286,81 @@ export default function QuizPlay() {
 
   /* ── Résultat final ────────────────────────────────────────────────── */
   if (done) {
-    const pct    = Math.round((score / total) * 100);
-    const passed = pct >= 60;
+    const pct          = Math.round((score / total) * 100);
+    const wrong        = total - score;
+    const passed       = pct >= 60;
+    const emoji        = pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📚';
+    const title        = pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bien joué !' : "Continue à t'entraîner !";
+    const wrongAnswers = answers.filter(a => !a.isCorrect);
     return (
       <DashboardLayout>
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col">
           <div className="w-full max-w-lg mx-auto my-auto">
             <div className="bg-white rounded-3xl p-8 border border-blue-100 shadow-xl shadow-blue-100 text-center">
-              <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-red-100'}`}>
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={passed ? '#16a34a' : '#dc2626'} strokeWidth="2" strokeLinecap="round">
-                  {passed
-                    ? <polyline points="20 6 9 17 4 12"/>
-                    : <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>
-                  }
-                </svg>
+
+              {/* Emoji */}
+              <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                <span className="text-4xl">{emoji}</span>
               </div>
-              <h2 className="text-2xl font-bold text-blue-900 mb-1">
-                {passed ? 'Félicitations !' : 'Continue à t\'entraîner !'}
-              </h2>
+              <h2 className="text-2xl font-bold text-blue-900 mb-1">{title}</h2>
               <p className="text-sm text-blue-400 mb-6">Quiz terminé</p>
 
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-5xl font-bold text-blue-600">{score}</span>
-                <span className="text-2xl text-blue-300">/ {total}</span>
+              {/* Stats correct / total / erreurs */}
+              <div className="flex items-center justify-center gap-6 mb-6">
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-green-500">{score}</span>
+                  <p className="text-xs text-green-400 mt-1">✓ Correct</p>
+                </div>
+                <div className="text-3xl text-blue-200">/</div>
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-blue-600">{total}</span>
+                  <p className="text-xs text-blue-400 mt-1">Total</p>
+                </div>
+                <div className="text-3xl text-blue-200">/</div>
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-red-400">{wrong}</span>
+                  <p className="text-xs text-red-300 mt-1">✗ Erreurs</p>
+                </div>
               </div>
-              <div className={`text-2xl font-bold mb-6 ${passed ? 'text-green-500' : 'text-red-500'}`}>{pct}%</div>
 
+              {/* Pourcentage */}
+              <div className={`text-2xl font-bold mb-6 ${passed ? 'text-green-500' : 'text-orange-500'}`}>{pct}%</div>
+
+              {/* Barre animée */}
               <div className="w-full h-3 bg-blue-100 rounded-full mb-6 overflow-hidden">
-                <div className={`h-3 rounded-full transition-all duration-1000 ${passed ? 'bg-green-400' : 'bg-red-400'}`}
-                  style={{ width: `${pct}%` }}/>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  className={`h-3 rounded-full ${passed ? 'bg-green-400' : 'bg-orange-400'}`}
+                />
               </div>
 
-              {/* Récap des réponses */}
-              <div className="text-left space-y-2 mb-6 max-h-48 overflow-auto">
-                {answers.map((a, i) => (
-                  <div key={i} className={`text-xs p-3 rounded-xl flex items-start gap-2 ${a.isCorrect ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-                    <span className="font-bold flex-shrink-0">{a.isCorrect ? '✓' : '✗'}</span>
-                    <span>{a.questionText}</span>
+              {/* Questions ratées */}
+              {wrongAnswers.length > 0 ? (
+                <div className="text-left mb-6">
+                  <p className="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide">
+                    {wrongAnswers.length} question{wrongAnswers.length > 1 ? 's' : ''} à retravailler :
+                  </p>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {wrongAnswers.map((a, i) => (
+                      <div key={i} className="bg-red-50 border border-red-100 rounded-xl p-3 text-left">
+                        <p className="text-xs font-semibold text-red-800 mb-1">{a.questionText}</p>
+                        <p className="text-xs text-red-500 flex items-start gap-1">
+                          <span className="font-bold flex-shrink-0">✗</span> Ta réponse : {a.selectedText}
+                        </p>
+                        <p className="text-xs text-green-700 flex items-start gap-1 mt-0.5">
+                          <span className="font-bold flex-shrink-0">✓</span> Bonne réponse : {a.correctText}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 rounded-xl p-4 text-center mb-6">
+                  <p className="text-sm font-semibold text-green-700">🎉 Aucune erreur, parfait !</p>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <button onClick={() => navigate('/dashboard/quiz')}
