@@ -168,109 +168,30 @@ export default function Dashboard() {
     premium: { bg: 'bg-gradient-to-r from-amber-400 to-orange-500', text: 'text-white' },
   }[user?.subscription] || { bg: 'bg-slate-100', text: 'text-slate-500' };
 
+  const cardIcon = (alt) => (
+    <img src="/icons/card-icon.png" alt={alt} className="w-14 h-14 object-contain" />
+  );
+
   const stats = [
     {
       label: 'Quiz complétés', val: quizVal,
       glow: 'shadow-blue-200', textC: 'text-blue-600',
-      icon: (
-        <svg width="58" height="58" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="qz-bg" x1="4" y1="52" x2="52" y2="4" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#1d4ed8"/><stop offset="1" stopColor="#22d3ee"/>
-            </linearGradient>
-          </defs>
-          <rect width="56" height="56" rx="14" fill="url(#qz-bg)"/>
-          <rect x="0" y="0" width="56" height="22" rx="14" fill="white" fillOpacity="0.13"/>
-          {/* circle glow */}
-          <circle cx="29" cy="30" r="14" fill="#1e3a8a" fillOpacity="0.28"/>
-          {/* circle body */}
-          <circle cx="28" cy="28" r="13" fill="white" fillOpacity="0.25"/>
-          <circle cx="28" cy="28" r="11.5" fill="white" fillOpacity="0.9"/>
-          {/* question mark */}
-          <path d="M25 23c0-1.66 1.34-3 3-3s3 1.34 3 3c0 1.6-1.8 2.6-2.6 3.5-.4.45-.6.95-.6 1.6" stroke="#2563eb" strokeWidth="2.3" strokeLinecap="round"/>
-          <circle cx="27.8" cy="34" r="1.5" fill="#2563eb"/>
-        </svg>
-      ),
+      icon: cardIcon('Quiz'),
     },
     {
       label: 'Flashcards', val: flashVal,
       glow: 'shadow-indigo-200', textC: 'text-indigo-600',
-      icon: (
-        <svg width="58" height="58" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="fc-bg" x1="4" y1="52" x2="52" y2="4" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#3730a3"/><stop offset="1" stopColor="#a855f7"/>
-            </linearGradient>
-          </defs>
-          <rect width="56" height="56" rx="14" fill="url(#fc-bg)"/>
-          <rect x="0" y="0" width="56" height="22" rx="14" fill="white" fillOpacity="0.13"/>
-          {/* back card rotated */}
-          <g transform="rotate(-7 28 28)">
-            <rect x="9" y="14" width="31" height="21" rx="5" fill="white" fillOpacity="0.28"/>
-          </g>
-          {/* middle card */}
-          <rect x="10" y="17" width="31" height="21" rx="5" fill="white" fillOpacity="0.52"/>
-          {/* front card */}
-          <rect x="12" y="21" width="31" height="21" rx="5" fill="white"/>
-          {/* left text lines */}
-          <rect x="16" y="28.5" width="14" height="2.5" rx="1.2" fill="#6366f1"/>
-          <rect x="16" y="33.5" width="10" height="2" rx="1" fill="#a5b4fc"/>
-          {/* right divider */}
-          <rect x="33" y="23" width="1.5" height="17" rx="0.75" fill="#e0e7ff"/>
-          {/* right mini lines */}
-          <rect x="36" y="27.5" width="4" height="2.5" rx="1.2" fill="#c7d2fe"/>
-          <rect x="36" y="32.5" width="3" height="2" rx="1" fill="#e0e7ff"/>
-        </svg>
-      ),
+      icon: cardIcon('Flashcards'),
     },
     {
       label: 'Exercices', val: exercVal,
       glow: 'shadow-teal-200', textC: 'text-teal-600',
-      icon: (
-        <svg width="58" height="58" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="ex-bg" x1="4" y1="52" x2="52" y2="4" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#0f766e"/><stop offset="1" stopColor="#34d399"/>
-            </linearGradient>
-          </defs>
-          <rect width="56" height="56" rx="14" fill="url(#ex-bg)"/>
-          <rect x="0" y="0" width="56" height="22" rx="14" fill="white" fillOpacity="0.13"/>
-          {/* doc shadow */}
-          <rect x="18.5" y="16.5" width="23" height="29" rx="4.5" fill="#064e3b" fillOpacity="0.3"/>
-          {/* doc body */}
-          <rect x="17" y="15" width="23" height="29" rx="4.5" fill="white"/>
-          {/* folded corner */}
-          <path d="M33 15 L40 22 H33 V15Z" fill="#d1fae5"/>
-          <path d="M33 15 L40 22 H33 V15Z" fill="#6ee7b7" fillOpacity="0.55"/>
-          {/* text lines */}
-          <rect x="21" y="26" width="11" height="2" rx="1" fill="#0d9488"/>
-          <rect x="21" y="30.5" width="14.5" height="2" rx="1" fill="#0d9488"/>
-          <rect x="21" y="35" width="9" height="2" rx="1" fill="#5eead4" fillOpacity="0.85"/>
-        </svg>
-      ),
+      icon: cardIcon('Exercices'),
     },
     {
       label: 'Points gagnés', val: scoreVal,
       glow: 'shadow-amber-200', textC: 'text-amber-600',
-      icon: (
-        <svg width="58" height="58" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="pt-bg" x1="4" y1="52" x2="52" y2="4" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#b45309"/><stop offset="1" stopColor="#fcd34d"/>
-            </linearGradient>
-          </defs>
-          <rect width="56" height="56" rx="14" fill="url(#pt-bg)"/>
-          <rect x="0" y="0" width="56" height="22" rx="14" fill="white" fillOpacity="0.13"/>
-          {/* star shadow */}
-          <path d="M28 15.5l3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L28 31.27l-6.18 3.25L23 27.64 18 22.77l6.91-1.01Z"
-            fill="#78350f" fillOpacity="0.3" transform="translate(0.6 1.8)"/>
-          {/* star body */}
-          <path d="M28 14l3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L28 29.77l-6.18 3.25L23 26.14 18 21.27l6.91-1.01Z"
-            fill="white"/>
-          {/* star inner highlight */}
-          <path d="M28 14 L30.2 19.5 28 23.2 25.8 19.5 Z" fill="white" fillOpacity="0.45"/>
-        </svg>
-      ),
+      icon: cardIcon('Points'),
     },
   ];
 
