@@ -211,6 +211,7 @@ export default function MedicamentDetail() {
 
   return (
     <DashboardLayout>
+      <div className="flex-1 overflow-auto bg-slate-50/60">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6">
 
         {/* ── Top bar ──────────────────────────────────────────────── */}
@@ -443,6 +444,7 @@ export default function MedicamentDetail() {
 
           </main>
         </div>
+      </div>
       </div>
     </DashboardLayout>
   );
