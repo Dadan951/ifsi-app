@@ -330,7 +330,7 @@ export default function Dashboard() {
                       <img
                         src="/icons/card-icon.png"
                         alt="Flashcards"
-                        className="absolute top-1/2 left-0 -translate-y-1/2 w-16 h-16 object-contain drop-shadow-lg"
+                        className="absolute top-1/2 left-0 -translate-y-1/2 w-24 h-24 object-contain drop-shadow-lg"
                       />
                     </div>
                   )}
