@@ -326,12 +326,11 @@ export default function Dashboard() {
                       <span className="text-white">{s.icon}</span>
                     </div>
                   ) : (
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden mb-3 shadow-lg bg-black">
+                    <div className="mb-3">
                       <img
                         src="/icons/card-icon.png"
                         alt="Flashcards"
-                        className="w-full h-full object-cover"
-                        style={{ mixBlendMode: 'screen' }}
+                        className="w-14 h-14 object-contain drop-shadow-xl"
                       />
                     </div>
                   )}
