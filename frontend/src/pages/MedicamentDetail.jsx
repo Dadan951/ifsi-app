@@ -127,9 +127,9 @@ export default function MedicamentDetail() {
   const [mobileTocOpen, setMobileTocOpen] = useState(false);
   const sectionRefs = useRef([]);
 
-  const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
+    if (!token) return;
+    const headers = { Authorization: `Bearer ${token}` };
     const load = async () => {
       try {
         const res = await axios.get(`${API}/api/drugs/${id}`, { headers });
@@ -141,7 +141,7 @@ export default function MedicamentDetail() {
       }
     };
     load();
-  }, [id]);
+  }, [id, token]);
 
   /* Track active section via scroll */
   useEffect(() => {

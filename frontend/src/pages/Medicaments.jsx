@@ -147,9 +147,11 @@ export default function Medicaments() {
   const [loading, setLoading]   = useState(true);
   const searchRef = useRef(null);
 
-  const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
+    if (!token) return;
+
+    const headers = { Authorization: `Bearer ${token}` };
+
     // Cache immédiat
     const cachedClasses = getCache('drugs_classes');
     const cachedDrugs   = getCache('drugs_list');
@@ -175,7 +177,7 @@ export default function Medicaments() {
       }
     };
     load();
-  }, []);
+  }, [token]);
 
   // Group drugs by class, sorted alphabetically by class name
   const grouped = classes
