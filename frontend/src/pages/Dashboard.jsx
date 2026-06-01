@@ -326,11 +326,11 @@ export default function Dashboard() {
                       <span className="text-white">{s.icon}</span>
                     </div>
                   ) : (
-                    <div className="w-10 h-10 flex items-center justify-center mb-3">
+                    <div className="w-16 h-16 flex items-center justify-center mb-3">
                       <img
                         src="/icons/card-icon.png"
                         alt="Flashcards"
-                        className="w-10 h-10 object-contain drop-shadow-lg"
+                        className="w-16 h-16 object-contain drop-shadow-lg"
                       />
                     </div>
                   )}
