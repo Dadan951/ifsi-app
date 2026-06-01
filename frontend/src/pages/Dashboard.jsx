@@ -168,30 +168,26 @@ export default function Dashboard() {
     premium: { bg: 'bg-gradient-to-r from-amber-400 to-orange-500', text: 'text-white' },
   }[user?.subscription] || { bg: 'bg-slate-100', text: 'text-slate-500' };
 
-  const cardIcon = (alt) => (
-    <img src="/icons/card-icon.png" alt={alt} className="w-14 h-14 object-contain" />
-  );
-
   const stats = [
     {
       label: 'Quiz complétés', val: quizVal,
-      glow: 'shadow-blue-200', textC: 'text-blue-600',
-      icon: cardIcon('Quiz'),
+      grad: 'from-blue-500 to-cyan-500', glow: 'shadow-blue-200', textC: 'text-blue-600',
+      icon: <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
     },
     {
       label: 'Flashcards', val: flashVal,
-      glow: 'shadow-indigo-200', textC: 'text-indigo-600',
-      icon: cardIcon('Flashcards'),
+      grad: null, glow: 'shadow-indigo-200', textC: 'text-indigo-600',
+      icon: null,
     },
     {
       label: 'Exercices', val: exercVal,
-      glow: 'shadow-teal-200', textC: 'text-teal-600',
-      icon: cardIcon('Exercices'),
+      grad: 'from-teal-500 to-emerald-500', glow: 'shadow-teal-200', textC: 'text-teal-600',
+      icon: <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>,
     },
     {
       label: 'Points gagnés', val: scoreVal,
-      glow: 'shadow-amber-200', textC: 'text-amber-600',
-      icon: cardIcon('Points'),
+      grad: 'from-amber-400 to-orange-500', glow: 'shadow-amber-200', textC: 'text-amber-600',
+      icon: <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>,
     },
   ];
 
@@ -325,7 +321,20 @@ export default function Dashboard() {
             {stats.map((s, i) => (
               <motion.div key={i} variants={item}>
                 <TiltCard className={`rounded-2xl p-5 bg-white border border-slate-100 shadow-md ${s.glow} hover:shadow-xl transition-shadow cursor-default`}>
-                  <div className="mb-3 drop-shadow-xl">{s.icon}</div>
+                  {s.grad ? (
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.grad} flex items-center justify-center mb-3 shadow-lg`}>
+                      <span className="text-white">{s.icon}</span>
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden mb-3 shadow-lg bg-black">
+                      <img
+                        src="/icons/card-icon.png"
+                        alt="Flashcards"
+                        className="w-full h-full object-cover"
+                        style={{ mixBlendMode: 'screen' }}
+                      />
+                    </div>
+                  )}
                   <p className="text-2xl font-bold text-slate-800 tabular-nums">{s.val}</p>
                   <p className={`text-xs font-medium mt-0.5 ${s.textC}`}>{s.label}</p>
                 </TiltCard>
