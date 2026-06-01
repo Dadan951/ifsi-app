@@ -322,20 +322,26 @@ export default function Dashboard() {
               <motion.div key={i} variants={item}>
                 <TiltCard className={`rounded-2xl p-5 bg-white border border-slate-100 shadow-md ${s.glow} hover:shadow-xl transition-shadow cursor-default`}>
                   {s.grad ? (
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.grad} flex items-center justify-center mb-3 shadow-lg`}>
-                      <span className="text-white">{s.icon}</span>
-                    </div>
+                    <>
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.grad} flex items-center justify-center mb-3 shadow-lg`}>
+                        <span className="text-white">{s.icon}</span>
+                      </div>
+                      <p className="text-2xl font-bold text-slate-800 tabular-nums">{s.val}</p>
+                      <p className={`text-xs font-medium mt-0.5 ${s.textC}`}>{s.label}</p>
+                    </>
                   ) : (
-                    <div className="relative h-10 w-10 mb-3">
+                    <div className="flex items-center gap-3">
                       <img
                         src="/icons/card-icon.png"
                         alt="Flashcards"
-                        className="absolute top-1/2 left-0 -translate-y-1/2 w-24 h-24 object-contain drop-shadow-lg"
+                        className="w-20 h-20 object-contain drop-shadow-lg flex-shrink-0"
                       />
+                      <div>
+                        <p className="text-2xl font-bold text-slate-800 tabular-nums">{s.val}</p>
+                        <p className={`text-xs font-medium mt-0.5 ${s.textC}`}>{s.label}</p>
+                      </div>
                     </div>
                   )}
-                  <p className="text-2xl font-bold text-slate-800 tabular-nums">{s.val}</p>
-                  <p className={`text-xs font-medium mt-0.5 ${s.textC}`}>{s.label}</p>
                 </TiltCard>
               </motion.div>
             ))}
