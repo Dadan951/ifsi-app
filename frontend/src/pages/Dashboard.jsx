@@ -485,13 +485,24 @@ export default function Dashboard() {
                             bg: 'from-indigo-50 to-indigo-100/60',
                             border: 'border-indigo-100',
                             icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="14" height="11" rx="2"/><rect x="8" y="9" width="14" height="11" rx="2"/></svg>,
-                            rows: [
-                              { label: 'Révisées',    val: fTotal,  unit: 'cartes' },
-                              { label: 'Mémorisées',  val: '—',     unit: ''       },
-                              { label: 'À revoir',    val: '—',     unit: ''       },
-                              { label: 'Objectif',    val: '100',   unit: 'cartes' },
-                            ],
-                            pct: Math.min(Math.round(((pr.flashcardsReviewed || 0) / 100) * 100), 100),
+                            rows: (() => {
+                              const known   = Math.round((pr.flashcardsReviewed || 0) * coeff);
+                              const unknown = Math.round((pr.flashcardsUnknown  || 0) * coeff);
+                              const total   = known + unknown;
+                              const tauxMemo = total > 0 ? Math.round((known / total) * 100) : null;
+                              return [
+                                { label: 'Maîtrisées', val: known,                                                        unit: 'cartes' },
+                                { label: 'À revoir',   val: unknown > 0 ? unknown : (pr.flashcardsUnknown === 0 && pr.flashcardsReviewed > 0 ? '0' : '—'), unit: unknown > 0 ? 'cartes' : '' },
+                                { label: 'Taux mémo',  val: tauxMemo !== null ? `${tauxMemo}%` : '—',                     unit: ''       },
+                                { label: 'Objectif',   val: '100',                                                        unit: 'cartes' },
+                              ];
+                            })(),
+                            pct: (() => {
+                              const known   = pr.flashcardsReviewed || 0;
+                              const unknown = pr.flashcardsUnknown  || 0;
+                              const total   = known + unknown;
+                              return total > 0 ? Math.min(Math.round((known / total) * 100), 100) : 0;
+                            })(),
                           },
                           {
                             label: 'Exercices',
@@ -500,10 +511,10 @@ export default function Dashboard() {
                             border: 'border-teal-100',
                             icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>,
                             rows: [
-                              { label: 'Complétés',  val: eTotal, unit: 'exercices' },
-                              { label: 'Réussis',    val: '—',    unit: ''          },
-                              { label: 'Erreurs',    val: '—',    unit: ''          },
-                              { label: 'Objectif',   val: '30',   unit: 'exercices' },
+                              { label: 'Complétés', val: eTotal, unit: 'exercices'  },
+                              { label: 'Réussis',   val: '—',    unit: ''           },
+                              { label: 'Erreurs',   val: '—',    unit: ''           },
+                              { label: 'Objectif',  val: '30',   unit: 'exercices'  },
                             ],
                             pct: Math.min(Math.round(((pr.exercisesCompleted || 0) / 30) * 100), 100),
                           },

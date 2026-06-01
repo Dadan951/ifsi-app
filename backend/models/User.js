@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   progress: {
     quizCompleted: { type: Number, default: 0 },
     flashcardsReviewed: { type: Number, default: 0 },
+    flashcardsUnknown: { type: Number, default: 0 },
     exercisesCompleted: { type: Number, default: 0 },
     totalScore: { type: Number, default: 0 },
     streak: { type: Number, default: 0 },

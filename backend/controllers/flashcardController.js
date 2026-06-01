@@ -117,7 +117,7 @@ exports.completeAttempt = async (req, res) => {
 
     // Mise à jour stats utilisateur
     await User.findByIdAndUpdate(req.user._id, {
-      $inc: { 'progress.flashcardsReviewed': known },
+      $inc: { 'progress.flashcardsReviewed': known, 'progress.flashcardsUnknown': unknown },
       $set: { 'progress.lastActivity': new Date() }
     });
 
