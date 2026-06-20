@@ -134,14 +134,14 @@ function catColor(str) {
 }
 
 const COURS_PALETTE = [
-  { from: '#6366f1', to: '#8b5cf6', emoji: '📖' },
-  { from: '#0891b2', to: '#0284c7', emoji: '🩺' },
-  { from: '#059669', to: '#047857', emoji: '💊' },
-  { from: '#dc2626', to: '#db2777', emoji: '❤️' },
-  { from: '#ea580c', to: '#d97706', emoji: '🔬' },
-  { from: '#7c3aed', to: '#6d28d9', emoji: '🏥' },
-  { from: '#0f766e', to: '#0891b2', emoji: '📋' },
-  { from: '#be185d', to: '#9333ea', emoji: '🧬' },
+  { from: '#6366f1', to: '#8b5cf6', emoji: '' },
+  { from: '#0891b2', to: '#0284c7', emoji: '' },
+  { from: '#059669', to: '#047857', emoji: '' },
+  { from: '#dc2626', to: '#db2777', emoji: '' },
+  { from: '#ea580c', to: '#d97706', emoji: '' },
+  { from: '#7c3aed', to: '#6d28d9', emoji: '' },
+  { from: '#0f766e', to: '#0891b2', emoji: '' },
+  { from: '#be185d', to: '#9333ea', emoji: '' },
 ];
 
 function CoursBreadcrumb({ items }) {
@@ -252,7 +252,7 @@ function CoursTab() {
       {view === 'semesters' && (
         <motion.div key="sems" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
           {semesters.length === 0 ? (
-            <div className="text-center py-16 text-slate-400"><div className="text-5xl mb-3">📖</div><p className="font-semibold">Aucun cours disponible</p></div>
+            <div className="text-center py-16 text-slate-400"><div className="text-5xl mb-3"></div><p className="font-semibold">Aucun cours disponible</p></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {semesters.map((sem, idx) => {
@@ -268,7 +268,6 @@ function CoursTab() {
                     style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                     <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10 blur-2xl"/>
                     <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-black/10 blur-xl"/>
-                    <div className="text-4xl mb-4">{pal.emoji}</div>
                     <h3 className="font-bold text-white text-base mb-1">{sem}</h3>
                     <p className="text-white/75 text-xs mb-4">{ueCount} UE · {total} cours</p>
                     <div className="flex items-center justify-between">
@@ -306,7 +305,6 @@ function CoursTab() {
                   className="relative overflow-hidden rounded-2xl p-5 text-left shadow-md hover:shadow-xl transition-shadow"
                   style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                   <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"/>
-                  <div className="text-3xl mb-3">{pal.emoji}</div>
                   <h3 className="font-bold text-white text-sm mb-1">{ue}</h3>
                   <p className="text-white/75 text-xs mb-3">{chCount} chapitre{chCount > 1 ? 's' : ''} · {total} cours</p>
                   <div className="flex justify-end">
@@ -344,7 +342,6 @@ function CoursTab() {
                   className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all text-left group flex items-center gap-4 shadow-sm">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                     style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-                    {pal.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-slate-800 text-sm truncate">{chap}</h3>
@@ -567,7 +564,7 @@ function FichesTab() {
       {view === 'semesters' && (
         <motion.div key="sems-f" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
           {semesters.length === 0 ? (
-            <div className="text-center py-16 text-slate-400"><div className="text-5xl mb-3">📄</div><p className="font-semibold">Aucune fiche disponible</p></div>
+            <div className="text-center py-16 text-slate-400"><div className="text-5xl mb-3"></div><p className="font-semibold">Aucune fiche disponible</p></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {semesters.map((sem, idx) => {
@@ -583,7 +580,6 @@ function FichesTab() {
                     style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                     <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10 blur-2xl"/>
                     <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-black/10 blur-xl"/>
-                    <div className="text-4xl mb-4">📄</div>
                     <h3 className="font-bold text-white text-base mb-1">{sem}</h3>
                     <p className="text-white/75 text-xs mb-4">{ueCount} UE · {total} fiche{total > 1 ? 's' : ''}</p>
                     <div className="flex items-center justify-between">
@@ -621,7 +617,6 @@ function FichesTab() {
                   className="relative overflow-hidden rounded-2xl p-5 text-left shadow-md hover:shadow-xl transition-shadow"
                   style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                   <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"/>
-                  <div className="text-3xl mb-3">{pal.emoji}</div>
                   <h3 className="font-bold text-white text-sm mb-1">{ue}</h3>
                   <p className="text-white/75 text-xs mb-3">{chCount} chapitre{chCount > 1 ? 's' : ''} · {total} fiche{total > 1 ? 's' : ''}</p>
                   <div className="flex justify-end">
@@ -659,7 +654,6 @@ function FichesTab() {
                   className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all text-left group flex items-center gap-4 shadow-sm">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                     style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-                    {pal.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-slate-800 text-sm truncate">{chap}</h3>
@@ -807,11 +801,11 @@ function FichesPersoUpgradeWall() {
         </p>
         <div className="bg-slate-50 rounded-2xl p-5 text-left mb-6 space-y-3 border border-slate-200">
           {[
-            { icon: '📄', text: 'Import de PDF, images et texte' },
-            { icon: '🤖', text: 'Génération automatique de fiches par IA' },
-            { icon: '🎨', text: 'Fiches colorées, épurées et bien structurées' },
-            { icon: '📁', text: 'Stockage de vos fichiers personnels' },
-            { icon: '🔄', text: "Jusqu'à 5 fiches générées par jour (Pro) ou 10 (Premium)" },
+            { icon: '', text: 'Import de PDF, images et texte' },
+            { icon: '', text: 'Génération automatique de fiches par IA' },
+            { icon: '', text: 'Fiches colorées, épurées et bien structurées' },
+            { icon: '', text: 'Stockage de vos fichiers personnels' },
+            { icon: '', text: "Jusqu'à 5 fiches générées par jour (Pro) ou 10 (Premium)" },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center flex-shrink-0 shadow-sm text-sm">{item.icon}</div>
@@ -1086,7 +1080,7 @@ function FichesPersoTab({ isPro }) {
             style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
             {generating
               ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>Génération en cours...</>
-              : '✨ Générer la fiche'
+              : 'Générer la fiche'
             }
           </motion.button>
         </form>
@@ -1119,9 +1113,9 @@ export default function Cours() {
   const isPro = ['pro', 'premium'].includes(user?.subscription);
 
   const tabs = [
-    { id: 'cours',  label: 'Cours',          icon: '📖' },
-    { id: 'fiches', label: 'Fiches',          icon: '📄' },
-    { id: 'perso',  label: isPro ? 'Fiches perso' : 'Fiches perso ⭐', icon: '✨' },
+    { id: 'cours',  label: 'Cours',          icon: '' },
+    { id: 'fiches', label: 'Fiches',          icon: '' },
+    { id: 'perso',  label: isPro ? 'Fiches perso' : 'Fiches perso', icon: '' },
   ];
 
   return (
@@ -1144,7 +1138,6 @@ export default function Cours() {
                     ? 'border-white text-white'
                     : 'border-transparent text-blue-300/70 hover:text-blue-200'
                 }`}>
-                <span>{t.icon}</span>
                 {t.label}
               </button>
             ))}

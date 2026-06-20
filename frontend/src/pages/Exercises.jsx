@@ -7,9 +7,9 @@ import { getCache, setCache } from '../utils/cache';
 import { API_URL, useAuth } from '../context/AuthContext';
 
 const TYPE_CONFIG = {
-  qcm:        { label: 'QCM',              color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', emoji: '☑️' },
-  open:       { label: 'Question ouverte', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe', emoji: '✍️' },
-  case_study: { label: 'Cas clinique',     color: '#ea580c', bg: '#fff7ed', border: '#fed7aa', emoji: '🏥' },
+  qcm:        { label: 'QCM',              color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', emoji: '' },
+  open:       { label: 'Question ouverte', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe', emoji: '' },
+  case_study: { label: 'Cas clinique',     color: '#ea580c', bg: '#fff7ed', border: '#fed7aa', emoji: '' },
 };
 const diffColors = { easy: 'bg-emerald-100 text-emerald-700', medium: 'bg-amber-100 text-amber-700', hard: 'bg-red-100 text-red-700' };
 const diffLabel  = { easy: 'Facile', medium: 'Moyen', hard: 'Difficile' };
@@ -197,10 +197,10 @@ function UpgradeWall() {
 
             <div className="bg-slate-50 rounded-2xl p-5 text-left mb-6 space-y-3 border border-slate-200">
               {[
-                { icon: '☑️', text: 'QCM sur toutes les UE' },
-                { icon: '✍️', text: 'Questions ouvertes avec correction détaillée' },
-                { icon: '🏥', text: 'Cas cliniques complets (mise en situation réelle)' },
-                { icon: '📈', text: "Suivi de votre progression par type d'exercice" },
+                { icon: '', text: 'QCM sur toutes les UE' },
+                { icon: '', text: 'Questions ouvertes avec correction détaillée' },
+                { icon: '', text: 'Cas cliniques complets (mise en situation réelle)' },
+                { icon: '', text: "Suivi de votre progression par type d'exercice" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm text-base">{item.icon}</div>
@@ -225,14 +225,14 @@ function UpgradeWall() {
 
 /* ─── Navigation palette ────────────────────────────────────────────────────── */
 const EX_PALETTE = [
-  { from: '#2563eb', to: '#0891b2', emoji: '📝' },
-  { from: '#7c3aed', to: '#6d28d9', emoji: '🏥' },
-  { from: '#ea580c', to: '#d97706', emoji: '🔬' },
-  { from: '#059669', to: '#047857', emoji: '✍️' },
-  { from: '#dc2626', to: '#db2777', emoji: '☑️' },
-  { from: '#0f766e', to: '#0891b2', emoji: '📋' },
-  { from: '#be185d', to: '#9333ea', emoji: '🧬' },
-  { from: '#6366f1', to: '#8b5cf6', emoji: '💊' },
+  { from: '#2563eb', to: '#0891b2', emoji: '' },
+  { from: '#7c3aed', to: '#6d28d9', emoji: '' },
+  { from: '#ea580c', to: '#d97706', emoji: '' },
+  { from: '#059669', to: '#047857', emoji: '' },
+  { from: '#dc2626', to: '#db2777', emoji: '' },
+  { from: '#0f766e', to: '#0891b2', emoji: '' },
+  { from: '#be185d', to: '#9333ea', emoji: '' },
+  { from: '#6366f1', to: '#8b5cf6', emoji: '' },
 ];
 
 function ExBreadcrumb({ items }) {
@@ -344,7 +344,7 @@ export default function Exercises() {
               {view === 'semesters' && (
                 <motion.div key="sems-ex" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
                   {semesters.length === 0 ? (
-                    <div className="text-center py-20 text-slate-400"><div className="text-5xl mb-3">📋</div><p className="font-semibold">Aucun exercice disponible</p></div>
+                    <div className="text-center py-20 text-slate-400"><div className="text-5xl mb-3"></div><p className="font-semibold">Aucun exercice disponible</p></div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                       {semesters.map((sem, idx) => {
@@ -360,7 +360,6 @@ export default function Exercises() {
                             style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                             <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10 blur-2xl"/>
                             <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-black/10 blur-xl"/>
-                            <div className="text-4xl mb-4">{pal.emoji}</div>
                             <h3 className="font-bold text-white text-base mb-1">{sem}</h3>
                             <p className="text-white/75 text-xs mb-4">{ctCount} type{ctCount > 1 ? 's' : ''} de cas · {total} exercice{total > 1 ? 's' : ''}</p>
                             <div className="flex items-center justify-between">
@@ -398,7 +397,6 @@ export default function Exercises() {
                           className="relative overflow-hidden rounded-2xl p-5 text-left shadow-md hover:shadow-xl transition-shadow"
                           style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
                           <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"/>
-                          <div className="text-3xl mb-3">{pal.emoji}</div>
                           <h3 className="font-bold text-white text-sm mb-1">{ct}</h3>
                           <p className="text-white/75 text-xs mb-3">{ueCount} UE · {total} exercice{total > 1 ? 's' : ''}</p>
                           <div className="flex justify-end">
@@ -436,7 +434,6 @@ export default function Exercises() {
                           className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all text-left group flex items-center gap-4 shadow-sm">
                           <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                             style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-                            {pal.emoji}
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-slate-800 text-sm truncate">{ue}</h3>

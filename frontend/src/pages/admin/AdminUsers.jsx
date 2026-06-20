@@ -176,7 +176,7 @@ function DeleteModal({ user, onClose, onConfirm }) {
         transition={{ type: 'spring', stiffness: 320, damping: 26 }}
         className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 text-center"
       >
-        <div className="text-4xl mb-3">🗑️</div>
+        <div className="text-4xl mb-3"></div>
         <h3 className="text-base font-bold text-slate-800 mb-1">Supprimer l'utilisateur ?</h3>
         <p className="text-xs text-slate-400 mb-6">
           <span className="font-semibold text-slate-600">{user.name}</span> sera définitivement supprimé. Cette action est irréversible.
@@ -265,28 +265,28 @@ export default function AdminUsers() {
             <StatCard
               label="Total utilisateurs"
               value={users.length}
-              icon="👥"
+              icon=""
               gradient="linear-gradient(135deg,#2563eb,#1d4ed8)"
               delay={0}
             />
             <StatCard
               label="Comptes gratuits"
               value={freeCount}
-              icon="🎓"
+              icon=""
               gradient="linear-gradient(135deg,#0891b2,#0e7490)"
               delay={0.08}
             />
             <StatCard
               label="Comptes Pro/Premium"
               value={paidCount}
-              icon="⭐"
+              icon=""
               gradient="linear-gradient(135deg,#7c3aed,#6d28d9)"
               delay={0.16}
             />
             <StatCard
               label="Administrateurs"
               value={adminCount}
-              icon="🛡️"
+              icon=""
               gradient="linear-gradient(135deg,#059669,#047857)"
               delay={0.24}
             />
@@ -388,7 +388,7 @@ export default function AdminUsers() {
                                   {user.role === 'admin' && (
                                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
                                       style={{ background: 'rgba(5,150,105,0.12)', color: '#059669' }}>
-                                      🛡️ Admin
+                                      Admin
                                     </span>
                                   )}
                                 </div>

@@ -176,7 +176,7 @@ function DelModal({ item, label, onClose, onConfirm }) {
       initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={onClose}>
       <motion.div initial={{scale:0.9,y:12}} animate={{scale:1,y:0}} exit={{scale:0.9}} transition={{duration:0.22}}
         onClick={e=>e.stopPropagation()} className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center">
-        <div className="text-4xl mb-3">🗑️</div>
+        <div className="text-4xl mb-3"></div>
         <h3 className="font-bold text-slate-800 mb-1">Supprimer ce quiz ?</h3>
         <p className="text-sm text-slate-500 mb-5"><span className="font-semibold">"{label}"</span> sera définitivement supprimé.</p>
         <div className="flex gap-3">
@@ -245,9 +245,9 @@ export default function AdminQuizzes() {
             </motion.button>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <StatCard label="Total quiz"      value={quizzes.length} icon="🧠" gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" delay={0}   />
-            <StatCard label="Publiés"         value={published}      icon="✅" gradient="linear-gradient(135deg,#059669,#047857)" delay={0.1} />
-            <StatCard label="Total questions" value={totalQ}         icon="❓" gradient="linear-gradient(135deg,#0891b2,#0e7490)" delay={0.2} />
+            <StatCard label="Total quiz"      value={quizzes.length} icon="" gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" delay={0}   />
+            <StatCard label="Publiés"         value={published}      icon="" gradient="linear-gradient(135deg,#059669,#047857)" delay={0.1} />
+            <StatCard label="Total questions" value={totalQ}         icon="" gradient="linear-gradient(135deg,#0891b2,#0e7490)" delay={0.2} />
           </div>
         </div>
 
@@ -290,7 +290,7 @@ export default function AdminQuizzes() {
               <div className="flex justify-center py-16"><div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"/></div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
-                <div className="text-5xl mb-3">🧠</div>
+                <div className="text-5xl mb-3"></div>
                 <p className="font-semibold">Aucun quiz trouvé</p>
                 {(search || filterSem || filterDiff) && (
                   <button onClick={() => { setSearch(''); setFilterSem(''); setFilterDiff(''); }}

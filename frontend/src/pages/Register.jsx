@@ -248,7 +248,7 @@ export default function Register() {
             </div>
           </div>
 
-          <h2 className="text-xl font-bold text-slate-800 text-center mb-1">Vérifie ton email 📧</h2>
+          <h2 className="text-xl font-bold text-slate-800 text-center mb-1">Vérifie ton email</h2>
           <p className="text-xs text-slate-400 text-center mb-1">Un code à 6 chiffres a été envoyé à</p>
           <p className="text-sm font-semibold text-blue-600 text-center mb-6">{pendingEmail}</p>
 
@@ -463,7 +463,7 @@ export default function Register() {
             <NursesLogo size="sm" />
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800 text-center mb-1">Créer un compte ✨</h1>
+          <h1 className="text-2xl font-bold text-slate-800 text-center mb-1">Créer un compte</h1>
           <p className="text-sm text-slate-400 text-center mb-7">Gratuit · Sans carte bancaire · En 30 secondes</p>
 
           {/* ── Social buttons ── */}
@@ -471,7 +471,7 @@ export default function Register() {
             <motion.button
               whileHover={{ scale: 1.015, y: -1 }}
               whileTap={{ scale: 0.985 }}
-              onClick={() => showToast('Inscription Google — bientôt disponible ✨')}
+              onClick={() => showToast('Inscription Google — bientôt disponible')}
               className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow"
             >
               <svg width="18" height="18" viewBox="0 0 48 48">
@@ -486,7 +486,7 @@ export default function Register() {
             <motion.button
               whileHover={{ scale: 1.015, y: -1 }}
               whileTap={{ scale: 0.985 }}
-              onClick={() => showToast('Lien magique — bientôt disponible ✨')}
+              onClick={() => showToast('Lien magique — bientôt disponible')}
               className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round">

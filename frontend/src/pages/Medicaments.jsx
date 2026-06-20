@@ -78,7 +78,7 @@ function ClassGroup({ cls, drugs, searchQuery, delay }) {
           className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm"
           style={{ backgroundColor: cls.color + '20', border: `1.5px solid ${cls.color}40` }}
         >
-          {cls.icon || '💊'}
+          {cls.icon || ''}
         </div>
         <div className="flex-1 min-w-0 text-left">
           <h2 className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
@@ -215,7 +215,6 @@ export default function Medicaments() {
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl">
-                💊
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Médicaments</h1>
@@ -290,7 +289,7 @@ export default function Medicaments() {
                 animate={{ opacity: 1 }}
                 className="text-center py-20 text-slate-400"
               >
-                <div className="text-5xl mb-3">🔍</div>
+                <div className="text-5xl mb-3"></div>
                 <p className="font-medium">Aucun médicament trouvé</p>
                 <p className="text-sm mt-1">Essaie un autre terme de recherche</p>
               </motion.div>

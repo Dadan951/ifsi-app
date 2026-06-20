@@ -8,14 +8,14 @@ import { getCache, setCache } from '../utils/cache';
 
 /* ─── Category colour palette ──────────────────────────────────────────────── */
 const PALETTE = [
-  { from: '#6366f1', to: '#8b5cf6', emoji: '🧠' },
-  { from: '#0891b2', to: '#0284c7', emoji: '💊' },
-  { from: '#059669', to: '#047857', emoji: '🩺' },
-  { from: '#dc2626', to: '#db2777', emoji: '❤️' },
-  { from: '#ea580c', to: '#d97706', emoji: '🔥' },
-  { from: '#7c3aed', to: '#6d28d9', emoji: '🏥' },
-  { from: '#0f766e', to: '#0891b2', emoji: '🔬' },
-  { from: '#be185d', to: '#9333ea', emoji: '📋' },
+  { from: '#6366f1', to: '#8b5cf6', emoji: '' },
+  { from: '#0891b2', to: '#0284c7', emoji: '' },
+  { from: '#059669', to: '#047857', emoji: '' },
+  { from: '#dc2626', to: '#db2777', emoji: '' },
+  { from: '#ea580c', to: '#d97706', emoji: '' },
+  { from: '#7c3aed', to: '#6d28d9', emoji: '' },
+  { from: '#0f766e', to: '#0891b2', emoji: '' },
+  { from: '#be185d', to: '#9333ea', emoji: '' },
 ];
 
 const diffColors = { easy: 'bg-emerald-100 text-emerald-700', medium: 'bg-amber-100 text-amber-700', hard: 'bg-red-100 text-red-700' };
@@ -142,7 +142,7 @@ function QuizGenerator({ onGenerated }) {
           style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
           {generating
             ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>Génération en cours...</>
-            : <><span>✨</span> Générer le quiz</>
+            : <>Générer le quiz</>
           }
         </motion.button>
       </form>
@@ -162,7 +162,7 @@ function PersonalQuizList({ quizzes, onDelete, onPlay }) {
 
   if (quizzes.length === 0) return (
     <div className="text-center py-10 text-slate-400">
-      <div className="text-4xl mb-3">📝</div>
+      <div className="text-4xl mb-3"></div>
       <p className="font-semibold text-slate-600 mb-1">Aucun quiz généré</p>
       <p className="text-sm">Utilisez le générateur ci-dessus pour créer votre premier quiz.</p>
     </div>
@@ -326,7 +326,7 @@ export default function Quiz() {
           <div className="flex gap-0">
             {[
               { id: 'catalogue', label: 'Catalogue' },
-              { id: 'personnalises', label: isPro ? 'Mes quiz' : 'Mes quiz ⭐' },
+              { id: 'personnalises', label: isPro ? 'Mes quiz' : 'Mes quiz' },
             ].map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`px-5 py-3 text-sm font-semibold border-b-2 transition-all ${
@@ -354,7 +354,7 @@ export default function Quiz() {
                   transition={{ duration: 0.3 }}>
                   {semesters.length === 0 ? (
                     <div className="text-center py-20 text-slate-400">
-                      <div className="text-5xl mb-3">📚</div>
+                      <div className="text-5xl mb-3"></div>
                       <p className="font-semibold">Aucun quiz disponible</p>
                     </div>
                   ) : (

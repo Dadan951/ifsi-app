@@ -269,7 +269,7 @@ export default function Login() {
             {mode === 'forgot-code' && (
               <motion.div key="code-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <h2 className="text-xl font-bold text-slate-800 text-center mb-1">
-                  {forgotSuccess ? '✅ Mot de passe modifié !' : 'Nouveau mot de passe'}
+                  {forgotSuccess ? 'Mot de passe modifié !' : 'Nouveau mot de passe'}
                 </h2>
                 <p className="text-xs text-slate-400 text-center mb-6">
                   {forgotSuccess
@@ -478,7 +478,7 @@ export default function Login() {
             <NursesLogo size="sm" />
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800 text-center mb-1">Bon retour ! 👋</h1>
+          <h1 className="text-2xl font-bold text-slate-800 text-center mb-1">Bon retour !</h1>
           <p className="text-sm text-slate-400 text-center mb-7">Connecte-toi pour continuer tes révisions</p>
 
           {/* ── Social buttons ── */}
@@ -486,7 +486,7 @@ export default function Login() {
             <motion.button
               whileHover={{ scale: 1.015, y: -1 }}
               whileTap={{ scale: 0.985 }}
-              onClick={() => showToast('Connexion Google — bientôt disponible ✨')}
+              onClick={() => showToast('Connexion Google — bientôt disponible')}
               className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow"
             >
               <svg width="18" height="18" viewBox="0 0 48 48">
@@ -501,7 +501,7 @@ export default function Login() {
             <motion.button
               whileHover={{ scale: 1.015, y: -1 }}
               whileTap={{ scale: 0.985 }}
-              onClick={() => showToast('Lien magique — bientôt disponible ✨')}
+              onClick={() => showToast('Lien magique — bientôt disponible')}
               className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round">

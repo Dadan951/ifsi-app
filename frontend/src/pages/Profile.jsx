@@ -233,7 +233,7 @@ function AvatarCropModal({ src, onConfirm, onCancel, loading }) {
         onClick={e => e.stopPropagation()}
       >
         <h3 className="text-sm font-bold text-slate-800 text-center mb-1">Positionner ta photo</h3>
-        <p className="text-xs text-slate-400 text-center mb-4">👆 Glisse · 🤏 Pincer · 🖱 Scroll</p>
+        <p className="text-xs text-slate-400 text-center mb-4">Glisse · Pincer · Scroll</p>
 
         {/* Zone interactive — image entière visible */}
         <div className="flex justify-center mb-4">
@@ -334,7 +334,7 @@ export default function Profile() {
       else showToast(push.error || 'Erreur', 'error');
     } else {
       const ok = await push.subscribe();
-      if (ok) showToast('Notifications activées ! 🔔', 'success');
+      if (ok) showToast('Notifications activées !', 'success');
       else if (push.permission === 'denied') showToast('Permission refusée dans le navigateur', 'error');
       else showToast(push.error || 'Erreur', 'error');
     }
@@ -395,10 +395,10 @@ export default function Profile() {
 
   const sub    = subConfig[user?.subscription] || subConfig.free;
   const stats  = [
-    { label: 'Quiz',        value: user?.progress?.quizCompleted      || 0, icon: '🧠', color: '#2563eb' },
-    { label: 'Flashcards',  value: user?.progress?.flashcardsReviewed || 0, icon: '🃏', color: '#0891b2' },
-    { label: 'Exercices',   value: user?.progress?.exercisesCompleted || 0, icon: '📋', color: '#7c3aed' },
-    { label: 'Score',       value: user?.progress?.totalScore         || 0, icon: '⭐', color: '#ea580c' },
+    { label: 'Quiz',        value: user?.progress?.quizCompleted      || 0, icon: '', color: '#2563eb' },
+    { label: 'Flashcards',  value: user?.progress?.flashcardsReviewed || 0, icon: '', color: '#0891b2' },
+    { label: 'Exercices',   value: user?.progress?.exercisesCompleted || 0, icon: '', color: '#7c3aed' },
+    { label: 'Score',       value: user?.progress?.totalScore         || 0, icon: '', color: '#ea580c' },
   ];
 
   return (

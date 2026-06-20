@@ -549,7 +549,7 @@ function PushPanel() {
     setSending(true); setResult(null);
     try {
       const r = await axios.post(`${API_URL}/notifications/send-all`, { title, body, url });
-      setResult({ ok: true, msg: `✅ Envoyé à ${r.data.sent} utilisateur(s)` });
+      setResult({ ok: true, msg: `Envoyé à ${r.data.sent} utilisateur(s)` });
       setTitle(''); setBody(''); setUrl('/dashboard');
     } catch (err) {
       setResult({ ok: false, msg: err.response?.data?.message || 'Erreur' });
@@ -560,7 +560,7 @@ function PushPanel() {
     setReminding(true); setResult(null);
     try {
       const r = await axios.post(`${API_URL}/notifications/send-streak-reminder`);
-      setResult({ ok: true, msg: `✅ Rappels envoyés à ${r.data.sent} utilisateur(s)` });
+      setResult({ ok: true, msg: `Rappels envoyés à ${r.data.sent} utilisateur(s)` });
     } catch (err) {
       setResult({ ok: false, msg: err.response?.data?.message || 'Erreur' });
     } finally { setReminding(false); }
@@ -601,7 +601,7 @@ function PushPanel() {
       >
         {reminding
           ? <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
-          : '🔥'}
+          : null}
         {reminding ? 'Envoi...' : 'Rappel streak (inactifs aujourd\'hui)'}
       </button>
 
@@ -623,17 +623,17 @@ function PushPanel() {
           value={url} onChange={e => setUrl(e.target.value)}
           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-400 transition bg-white text-slate-700"
         >
-          <option value="/dashboard">🏠 Tableau de bord</option>
-          <option value="/dashboard/quiz">🧠 Quiz</option>
-          <option value="/dashboard/flashcards">🃏 Flashcards</option>
-          <option value="/dashboard/cours">📖 Cours & Fiches</option>
-          <option value="/dashboard/exercises">💪 Exercices</option>
-          <option value="/dashboard/annales">📄 Annales</option>
-          <option value="/dashboard/medicaments">💊 Médicaments</option>
-          <option value="/dashboard/groups">👥 Groupes</option>
-          <option value="/dashboard/profile">👤 Profil</option>
-          <option value="/dashboard/subscription">⭐ Abonnement</option>
-          <option value="/dashboard/support">🎧 Support</option>
+          <option value="/dashboard">Tableau de bord</option>
+          <option value="/dashboard/quiz">Quiz</option>
+          <option value="/dashboard/flashcards">Flashcards</option>
+          <option value="/dashboard/cours">Cours & Fiches</option>
+          <option value="/dashboard/exercises">Exercices</option>
+          <option value="/dashboard/annales">Annales</option>
+          <option value="/dashboard/medicaments">Médicaments</option>
+          <option value="/dashboard/groups">Groupes</option>
+          <option value="/dashboard/profile">Profil</option>
+          <option value="/dashboard/subscription">Abonnement</option>
+          <option value="/dashboard/support">Support</option>
         </select>
         <button
           onClick={handleSendAll}
@@ -646,7 +646,7 @@ function PushPanel() {
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
                 Envoi en cours...
               </span>
-            : '📢 Envoyer à tous les abonnés'
+            : 'Envoyer à tous les abonnés'
           }
         </button>
       </div>

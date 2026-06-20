@@ -153,7 +153,6 @@ function LessonModal({ lesson, onClose, onSave, existingSemesters = [], existing
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base"
               style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-              📚
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">
@@ -194,7 +193,7 @@ function LessonModal({ lesson, onClose, onSave, existingSemesters = [], existing
                   }`}
                   style={form.type === t ? { background: 'linear-gradient(135deg,#2563eb,#0891b2)' } : {}}
                 >
-                  {t === 'cours' ? '📖 Cours' : '📄 Fiche'}
+                  {t === 'cours' ? 'Cours' : 'Fiche'}
                 </button>
               ))}
             </div>
@@ -359,7 +358,7 @@ function LessonModal({ lesson, onClose, onSave, existingSemesters = [], existing
             onClick={() => set('isPublished', !form.isPublished)}
           >
             <span className={`text-xs font-semibold ${form.isPublished ? 'text-emerald-700' : 'text-slate-500'}`}>
-              {form.isPublished ? '✅ Publié — visible par les étudiants' : '🔒 Masqué — non visible'}
+              {form.isPublished ? 'Publié — visible par les étudiants' : 'Masqué — non visible'}
             </span>
             <div className={`w-10 h-5 rounded-full relative transition-all ${form.isPublished ? 'bg-emerald-500' : 'bg-slate-300'}`}>
               <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${form.isPublished ? 'left-5' : 'left-0.5'}`} />
@@ -485,21 +484,21 @@ export default function AdminLessons() {
             <StatCard
               label="Total contenus"
               value={lessons.length}
-              icon="📚"
+              icon=""
               gradient="linear-gradient(135deg,#2563eb,#1d4ed8)"
               delay={0}
             />
             <StatCard
               label="Cours"
               value={cours}
-              icon="📖"
+              icon=""
               gradient="linear-gradient(135deg,#0891b2,#0e7490)"
               delay={0.1}
             />
             <StatCard
               label="Fiches"
               value={fiches}
-              icon="📄"
+              icon=""
               gradient="linear-gradient(135deg,#7c3aed,#6d28d9)"
               delay={0.2}
             />
@@ -555,7 +554,7 @@ export default function AdminLessons() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
-                <div className="text-5xl mb-3">📚</div>
+                <div className="text-5xl mb-3"></div>
                 <p className="font-semibold">Aucun contenu</p>
                 <p className="text-xs mt-1">Créez votre premier cours ou fiche de révision</p>
               </div>
@@ -658,7 +657,7 @@ export default function AdminLessons() {
                     {filtered.length === 0 && (
                       <tr>
                         <td colSpan={7} className="text-center py-14">
-                          <div className="text-3xl mb-2">📋</div>
+                          <div className="text-3xl mb-2"></div>
                           <div className="text-sm text-slate-400 font-medium">Aucun contenu trouvé</div>
                         </td>
                       </tr>
@@ -705,7 +704,7 @@ export default function AdminLessons() {
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
               className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl text-center"
             >
-              <div className="text-4xl mb-4">🗑️</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-base font-bold text-slate-800 mb-1.5">Supprimer ce contenu ?</h3>
               <p className="text-sm font-semibold text-slate-700 mb-1 truncate px-4">{deleting.title}</p>
               <p className="text-xs text-slate-400 mb-6">Cette action est irréversible.</p>

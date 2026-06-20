@@ -476,9 +476,9 @@ export default function AdminTickets() {
                     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5">
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Changer le statut</p>
                       <div className="flex flex-col gap-2">
-                        <StatusBtn current={ticket.status} value="open"        label="🟢 Ouvert"   color="#10b981" onClick={handleStatus} loading={updatingStatus}/>
-                        <StatusBtn current={ticket.status} value="in_progress" label="🟡 En cours"  color="#f59e0b" onClick={handleStatus} loading={updatingStatus}/>
-                        <StatusBtn current={ticket.status} value="closed"      label="⚫ Fermé"    color="#64748b" onClick={handleStatus} loading={updatingStatus}/>
+                        <StatusBtn current={ticket.status} value="open"        label="Ouvert"   color="#10b981" onClick={handleStatus} loading={updatingStatus}/>
+                        <StatusBtn current={ticket.status} value="in_progress" label="En cours"  color="#f59e0b" onClick={handleStatus} loading={updatingStatus}/>
+                        <StatusBtn current={ticket.status} value="closed"      label="Fermé"    color="#64748b" onClick={handleStatus} loading={updatingStatus}/>
                       </div>
                     </div>
 

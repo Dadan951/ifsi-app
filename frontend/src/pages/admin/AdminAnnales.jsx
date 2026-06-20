@@ -130,7 +130,6 @@ function AnnaleModal({ annale, onClose, onSave, existingSemesters = [], existing
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base"
               style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-              📜
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">{annale ? "Modifier l'annale" : 'Nouvelle annale'}</h3>
@@ -227,7 +226,7 @@ function AnnaleModal({ annale, onClose, onSave, existingSemesters = [], existing
             style={{ background: form.isPublished ? 'linear-gradient(135deg,#dcfce7,#d1fae5)' : '#f8fafc' }}
             onClick={() => set('isPublished', !form.isPublished)}>
             <span className={`text-xs font-semibold ${form.isPublished ? 'text-emerald-700' : 'text-slate-500'}`}>
-              {form.isPublished ? '✅ Publiée — visible par les étudiants' : '🔒 Masquée — non visible'}
+              {form.isPublished ? 'Publiée — visible par les étudiants' : 'Masquée — non visible'}
             </span>
             <div className={`w-10 h-5 rounded-full relative transition-all ${form.isPublished ? 'bg-emerald-500' : 'bg-slate-300'}`}>
               <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${form.isPublished ? 'left-5' : 'left-0.5'}`}/>
@@ -314,9 +313,9 @@ export default function AdminAnnales() {
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <StatCard label="Total annales" value={items.length}  icon="📜" gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" delay={0}/>
-            <StatCard label="Publiées"       value={published}    icon="✅" gradient="linear-gradient(135deg,#059669,#047857)" delay={0.1}/>
-            <StatCard label="Années"         value={years}        icon="📅" gradient="linear-gradient(135deg,#0891b2,#0e7490)" delay={0.2}/>
+            <StatCard label="Total annales" value={items.length}  icon="" gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" delay={0}/>
+            <StatCard label="Publiées"       value={published}    icon="" gradient="linear-gradient(135deg,#059669,#047857)" delay={0.1}/>
+            <StatCard label="Années"         value={years}        icon="" gradient="linear-gradient(135deg,#0891b2,#0e7490)" delay={0.2}/>
           </div>
         </div>
 
@@ -346,7 +345,7 @@ export default function AdminAnnales() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
-                <div className="text-5xl mb-3">📜</div>
+                <div className="text-5xl mb-3"></div>
                 <p className="font-semibold">Aucune annale</p>
                 <p className="text-xs mt-1">Ajoutez votre premier sujet d'examen</p>
               </div>
@@ -443,7 +442,7 @@ export default function AdminAnnales() {
               exit={{ opacity: 0, scale: 0.88, y: 16 }}
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
               className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl text-center">
-              <div className="text-4xl mb-4">🗑️</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-base font-bold text-slate-800 mb-1.5">Supprimer cette annale ?</h3>
               <p className="text-xs text-slate-400 mb-1 font-medium">{deleting.title}</p>
               <p className="text-xs text-slate-400 mb-6">Cette action est irréversible.</p>

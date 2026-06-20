@@ -290,21 +290,21 @@ export default function AdminFlashcards() {
             <StatCard
               label="Total Flashcards"
               value={items.length}
-              icon="🃏"
+              icon=""
               gradient="linear-gradient(135deg,#2563eb,#1d4ed8)"
               delay={0}
             />
             <StatCard
               label="Publiées"
               value={published}
-              icon="✅"
+              icon=""
               gradient="linear-gradient(135deg,#059669,#047857)"
               delay={0.1}
             />
             <StatCard
               label="Catégories"
               value={categories}
-              icon="🏷️"
+              icon=""
               gradient="linear-gradient(135deg,#0891b2,#0e7490)"
               delay={0.2}
             />
@@ -339,7 +339,7 @@ export default function AdminFlashcards() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
-                <div className="text-5xl mb-3">🃏</div>
+                <div className="text-5xl mb-3"></div>
                 <p className="font-semibold">Aucune flashcard</p>
                 <p className="text-xs mt-1">Ajoutez votre première carte de révision</p>
               </div>
@@ -436,7 +436,7 @@ export default function AdminFlashcards() {
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
               className="bg-white rounded-3xl p-7 w-full max-w-sm shadow-2xl text-center"
             >
-              <div className="text-5xl mb-4">🗑️</div>
+              <div className="text-5xl mb-4"></div>
               <h3 className="text-base font-bold text-slate-800 mb-1">Supprimer cette flashcard ?</h3>
               <p className="text-xs text-slate-400 mb-6">
                 « <span className="font-medium text-slate-600">{deleting.front?.slice(0, 60)}{deleting.front?.length > 60 ? '…' : ''}</span> »

@@ -132,10 +132,10 @@ export default function Subscription() {
             {/* Value props */}
             <div className="flex flex-wrap gap-3 mt-6">
               {[
-                { icon: '🎓', text: 'Conçu pour les étudiants IFSI' },
-                { icon: '🔒', text: 'Sans engagement' },
-                { icon: '⚡', text: 'Accès immédiat' },
-                { icon: '💳', text: 'Paiement sécurisé' },
+                { icon: '', text: 'Conçu pour les étudiants IFSI' },
+                { icon: '', text: 'Sans engagement' },
+                { icon: '', text: 'Accès immédiat' },
+                { icon: '', text: 'Paiement sécurisé' },
               ].map((v, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.07 }}
                   className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
@@ -174,7 +174,7 @@ export default function Subscription() {
                     <div className="absolute -top-0 left-1/2 -translate-x-1/2">
                       <div className="mt-[-1px] text-xs font-bold text-white px-5 py-1 rounded-b-xl"
                         style={{ background: plan.gradient }}>
-                        ⭐ Le plus populaire
+                        Le plus populaire
                       </div>
                     </div>
                   )}

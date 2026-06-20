@@ -7,14 +7,14 @@ import { getCache, setCache } from '../utils/cache';
 
 /* ─── Palette ───────────────────────────────────────────────────────────────── */
 const PALETTE = [
-  { from: '#6366f1', to: '#8b5cf6', emoji: '🧠' },
-  { from: '#0891b2', to: '#0284c7', emoji: '💊' },
-  { from: '#059669', to: '#047857', emoji: '🩺' },
-  { from: '#dc2626', to: '#db2777', emoji: '❤️' },
-  { from: '#ea580c', to: '#d97706', emoji: '🔥' },
-  { from: '#7c3aed', to: '#6d28d9', emoji: '🏥' },
-  { from: '#0f766e', to: '#0891b2', emoji: '🔬' },
-  { from: '#be185d', to: '#9333ea', emoji: '📋' },
+  { from: '#6366f1', to: '#8b5cf6', emoji: '' },
+  { from: '#0891b2', to: '#0284c7', emoji: '' },
+  { from: '#059669', to: '#047857', emoji: '' },
+  { from: '#dc2626', to: '#db2777', emoji: '' },
+  { from: '#ea580c', to: '#d97706', emoji: '' },
+  { from: '#7c3aed', to: '#6d28d9', emoji: '' },
+  { from: '#0f766e', to: '#0891b2', emoji: '' },
+  { from: '#be185d', to: '#9333ea', emoji: '' },
 ];
 
 function ChevronRight({ className = '' }) {
@@ -86,7 +86,6 @@ function FlashCard({ card, palette, flipped, onFlip }) {
               style={{ background: `linear-gradient(135deg,${palette.from},${palette.to})` }}>
               {card.category}
             </span>
-            <span className="text-xl">{palette.emoji}</span>
           </div>
           {/* Question : centrée verticalement, scroll si trop longue */}
           <div className="flex-1 overflow-y-auto flex items-center justify-center">
@@ -108,7 +107,6 @@ function FlashCard({ card, palette, flipped, onFlip }) {
           {/* En-tête */}
           <div className="flex items-center justify-between mb-3 flex-shrink-0 relative">
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/20 text-white">Réponse</span>
-            <span className="text-xl">{palette.emoji}</span>
           </div>
 
           {/* Réponse : centrée si courte, scrollable depuis le début si longue */}
@@ -121,7 +119,7 @@ function FlashCard({ card, palette, flipped, onFlip }) {
               <p className="text-sm font-semibold text-white text-center leading-relaxed whitespace-pre-line">
                 {card.back}
               </p>
-              {card.hint && <p className="text-xs text-white/70 text-center mt-3 italic">💡 {card.hint}</p>}
+              {card.hint && <p className="text-xs text-white/70 text-center mt-3 italic">{card.hint}</p>}
             </div>
           </div>
 
@@ -272,7 +270,6 @@ function SwipeGame({ cards, onExit, semester, ue, chapter, prevAttempt }) {
         <div className="w-full max-w-lg mx-auto my-auto">
           <div className="bg-white rounded-3xl p-8 border border-blue-100 shadow-xl shadow-blue-100 text-center">
             <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-              <span className="text-4xl">{pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📚'}</span>
             </div>
             <h2 className="text-2xl font-bold text-blue-900 mb-1">
               {pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bien joué !' : 'Continue à réviser !'}
@@ -574,7 +571,6 @@ export default function Flashcards() {
           <div className="w-full max-w-md mx-auto my-auto">
             <div className="bg-white rounded-3xl p-7 border border-blue-100 shadow-xl text-center">
               <div className="w-14 h-14 rounded-2xl bg-amber-100 mx-auto mb-4 flex items-center justify-center">
-                <span className="text-2xl">📌</span>
               </div>
               <h2 className="text-lg font-bold text-blue-900 mb-1">Session en cours</h2>
               <p className="text-sm text-blue-400 mb-5">
@@ -618,7 +614,6 @@ export default function Flashcards() {
             <div className="bg-white rounded-3xl p-7 border border-blue-100 shadow-xl">
               <div className="text-center mb-5">
                 <div className={`w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-                  <span className="text-2xl">{pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📚'}</span>
                 </div>
                 <h2 className="text-lg font-bold text-blue-900">Dernière session</h2>
                 <p className={`text-3xl font-bold mt-1 ${passed ? 'text-green-500' : 'text-orange-500'}`}>{pct}%</p>
@@ -642,7 +637,7 @@ export default function Flashcards() {
                 </div>
               ) : (
                 <div className="bg-green-50 rounded-xl p-4 text-center mb-5">
-                  <p className="text-sm font-semibold text-green-700">🎉 Tu savais toutes les cartes la dernière fois !</p>
+                  <p className="text-sm font-semibold text-green-700">Tu savais toutes les cartes la dernière fois !</p>
                 </div>
               )}
 
@@ -701,7 +696,7 @@ export default function Flashcards() {
               <motion.div key="sems" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
                 {semesters.length === 0 ? (
                   <div className="text-center py-20 text-slate-400">
-                    <div className="text-5xl mb-3">🃏</div>
+                    <div className="text-5xl mb-3"></div>
                     <p className="font-semibold">Aucune flashcard disponible</p>
                   </div>
                 ) : (
@@ -719,7 +714,6 @@ export default function Flashcards() {
                           className="relative overflow-hidden rounded-2xl p-6 text-left shadow-md hover:shadow-xl transition-shadow"
                           style={{ background: `linear-gradient(135deg, ${pal.from}, ${pal.to})` }}>
                           <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10 blur-2xl"/>
-                          <div className="text-4xl mb-4">{pal.emoji}</div>
                           <h3 className="font-bold text-white text-base mb-1">{sem}</h3>
                           <p className="text-white/75 text-xs mb-1">{ueCount} UE · {total} carte{total > 1 ? 's' : ''}</p>
                           {doneCount > 0 && <p className="text-white/60 text-xs mb-3">✓ {doneCount} chapitre{doneCount > 1 ? 's' : ''} terminé{doneCount > 1 ? 's' : ''}</p>}
@@ -769,7 +763,6 @@ export default function Flashcards() {
                         className="relative overflow-hidden rounded-2xl p-5 text-left shadow-md hover:shadow-xl transition-shadow"
                         style={{ background: `linear-gradient(135deg, ${pal.from}, ${pal.to})` }}>
                         <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"/>
-                        <div className="text-3xl mb-3">{pal.emoji}</div>
                         <h3 className="font-bold text-white text-sm mb-1">{ue}</h3>
                         <p className="text-white/75 text-xs">{chCount} chapitre{chCount > 1 ? 's' : ''} · {total} carte{total > 1 ? 's' : ''}</p>
                         {doneCount > 0 && (
@@ -820,7 +813,6 @@ export default function Flashcards() {
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                             style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-                            {pal.emoji}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-0.5">

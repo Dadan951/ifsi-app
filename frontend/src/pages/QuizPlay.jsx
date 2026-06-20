@@ -263,7 +263,7 @@ export default function QuizPlay() {
                 </div>
               ) : (
                 <div className="bg-green-50 rounded-xl p-4 text-center mb-5">
-                  <p className="text-sm font-semibold text-green-700">🎉 Aucune erreur lors de ta dernière session !</p>
+                  <p className="text-sm font-semibold text-green-700">Aucune erreur lors de ta dernière session !</p>
                 </div>
               )}
 
@@ -289,7 +289,7 @@ export default function QuizPlay() {
     const pct          = Math.round((score / total) * 100);
     const wrong        = total - score;
     const passed       = pct >= 60;
-    const emoji        = pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📚';
+    const emoji        = pct >= 80 ? '' : pct >= 60 ? '' : '';
     const title        = pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bien joué !' : "Continue à t'entraîner !";
     const wrongAnswers = answers.filter(a => !a.isCorrect);
     return (
@@ -300,7 +300,6 @@ export default function QuizPlay() {
 
               {/* Emoji */}
               <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-                <span className="text-4xl">{emoji}</span>
               </div>
               <h2 className="text-2xl font-bold text-blue-900 mb-1">{title}</h2>
               <p className="text-sm text-blue-400 mb-6">Quiz terminé</p>
@@ -358,7 +357,7 @@ export default function QuizPlay() {
                 </div>
               ) : (
                 <div className="bg-green-50 rounded-xl p-4 text-center mb-6">
-                  <p className="text-sm font-semibold text-green-700">🎉 Aucune erreur, parfait !</p>
+                  <p className="text-sm font-semibold text-green-700">Aucune erreur, parfait !</p>
                 </div>
               )}
 

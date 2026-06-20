@@ -19,11 +19,11 @@ const CAT_CFG = {
   other:      { label: 'Autre',       color: '#94a3b8' },
 };
 const CAT_LABELS = {
-  question:   '❓ Question générale',
-  bug:        '🐛 Signaler un bug',
-  billing:    '💳 Facturation / Abonnement',
-  suggestion: '💡 Suggestion',
-  other:      '📝 Autre',
+  question:   'Question générale',
+  bug:        'Signaler un bug',
+  billing:    'Facturation / Abonnement',
+  suggestion: 'Suggestion',
+  other:      'Autre',
 };
 
 /* ─── Mini components ────────────────────────────────────────────────────────── */

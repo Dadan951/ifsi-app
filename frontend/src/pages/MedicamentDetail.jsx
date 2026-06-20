@@ -183,7 +183,7 @@ export default function MedicamentDetail() {
     return (
       <DashboardLayout>
         <div className="text-center py-32 text-slate-500">
-          <div className="text-5xl mb-4">💊</div>
+          <div className="text-5xl mb-4"></div>
           <p className="font-semibold">Médicament introuvable</p>
           <button onClick={() => navigate('/dashboard/medicaments')} className="mt-4 text-blue-500 text-sm hover:underline">
             ← Retour aux médicaments
@@ -202,9 +202,9 @@ export default function MedicamentDetail() {
   const tocEntries = [
     { id: 'intro', label: 'Introduction', num: '·' },
     ...sections.map((s, i) => ({ id: `section-${i}`, label: s.title, num: i + 1 })),
-    ...(hasMindMap     ? [{ id: 'mindmap',     label: 'Carte mentale', num: '🧠' }] : []),
-    ...(hasAttachments ? [{ id: 'attachments', label: 'Ressources',    num: '📎' }] : []),
-    ...(hasSources     ? [{ id: 'sources',     label: 'Sources',       num: '📚' }] : []),
+    ...(hasMindMap     ? [{ id: 'mindmap',     label: 'Carte mentale', num: '' }] : []),
+    ...(hasAttachments ? [{ id: 'attachments', label: 'Ressources',    num: '' }] : []),
+    ...(hasSources     ? [{ id: 'sources',     label: 'Sources',       num: '' }] : []),
   ];
 
   const classColor = drug.drugClass?.color || '#0891b2';
@@ -355,7 +355,6 @@ export default function MedicamentDetail() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-purple-100 flex items-center justify-center text-xl flex-shrink-0">
-                    🧠
                   </div>
                   <h2 className="text-xl font-bold text-slate-800">Carte mentale</h2>
                 </div>
@@ -382,7 +381,6 @@ export default function MedicamentDetail() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-teal-100 flex items-center justify-center text-xl flex-shrink-0">
-                    📎
                   </div>
                   <h2 className="text-xl font-bold text-slate-800">Ressources</h2>
                 </div>
@@ -409,7 +407,6 @@ export default function MedicamentDetail() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-xl flex-shrink-0">
-                    📚
                   </div>
                   <h2 className="text-xl font-bold text-slate-800">Sources</h2>
                 </div>

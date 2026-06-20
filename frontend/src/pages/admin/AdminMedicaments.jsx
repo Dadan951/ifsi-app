@@ -77,7 +77,7 @@ function ClassModal({ editCls, onSave, onClose, token }) {
   const [form, setForm] = useState(
     editCls
       ? { name: editCls.name, description: editCls.description, color: editCls.color, icon: editCls.icon }
-      : { name: '', description: '', color: COLORS[0], icon: '💊' }
+      : { name: '', description: '', color: COLORS[0], icon: '' }
   );
   const [saving, setSaving] = useState(false);
   const headers = { Authorization: `Bearer ${token}` };
@@ -255,10 +255,10 @@ function DrugEditor({ drug: initDrug, classes, token, onSaved, onCancel }) {
   };
 
   const TABS = [
-    { id: 'general',  label: 'Général',   icon: '📋' },
-    { id: 'sections', label: 'Sections',  icon: '📖' },
-    { id: 'media',    label: 'Médias',    icon: '🖼️'  },
-    { id: 'sources',  label: 'Sources',   icon: '📚' },
+    { id: 'general',  label: 'Général',   icon: '' },
+    { id: 'sections', label: 'Sections',  icon: '' },
+    { id: 'media',    label: 'Médias',    icon: ''  },
+    { id: 'sources',  label: 'Sources',   icon: '' },
   ];
 
   const inputCls = "w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition";
@@ -401,7 +401,7 @@ function DrugEditor({ drug: initDrug, classes, token, onSaved, onCancel }) {
             {/* Mind map */}
             <div>
               <label className={`${labelCls} flex items-center gap-1.5`}>
-                <span>🧠</span> Carte mentale
+                Carte mentale
               </label>
               <div className="space-y-2">
                 <input type="url" value={form.mindMapUrl}
@@ -423,7 +423,7 @@ function DrugEditor({ drug: initDrug, classes, token, onSaved, onCancel }) {
             {/* Attachments */}
             <div>
               <label className={`${labelCls} flex items-center gap-1.5`}>
-                <span>📎</span> Pièces jointes
+                Pièces jointes
               </label>
               <div className="space-y-2">
                 {form.attachments.map((a, i) => (
@@ -619,9 +619,9 @@ export default function AdminMedicaments() {
 
           {/* Stat cards */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <StatCard label="Classes"     value={totalClasses}  icon="🗂️"  delay={0}    gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" />
-            <StatCard label="Médicaments" value={totalDrugs}    icon="💊"  delay={0.1}  gradient="linear-gradient(135deg,#0891b2,#0e7490)" />
-            <StatCard label="Sections"    value={totalSections} icon="📖"  delay={0.2}  gradient="linear-gradient(135deg,#7c3aed,#6d28d9)" />
+            <StatCard label="Classes"     value={totalClasses}  icon=""  delay={0}    gradient="linear-gradient(135deg,#2563eb,#1d4ed8)" />
+            <StatCard label="Médicaments" value={totalDrugs}    icon=""  delay={0.1}  gradient="linear-gradient(135deg,#0891b2,#0e7490)" />
+            <StatCard label="Sections"    value={totalSections} icon=""  delay={0.2}  gradient="linear-gradient(135deg,#7c3aed,#6d28d9)" />
           </div>
         </div>
 
@@ -643,7 +643,6 @@ export default function AdminMedicaments() {
                       !selClass ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    <span className="text-base">🗂️</span>
                     <span className="flex-1 truncate">Tous</span>
                     <span className={`text-xs px-1.5 py-0.5 rounded-md font-semibold ${!selClass ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
                       {drugs.length}
@@ -678,9 +677,13 @@ export default function AdminMedicaments() {
                             {/* Class actions */}
                             <div className="hidden group-hover:flex gap-0.5">
                               <button onClick={() => setClassModal(cls)}
-                                className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-400 hover:text-blue-600 flex items-center justify-center transition text-xs">✏️</button>
+                                className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-400 hover:text-blue-600 flex items-center justify-center transition text-xs">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                              </button>
                               <button onClick={() => setDelConfirm({ type: 'class', id: cls._id, name: cls.name })}
-                                className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-400 hover:text-red-500 flex items-center justify-center transition text-xs">🗑</button>
+                                className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-400 hover:text-red-500 flex items-center justify-center transition text-xs">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                              </button>
                             </div>
                           </motion.div>
                         );
@@ -821,7 +824,7 @@ export default function AdminMedicaments() {
                 onClick={e => e.stopPropagation()}
                 className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center"
               >
-                <div className="text-4xl mb-3">🗑️</div>
+                <div className="text-4xl mb-3"></div>
                 <h3 className="font-bold text-slate-800 mb-1">Supprimer ?</h3>
                 <p className="text-sm text-slate-500 mb-5">
                   <span className="font-semibold">"{delConfirm.name}"</span> sera définitivement supprimé
