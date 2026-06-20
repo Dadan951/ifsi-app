@@ -197,7 +197,7 @@ function PartieBlock({ partieNum, title, content, id, color, partieIndex }) {
       </div>
 
       {/* Content with left border */}
-      <div className="ml-16 pl-5 border-l-2 rounded-sm" style={{ borderColor: color + '40' }}>
+      <div className="ml-3 sm:ml-16 pl-3 sm:pl-5 border-l-2 rounded-sm" style={{ borderColor: color + '40' }}>
         <RichContent text={content} partieIndex={partieIndex} />
       </div>
     </motion.div>
@@ -435,7 +435,7 @@ export default function MedicamentDetail() {
                 </div>
                 <h2 className="text-lg font-bold text-slate-800">Introduction</h2>
               </div>
-              <div className="ml-14 pl-5 border-l-2 rounded-sm" style={{ borderColor: classColor + '40' }}>
+              <div className="ml-3 sm:ml-14 pl-3 sm:pl-5 border-l-2 rounded-sm" style={{ borderColor: classColor + '40' }}>
                 <RichContent text={drug.description} partieIndex={-1} />
               </div>
             </div>
@@ -466,7 +466,7 @@ export default function MedicamentDetail() {
                   </div>
                   <h2 className="text-lg font-bold text-slate-800">Médias</h2>
                 </div>
-                <div className="ml-14 pl-5 border-l-2 border-purple-100 rounded-sm">
+                <div className="ml-3 sm:ml-14 pl-3 sm:pl-5 border-l-2 border-purple-100 rounded-sm">
                   <p className="text-sm text-slate-600 leading-relaxed">{mediasSection.content}</p>
                 </div>
               </div>
