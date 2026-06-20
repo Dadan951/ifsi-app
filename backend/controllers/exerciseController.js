@@ -51,8 +51,15 @@ exports.remove = async (req, res) => {
 
 exports.complete = async (req, res) => {
   try {
+    // Reset daily si nouveau jour
+    const today = new Date().toISOString().split('T')[0];
+    await User.updateOne(
+      { _id: req.user._id, 'dailyProgress.date': { $ne: today } },
+      { $set: { 'dailyProgress.date': today, 'dailyProgress.quiz': 0, 'dailyProgress.flashcards': 0, 'dailyProgress.exercises': 0 } }
+    );
+
     await User.findByIdAndUpdate(req.user._id, {
-      $inc: { 'progress.exercisesCompleted': 1 },
+      $inc: { 'progress.exercisesCompleted': 1, 'dailyProgress.exercises': 1 },
       $set: { 'progress.lastActivity': new Date() }
     });
     res.json({ message: 'Exercice complété' });

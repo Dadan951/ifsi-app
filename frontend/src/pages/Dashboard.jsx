@@ -118,13 +118,18 @@ export default function Dashboard() {
   const { user, token, refreshUser } = useAuth();
   const p = user?.progress || {};
 
-  const [tipIdx,       setTipIdx]       = useState(0);
-  const [greeting,     setGreeting]     = useState('');
-  const [streak,       setStreak]       = useState(p.streak || 0);
-  const [weeklyData,   setWeeklyData]   = useState([0,0,0,0,0,0,0]);
-  const [showDetail,   setShowDetail]   = useState(false);
-  const [detailPeriod, setDetailPeriod] = useState('semaine');
-  const [customRange,  setCustomRange]  = useState({ from: '', to: '' });
+  const [tipIdx,        setTipIdx]        = useState(0);
+  const [greeting,      setGreeting]      = useState('');
+  const [streak,        setStreak]        = useState(p.streak || 0);
+  const [weeklyData,    setWeeklyData]    = useState([0,0,0,0,0,0,0]);
+  const [showDetail,    setShowDetail]    = useState(false);
+  const [detailPeriod,  setDetailPeriod]  = useState('semaine');
+  const [customRange,   setCustomRange]   = useState({ from: '', to: '' });
+  const [dailyGoals,    setDailyGoals]    = useState({ quizPerDay: 5, flashcardsPerDay: 20, exercisesPerDay: 3 });
+  const [dailyProgress, setDailyProgress] = useState({ quiz: 0, flashcards: 0, exercises: 0 });
+  const [showGoalsModal, setShowGoalsModal] = useState(false);
+  const [editGoals,     setEditGoals]     = useState({ quizPerDay: 5, flashcardsPerDay: 20, exercisesPerDay: 3 });
+  const [savingGoals,   setSavingGoals]   = useState(false);
 
   /* Time-based greeting */
   useEffect(() => {
@@ -147,6 +152,18 @@ export default function Dashboard() {
       console.error('[Ping] FAILED:', err?.response?.status, err?.response?.data || err.message);
     });
   }, []); // eslint-disable-line
+
+  /* Fetch daily goals + progress */
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API_URL}/auth/daily`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(res => {
+      setDailyGoals(res.data.goals);
+      setDailyProgress(res.data.daily);
+      setEditGoals(res.data.goals);
+    }).catch(console.error);
+  }, [token]); // eslint-disable-line
 
   /* Rotate tips */
   useEffect(() => {
@@ -243,10 +260,25 @@ export default function Dashboard() {
   ];
 
   const rings = [
-    { label: 'Quiz',       subLabel: 'objectif 50',  value: p.quizCompleted || 0,        max: 50,  color: '#3b82f6', glow: '#3b82f688' },
-    { label: 'Flashcards', subLabel: 'objectif 100', value: p.flashcardsReviewed || 0,   max: 100, color: '#6366f1', glow: '#6366f188' },
-    { label: 'Exercices',  subLabel: 'objectif 30',  value: p.exercisesCompleted || 0,   max: 30,  color: '#14b8a6', glow: '#14b8a688' },
+    { label: 'Quiz',       subLabel: `objectif ${dailyGoals.quizPerDay}`,       value: Math.min(dailyProgress.quiz,       dailyGoals.quizPerDay),       max: dailyGoals.quizPerDay,       color: '#3b82f6', glow: '#3b82f688' },
+    { label: 'Flashcards', subLabel: `objectif ${dailyGoals.flashcardsPerDay}`,  value: Math.min(dailyProgress.flashcards, dailyGoals.flashcardsPerDay), max: dailyGoals.flashcardsPerDay, color: '#6366f1', glow: '#6366f188' },
+    { label: 'Exercices',  subLabel: `objectif ${dailyGoals.exercisesPerDay}`,   value: Math.min(dailyProgress.exercises,  dailyGoals.exercisesPerDay),  max: dailyGoals.exercisesPerDay,  color: '#14b8a6', glow: '#14b8a688' },
   ];
+
+  async function saveGoals() {
+    setSavingGoals(true);
+    try {
+      await axios.put(`${API_URL}/auth/goals`, editGoals, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDailyGoals({ ...editGoals });
+      setShowGoalsModal(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingGoals(false);
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -346,7 +378,19 @@ export default function Dashboard() {
               >
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-5">
-                  <h2 className="text-sm font-semibold text-slate-700">Progression globale</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-semibold text-slate-700">Objectif du jour</h2>
+                    <button
+                      onClick={() => { setEditGoals({ ...dailyGoals }); setShowGoalsModal(true); }}
+                      className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors hover:bg-slate-100"
+                      title="Modifier les objectifs"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                  </div>
                   <button
                     onClick={() => setShowDetail(v => !v)}
                     className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
@@ -753,6 +797,85 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* ── Goals edit modal ──────────────────────────────────────────── */}
+      <AnimatePresence>
+      {showGoalsModal && (
+        <motion.div
+          key="goals-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(15,23,42,0.45)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setShowGoalsModal(false)}
+        >
+          <motion.div
+            key="goals-modal"
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-bold text-slate-800">Modifier mes objectifs</h3>
+              <button onClick={() => setShowGoalsModal(false)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                { key: 'quizPerDay',       label: 'Quiz par jour',        color: '#3b82f6', max: 500 },
+                { key: 'flashcardsPerDay', label: 'Flashcards par jour',  color: '#6366f1', max: 999 },
+                { key: 'exercisesPerDay',  label: 'Exercices par jour',   color: '#14b8a6', max: 200 },
+              ].map(({ key, label, color, max }) => (
+                <div key={key}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-600">{label}</label>
+                    <span className="text-xs font-bold tabular-nums" style={{ color }}>{editGoals[key]}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={max}
+                    value={editGoals[key]}
+                    onChange={e => setEditGoals(g => ({ ...g, [key]: +e.target.value }))}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                    style={{ accentColor: color }}
+                  />
+                  <div className="flex justify-between mt-0.5">
+                    <span className="text-[10px] text-slate-300">1</span>
+                    <span className="text-[10px] text-slate-300">{max}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowGoalsModal(false)}
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={saveGoals}
+                disabled={savingGoals}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-opacity disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#164e8a,#0891b2)' }}
+              >
+                {savingGoals ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+      </AnimatePresence>
+
     </DashboardLayout>
   );
 }

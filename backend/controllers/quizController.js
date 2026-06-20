@@ -119,9 +119,16 @@ exports.submitAttempt = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Mettre à jour les stats globales de l'utilisateur
+    // Reset daily si nouveau jour
+    const today = new Date().toISOString().split('T')[0];
+    await User.updateOne(
+      { _id: req.user._id, 'dailyProgress.date': { $ne: today } },
+      { $set: { 'dailyProgress.date': today, 'dailyProgress.quiz': 0, 'dailyProgress.flashcards': 0, 'dailyProgress.exercises': 0 } }
+    );
+
+    // Mettre à jour les stats globales + daily
     await User.findByIdAndUpdate(req.user._id, {
-      $inc: { 'progress.quizCompleted': 1, 'progress.totalScore': score },
+      $inc: { 'progress.quizCompleted': 1, 'progress.totalScore': score, 'dailyProgress.quiz': 1 },
       $set: { 'progress.lastActivity': new Date() }
     });
 

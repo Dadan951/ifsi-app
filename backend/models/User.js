@@ -18,6 +18,17 @@ const userSchema = new mongoose.Schema({
   },
   weeklyScores: [{ week: String, score: Number }],
   dailyActivity: [{ date: String, count: { type: Number, default: 0 } }],
+  goals: {
+    quizPerDay:        { type: Number, default: 5 },
+    flashcardsPerDay:  { type: Number, default: 20 },
+    exercisesPerDay:   { type: Number, default: 3 },
+  },
+  dailyProgress: {
+    date:       { type: String, default: '' },
+    quiz:       { type: Number, default: 0 },
+    flashcards: { type: Number, default: 0 },
+    exercises:  { type: Number, default: 0 },
+  },
   quizGen: {
     count: { type: Number, default: 0 },
     date: { type: String, default: '' }
