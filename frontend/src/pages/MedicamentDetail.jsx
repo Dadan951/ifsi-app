@@ -8,6 +8,146 @@ import DashboardLayout from '../components/DashboardLayout';
 /* ─── Sections spéciales (non numérotées comme "Partie N") ──────────────── */
 const SPECIAL = new Set(['Médias', 'Source', 'Général']);
 
+/* ─── Couleurs des titres par partie ────────────────────────────────────── */
+const HEADING_COLORS = [
+  { text: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' }, // bleu  — Partie 1
+  { text: '#0e7490', bg: '#ecfeff', border: '#a5f3fc' }, // cyan  — Partie 2
+  { text: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' }, // violet— Partie 3
+  { text: '#047857', bg: '#ecfdf5', border: '#a7f3d0' }, // vert  — Partie 4
+];
+
+/* ─── Renderer Markdown léger ────────────────────────────────────────────── */
+function RichContent({ text, partieIndex = 0 }) {
+  if (!text) return <span className="italic text-slate-400">Contenu non renseigné</span>;
+
+  const hc = HEADING_COLORS[partieIndex % HEADING_COLORS.length];
+
+  // Inline : **gras**, *italique*, __souligné__ (convention custom)
+  function renderInline(str) {
+    const parts = [];
+    // Regex pour capturer **bold**, *italic*, __underline__
+    const re = /(__.*?__|\*\*.*?\*\*|\*.*?\*)/g;
+    let last = 0, m;
+    while ((m = re.exec(str)) !== null) {
+      if (m.index > last) parts.push(str.slice(last, m.index));
+      const raw = m[0];
+      if (raw.startsWith('**')) {
+        parts.push(<strong key={m.index} className="font-bold text-slate-900">{raw.slice(2, -2)}</strong>);
+      } else if (raw.startsWith('__')) {
+        parts.push(<span key={m.index} className="underline decoration-2 underline-offset-2 text-slate-800">{raw.slice(2, -2)}</span>);
+      } else {
+        parts.push(<em key={m.index} className="italic text-slate-600">{raw.slice(1, -1)}</em>);
+      }
+      last = m.index + raw.length;
+    }
+    if (last < str.length) parts.push(str.slice(last));
+    return parts;
+  }
+
+  const lines = text.split('\n');
+  const elements = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Ligne vide
+    if (line.trim() === '') { i++; continue; }
+
+    // Tableau Markdown (détection : commence par |)
+    if (line.trim().startsWith('|')) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      // Filtrer la ligne séparatrice (---|---)
+      const rows = tableLines.filter(l => !l.replace(/[|\-\s]/g, '').trim() === false || !/^[|\s\-:]+$/.test(l));
+      const headers = rows[0]?.split('|').filter(Boolean).map(c => c.trim()) || [];
+      const dataRows = rows.slice(1).filter(r => !/^[|\s\-:]+$/.test(r));
+      elements.push(
+        <div key={`table-${i}`} className="overflow-x-auto my-4 rounded-xl border border-slate-200">
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{ backgroundColor: hc.bg }}>
+                {headers.map((h, hi) => (
+                  <th key={hi} className="px-4 py-2.5 text-left font-bold border-b border-slate-200" style={{ color: hc.text }}>
+                    {renderInline(h)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dataRows.map((row, ri) => {
+                const cells = row.split('|').filter(Boolean).map(c => c.trim());
+                return (
+                  <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
+                    {cells.map((cell, ci) => (
+                      <td key={ci} className="px-4 py-2 text-slate-700 border-b border-slate-100 last:border-b-0">
+                        {renderInline(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+      continue;
+    }
+
+    // Titre de section dans le contenu (ligne **Xxx** seule sur sa ligne)
+    const boldOnlyMatch = line.trim().match(/^\*\*(.+)\*\*$/);
+    if (boldOnlyMatch) {
+      elements.push(
+        <div key={`h-${i}`} className="flex items-center gap-2 mt-5 mb-2">
+          <div className="h-px flex-1 rounded-full" style={{ backgroundColor: hc.border }}/>
+          <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+            style={{ color: hc.text, backgroundColor: hc.bg, border: `1px solid ${hc.border}` }}>
+            {boldOnlyMatch[1]}
+          </span>
+          <div className="h-px flex-1 rounded-full" style={{ backgroundColor: hc.border }}/>
+        </div>
+      );
+      i++; continue;
+    }
+
+    // Liste à puces (- item)
+    if (line.trim().startsWith('- ')) {
+      const items = [];
+      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+        items.push(lines[i].trim().slice(2));
+        i++;
+      }
+      elements.push(
+        <ul key={`ul-${i}`} className="my-2 space-y-1.5 pl-1">
+          {items.map((item, ii) => (
+            <li key={ii} className="flex items-start gap-2.5 text-sm text-slate-700">
+              <span className="flex-shrink-0 w-4 h-4 rounded-full mt-0.5 flex items-center justify-center"
+                style={{ backgroundColor: hc.bg, border: `1.5px solid ${hc.border}` }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: hc.text }}/>
+              </span>
+              <span>{renderInline(item)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Paragraphe normal
+    elements.push(
+      <p key={`p-${i}`} className="text-sm text-slate-700 leading-relaxed my-1.5">
+        {renderInline(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div className="space-y-0.5">{elements}</div>;
+}
+
 /* ─── TOC item ───────────────────────────────────────────────────────────── */
 function TocItem({ label, sublabel, badge, active, onClick }) {
   return (
@@ -32,7 +172,7 @@ function TocItem({ label, sublabel, badge, active, onClick }) {
 }
 
 /* ─── Section content block ──────────────────────────────────────────────── */
-function PartieBlock({ partieNum, title, content, id, color }) {
+function PartieBlock({ partieNum, title, content, id, color, partieIndex }) {
   return (
     <motion.div
       id={id}
@@ -58,9 +198,7 @@ function PartieBlock({ partieNum, title, content, id, color }) {
 
       {/* Content with left border */}
       <div className="ml-16 pl-5 border-l-2 rounded-sm" style={{ borderColor: color + '40' }}>
-        <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
-          {content || <span className="italic text-slate-400">Contenu non renseigné</span>}
-        </div>
+        <RichContent text={content} partieIndex={partieIndex} />
       </div>
     </motion.div>
   );
@@ -298,9 +436,7 @@ export default function MedicamentDetail() {
                 <h2 className="text-lg font-bold text-slate-800">Introduction</h2>
               </div>
               <div className="ml-14 pl-5 border-l-2 rounded-sm" style={{ borderColor: classColor + '40' }}>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {drug.description || <span className="italic text-slate-400">Aucune introduction disponible.</span>}
-                </p>
+                <RichContent text={drug.description} partieIndex={-1} />
               </div>
             </div>
 
@@ -313,6 +449,7 @@ export default function MedicamentDetail() {
                   content={s.content}
                   id={`section-${i}`}
                   color={PARTIE_COLORS[i] || PARTIE_COLORS[0]}
+                  partieIndex={i}
                 />
               </div>
             ))}
