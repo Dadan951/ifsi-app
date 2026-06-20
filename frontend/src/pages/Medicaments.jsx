@@ -215,9 +215,15 @@ export default function Medicaments() {
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
-                  <line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Moitié gauche de la capsule — bleue */}
+                  <path d="M13.5 3.5a4.95 4.95 0 0 0-7 7l3.5 3.5 7-7-3.5-3.5z" fill="#60a5fa"/>
+                  {/* Moitié droite de la capsule — rose/rouge */}
+                  <path d="M10.5 20.5a4.95 4.95 0 0 0 7-7l-3.5-3.5-7 7 3.5 3.5z" fill="#f472b6"/>
+                  {/* Contour */}
+                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="white" strokeWidth="1.2" strokeOpacity="0.4" strokeLinecap="round" strokeLinejoin="round"/>
+                  {/* Ligne de séparation */}
+                  <line x1="8.5" y1="8.5" x2="15.5" y2="15.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.6" strokeLinecap="round"/>
                 </svg>
               </div>
               <div>
