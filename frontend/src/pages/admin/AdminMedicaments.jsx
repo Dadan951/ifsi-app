@@ -4,11 +4,9 @@ import {
   useMotionValue, useTransform, useSpring,
 } from 'framer-motion';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, API_URL } from '../../context/AuthContext';
 import DashboardLayout from '../../components/DashboardLayout';
 import NursesLogo from '../../components/NursesLogo';
-
-const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 /* ─── Palette of preset class colors ─────────────────────────────────────── */
 const COLORS = [
@@ -88,10 +86,10 @@ function ClassModal({ editCls, onSave, onClose, token }) {
     setSaving(true);
     try {
       if (editCls) {
-        const res = await axios.put(`${API}/api/drugs/classes/${editCls._id}`, form, { headers });
+        const res = await axios.put(`${API_URL}/drugs/classes/${editCls._id}`, form, { headers });
         onSave(res.data, 'edit');
       } else {
-        const res = await axios.post(`${API}/api/drugs/classes`, form, { headers });
+        const res = await axios.post(`${API_URL}/drugs/classes`, form, { headers });
         onSave(res.data, 'create');
       }
       onClose();
@@ -245,9 +243,9 @@ function DrugEditor({ drug: initDrug, classes, token, onSaved, onCancel }) {
     try {
       let res;
       if (isEdit) {
-        res = await axios.put(`${API}/api/drugs/${initDrug._id}`, payload, { headers });
+        res = await axios.put(`${API_URL}/drugs/${initDrug._id}`, payload, { headers });
       } else {
-        res = await axios.post(`${API}/api/drugs`, payload, { headers });
+        res = await axios.post(`${API_URL}/drugs`, payload, { headers });
       }
       onSaved(res.data, isEdit ? 'edit' : 'create');
     } catch (e) { console.error(e); }
@@ -531,8 +529,8 @@ export default function AdminMedicaments() {
   const load = async () => {
     try {
       const [cRes, dRes] = await Promise.all([
-        axios.get(`${API}/api/drugs/classes`, { headers }),
-        axios.get(`${API}/api/drugs`,         { headers }),
+        axios.get(`${API_URL}/drugs/classes`, { headers }),
+        axios.get(`${API_URL}/drugs`,         { headers }),
       ]);
       setClasses(cRes.data);
       setDrugs(dRes.data);
@@ -568,10 +566,10 @@ export default function AdminMedicaments() {
     if (!delConfirm) return;
     try {
       if (delConfirm.type === 'drug') {
-        await axios.delete(`${API}/api/drugs/${delConfirm.id}`, { headers });
+        await axios.delete(`${API_URL}/drugs/${delConfirm.id}`, { headers });
         setDrugs(prev => prev.filter(d => d._id !== delConfirm.id));
       } else {
-        await axios.delete(`${API}/api/drugs/classes/${delConfirm.id}`, { headers });
+        await axios.delete(`${API_URL}/drugs/classes/${delConfirm.id}`, { headers });
         setClasses(prev => prev.filter(c => c._id !== delConfirm.id));
         setDrugs(prev => prev.filter(d => d.drugClass?._id !== delConfirm.id));
         if (selClass === delConfirm.id) setSelClass(null);
