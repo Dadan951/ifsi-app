@@ -827,29 +827,38 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
-                { key: 'quizPerDay',       label: 'Quiz par jour',        color: '#3b82f6', max: 500 },
-                { key: 'flashcardsPerDay', label: 'Flashcards par jour',  color: '#6366f1', max: 999 },
-                { key: 'exercisesPerDay',  label: 'Exercices par jour',   color: '#14b8a6', max: 200 },
-              ].map(({ key, label, color, max }) => (
-                <div key={key}>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-semibold text-slate-600">{label}</label>
-                    <span className="text-xs font-bold tabular-nums" style={{ color }}>{editGoals[key]}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={max}
-                    value={editGoals[key]}
-                    onChange={e => setEditGoals(g => ({ ...g, [key]: +e.target.value }))}
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-                    style={{ accentColor: color }}
-                  />
-                  <div className="flex justify-between mt-0.5">
-                    <span className="text-[10px] text-slate-300">1</span>
-                    <span className="text-[10px] text-slate-300">{max}</span>
+                { key: 'quizPerDay',       label: 'Quiz par jour',       icon: '🧠', color: '#3b82f6', min: 1, max: 500 },
+                { key: 'flashcardsPerDay', label: 'Flashcards par jour', icon: '🃏', color: '#6366f1', min: 1, max: 999 },
+                { key: 'exercisesPerDay',  label: 'Exercices par jour',  icon: '✏️', color: '#14b8a6', min: 1, max: 200 },
+              ].map(({ key, label, icon, color, min, max }) => (
+                <div key={key} className="flex items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3">
+                  <span className="text-xl flex-shrink-0">{icon}</span>
+                  <label className="text-sm font-semibold text-slate-700 flex-1">{label}</label>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setEditGoals(g => ({ ...g, [key]: Math.max(min, g[key] - 1) }))}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all font-bold text-base"
+                    >−</button>
+                    <input
+                      type="number"
+                      min={min}
+                      max={max}
+                      value={editGoals[key]}
+                      onChange={e => {
+                        const v = Math.max(min, Math.min(max, parseInt(e.target.value) || min));
+                        setEditGoals(g => ({ ...g, [key]: v }));
+                      }}
+                      className="w-16 text-center text-base font-bold rounded-xl border-2 py-1 outline-none transition-all"
+                      style={{ borderColor: color + '60', color }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEditGoals(g => ({ ...g, [key]: Math.min(max, g[key] + 1) }))}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all font-bold text-base"
+                    >+</button>
                   </div>
                 </div>
               ))}
