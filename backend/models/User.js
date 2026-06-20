@@ -6,7 +6,9 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['student', 'admin'], default: 'student' },
-  subscription: { type: String, enum: ['free', 'pro', 'premium'], default: 'free' },
+  subscription:         { type: String, enum: ['free', 'pro', 'premium'], default: 'free' },
+  stripeCustomerId:     { type: String, default: null },
+  stripeSubscriptionId: { type: String, default: null },
   progress: {
     quizCompleted: { type: Number, default: 0 },
     flashcardsReviewed: { type: Number, default: 0 },

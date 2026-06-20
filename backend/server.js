@@ -10,6 +10,10 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
+
+// ⚠️ Webhook Stripe — raw body AVANT express.json()
+app.use('/api/subscription/webhook', require('./routes/subscription'));
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -27,6 +31,7 @@ app.use('/api/drugs',   require('./routes/drugs'));
 app.use('/api/annales', require('./routes/annales'));
 app.use('/api/tickets', require('./routes/tickets'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/subscription',  require('./routes/subscription'));
 
 app.get('/', (req, res) => {
   res.json({ message: '🚀 Serveur IFSI opérationnel !' });

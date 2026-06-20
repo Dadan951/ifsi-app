@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
+import PaywallGate from '../components/PaywallGate';
 import { getCache, setCache } from '../utils/cache';
 import { API_URL, useAuth } from '../context/AuthContext';
 
@@ -253,6 +254,7 @@ function ExBreadcrumb({ items }) {
 /* ─── Main ───────────────────────────────────────────────────────────────────── */
 export default function Exercises() {
   const { user }    = useAuth();
+  const isPro = user?.subscription === 'pro' || user?.subscription === 'premium';
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading]     = useState(true);
   const [completedCount, setCompletedCount] = useState(0);
@@ -298,6 +300,20 @@ export default function Exercises() {
   const qcmCount  = exercises.filter(e => e.type === 'qcm').length;
   const openCount = exercises.filter(e => e.type === 'open').length;
   const caseCount = exercises.filter(e => e.type === 'case_study').length;
+
+  if (!isPro) {
+    return (
+      <DashboardLayout>
+        <div className="flex-1 overflow-auto">
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #0c4a6e 100%)' }} className="px-6 pt-8 pb-6">
+            <h1 className="text-2xl font-bold text-white mb-1">Exercices</h1>
+            <p className="text-blue-200/70 text-sm">QCM, questions ouvertes et cas cliniques</p>
+          </div>
+          <PaywallGate requiredPlan="pro" feature="Les exercices théoriques (QCM, cas cliniques, questions ouvertes)" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
