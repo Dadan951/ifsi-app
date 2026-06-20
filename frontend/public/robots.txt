@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /api/
 
-Sitemap: https://VOTRE-DOMAINE.com/sitemap.xml
+Sitemap: https://www.nursesprep.fr/sitemap.xml
