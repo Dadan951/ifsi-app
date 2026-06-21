@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.1 - Psychologie, sociologie, anthropologie",
     chapter: "Introduction à la psychologie — définitions, méthodes et courants théoriques",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.1 - Psychologie, sociologie, anthropologie",
     chapter: "Mécanismes de défense — types, rôles et repérage clinique",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.1 - Psychologie, sociologie, anthropologie",
     chapter: "Psychanalyse de Freud — inconscient, pulsions et structure psychique",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.1 - Psychologie, sociologie, anthropologie",
     chapter: "Piaget — stades du développement cognitif de 0 à l'adolescence",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.1 - Psychologie, sociologie, anthropologie",
     chapter: "Erikson — stades psychosociaux du nourrisson à la vieillesse",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [

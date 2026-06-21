@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.3 - Législation, éthique, déontologie",
     chapter: "Droits fondamentaux des patients — loi du 4 mars 2002 (Kouchner)",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.3 - Législation, éthique, déontologie",
     chapter: "Personne de confiance — désignation, rôle et limites légales",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.3 - Législation, éthique, déontologie",
     chapter: "Consentement éclairé — conditions, refus de soins et exceptions",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.3 - Législation, éthique, déontologie",
     chapter: "Secret professionnel — étendue, partage et exceptions légales",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 1.3 - Législation, éthique, déontologie",
     chapter: "Responsabilité civile professionnelle de l'infirmière",
-    difficulty: "avancé",
+    difficulty: "hard",
     duration: 15,
     isPublished: true,
     questions: [

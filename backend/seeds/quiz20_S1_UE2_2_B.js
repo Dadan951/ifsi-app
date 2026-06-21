@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Chapitre 6 - Physiologie rénale",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Chapitre 7 - Physiologie digestive",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Chapitre 8 - Physiologie endocrinienne",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Chapitre 9 - Hémostase",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Chapitre 10 - Physiologie de la reproduction",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [

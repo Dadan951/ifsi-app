@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: 6,
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: 7,
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: 8,
-    difficulty: "avancé",
+    difficulty: "hard",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: 9,
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: 10,
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [

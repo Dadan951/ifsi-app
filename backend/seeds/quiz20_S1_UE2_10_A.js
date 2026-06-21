@@ -6,7 +6,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Bactériologie générale — structure, classification et pouvoir pathogène",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -100,7 +100,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Virologie générale — structure virale, réplication et tropisme",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -194,7 +194,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Mycologie et parasitologie — principaux agents fongiques et parasitaires",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -288,7 +288,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Mécanismes de l'infection — chaîne épidémiologique et portes d'entrée",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -382,7 +382,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Immunité anti-infectieuse — réponse innée et adaptative face aux agents pathogènes",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [

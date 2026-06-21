@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Chapitre 6 — Diagnostic infirmier NANDA",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Chapitre 7 — Planification des soins",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Chapitre 8 — Réalisation et évaluation des soins",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Chapitre 9 — Transmissions DAR",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Chapitre 10 — Dossier patient informatisé (DPI)",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [

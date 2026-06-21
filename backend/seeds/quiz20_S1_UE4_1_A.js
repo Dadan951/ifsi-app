@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 4.1 - Soins de confort et de relation",
     chapter: "Toilette au lit — préparation, technique et respect de l'intimité",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 4.1 - Soins de confort et de relation",
     chapter: "Douche et bain — aide partielle, totale et sécurité du patient",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 4.1 - Soins de confort et de relation",
     chapter: "Soins bucco-dentaires — technique, matériel et cas particuliers (prothèses, muqueuses)",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 4.1 - Soins de confort et de relation",
     chapter: "Soins des yeux et des oreilles — instillations, irrigation et surveillance",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 4.1 - Soins de confort et de relation",
     chapter: "Classification des escarres — stades I à IV et tissus concernés",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [

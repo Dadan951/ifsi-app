@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: "Organisation du temps de travail — priorisation, planification et gestion des urgences",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: "Gestion des imprévus — adaptabilité et réajustement en situation de soins",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: "Communication ISBAR — structure, utilisation et avantages en soins",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: "Transmissions écrites — règles de rédaction, objectivité et traçabilité",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 6.1 - Méthodes de travail et TIC",
     chapter: "Informatique et logiciels de soins — utilisation du DPI et des outils numériques",
-    difficulty: "débutant",
+    difficulty: "easy",
     duration: 15,
     isPublished: true,
     questions: [

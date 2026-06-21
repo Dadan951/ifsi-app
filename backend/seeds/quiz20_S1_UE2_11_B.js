@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: "Chapitre 6 - Effets indésirables médicamenteux",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: "Chapitre 7 - Circuit du médicament à l'hôpital",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: "Chapitre 8 - Administration IV — perfusions, débit, calcul de doses et complications",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: "Chapitre 9 - Voies IM, SC et ID — techniques, sites et précautions infirmières",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: "Chapitre 10 - Formes orales et autres voies — comprimés, gélules, patches et voie rectale",
-    difficulty: "intermédiaire",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
