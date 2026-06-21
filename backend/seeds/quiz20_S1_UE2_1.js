@@ -938,7 +938,7 @@ module.exports = [
         "explanation": "La jonction jéjuno-iléale n'a pas de limite anatomique macroscopique nette ; par convention, les 2/5 proximaux de l'intestin grêle forment le jéjunum et les 3/5 distaux l'iléon, avec des différences histologiques progressives."
       }
     ]
-  }
+  },
 
   // ─── 11. Système nerveux ──────────────────────────────────────────────────
   {
