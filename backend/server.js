@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 
 // ⚠️ Webhook Stripe — raw body AVANT express.json()
-app.use('/api/subscription/webhook', require('./routes/subscription'));
+app.use('/api/subscription/webhook', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(express.static('public'));

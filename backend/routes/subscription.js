@@ -1,6 +1,5 @@
-const router  = require('express').Router();
-const express = require('express');
-const Stripe  = require('stripe');
+const router = require('express').Router();
+const Stripe = require('stripe');
 const { protect } = require('../middleware/auth');
 const User = require('../models/User');
 
@@ -56,7 +55,7 @@ router.post('/portal', protect, async (req, res) => {
 });
 
 /* ── POST /api/subscription/webhook — raw body, registered in server.js ── */
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 
