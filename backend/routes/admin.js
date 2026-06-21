@@ -69,6 +69,36 @@ router.post('/seed-s1-20', async (req, res) => {
   }
 });
 
+/* ── POST /admin/fix-chapter-names ───────────────────────────────────────── */
+router.post('/fix-chapter-names', async (req, res) => {
+  try {
+    const Quiz = require('../models/Quiz');
+    const files = [
+      ...require('../seeds/quiz20_S1_UE1_1_B'),
+      ...require('../seeds/quiz20_S1_UE1_1_C'),
+      ...require('../seeds/quiz20_S1_UE2_10_C'),
+      ...require('../seeds/quiz20_S1_UE2_10_D'),
+      ...require('../seeds/quiz20_S1_UE2_11_C'),
+      ...require('../seeds/quiz20_S1_UE2_11_D'),
+      ...require('../seeds/quiz20_S1_UE4_1_B'),
+      ...require('../seeds/quiz20_S1_UE6_1_B'),
+      ...require('../seeds/quiz20_S1_UE6_1_C'),
+    ];
+    let updated = 0;
+    for (const quiz of files) {
+      const result = await Quiz.updateOne(
+        { title: quiz.title, category: quiz.category },
+        { $set: { chapter: quiz.chapter } }
+      );
+      if (result.modifiedCount > 0) updated++;
+    }
+    res.json({ success: true, updated, total: files.length });
+  } catch (err) {
+    console.error('[fix-chapter-names]', err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 /* ── POST /admin/seed-new-quizzes ────────────────────────────────────────── */
 router.post('/seed-new-quizzes', async (req, res) => {
   try {
