@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Concepts et modèles de soins infirmiers — définitions et fondements théoriques",
-    difficulty: "Débutant",
+    difficulty: "easy",
     duration: 12,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Modèle de Virginia Henderson — 14 besoins fondamentaux et recueil de données",
-    difficulty: "Débutant",
+    difficulty: "easy",
     duration: 12,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Modèles d'Orem et de Roy — autosoins et adaptation",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 14,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Processus de soins infirmiers — étapes et cadre méthodologique",
-    difficulty: "Débutant",
+    difficulty: "easy",
     duration: 12,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 3.1 - Raisonnement et démarche clinique infirmière",
     chapter: "Collecte de données — entretien, observation et sources d'information",
-    difficulty: "Débutant",
+    difficulty: "easy",
     duration: 12,
     isPublished: true,
     questions: [

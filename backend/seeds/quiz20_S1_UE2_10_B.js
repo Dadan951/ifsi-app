@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Chapitre 6 — Vaccination",
-    difficulty: "intermediate",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Chapitre 7 — Hygiène des mains",
-    difficulty: "intermediate",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Chapitre 8 — Précautions standard",
-    difficulty: "intermediate",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Chapitre 9 — Précautions complémentaires",
-    difficulty: "intermediate",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: "Chapitre 10 — Infections associées aux soins",
-    difficulty: "intermediate",
+    difficulty: "medium",
     duration: 15,
     isPublished: true,
     questions: [

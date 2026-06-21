@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: 16,
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: 17,
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: 18,
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: 19,
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.10 - Infectiologie et hygiène",
     chapter: 20,
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [

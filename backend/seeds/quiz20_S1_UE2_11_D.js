@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: 16,
-    difficulty: "intermediaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: 17,
-    difficulty: "intermediaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: 18,
-    difficulty: "intermediaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: 19,
-    difficulty: "intermediaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.11 - Pharmacologie et thérapeutiques",
     chapter: 20,
-    difficulty: "intermediaire",
+    difficulty: "medium",
     duration: 16,
     isPublished: true,
     questions: [

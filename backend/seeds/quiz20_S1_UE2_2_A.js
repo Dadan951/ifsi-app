@@ -5,7 +5,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Physiologie cardiaque",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 20,
     isPublished: true,
     questions: [
@@ -97,7 +97,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Lecture de l'ECG",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 20,
     isPublished: true,
     questions: [
@@ -189,7 +189,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Physiologie respiratoire",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 20,
     isPublished: true,
     questions: [
@@ -281,7 +281,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Physiologie neurologique",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 20,
     isPublished: true,
     questions: [
@@ -373,7 +373,7 @@ module.exports = [
     semester: "Semestre 1",
     category: "UE 2.2 - Cycles de la vie et grandes fonctions",
     chapter: "Système nerveux autonome",
-    difficulty: "Intermédiaire",
+    difficulty: "medium",
     duration: 20,
     isPublished: true,
     questions: [
