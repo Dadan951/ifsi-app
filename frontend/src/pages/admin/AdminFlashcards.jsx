@@ -222,7 +222,10 @@ export default function AdminFlashcards() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
   const [deleting, setDeleting] = useState(null);
-  const [search, setSearch] = useState('');
+  const [search,     setSearch]     = useState('');
+  const [filterSem,  setFilterSem]  = useState('');
+  const [filterUE,   setFilterUE]   = useState('');
+  const [filterChap, setFilterChap] = useState('');
 
   const load = () => {
     setLoading(true);
@@ -248,12 +251,24 @@ export default function AdminFlashcards() {
   };
   const diffLabel = { easy: 'Facile', medium: 'Moyen', hard: 'Difficile' };
 
-  const filtered = items.filter(i =>
-    i.front.toLowerCase().includes(search.toLowerCase()) ||
-    i.category.toLowerCase().includes(search.toLowerCase())
-  );
+  const semesters = [...new Set(items.map(i => i.semester).filter(Boolean))].sort();
+  const ues       = [...new Set(
+    items.filter(i => !filterSem || i.semester === filterSem).map(i => i.category).filter(Boolean)
+  )].sort();
+  const chapters  = [...new Set(
+    items.filter(i => (!filterSem || i.semester === filterSem) && (!filterUE || i.category === filterUE))
+         .map(i => i.chapter).filter(Boolean)
+  )].sort();
 
-  const published = items.filter(i => i.isPublished).length;
+  const filtered = items.filter(i => {
+    const matchSearch = i.front.toLowerCase().includes(search.toLowerCase()) || (i.category||'').toLowerCase().includes(search.toLowerCase());
+    const matchSem  = !filterSem  || i.semester  === filterSem;
+    const matchUE   = !filterUE   || i.category  === filterUE;
+    const matchChap = !filterChap || i.chapter    === filterChap;
+    return matchSearch && matchSem && matchUE && matchChap;
+  });
+
+  const published  = items.filter(i => i.isPublished).length;
   const categories = [...new Set(items.map(i => i.category).filter(Boolean))].length;
 
   return (
@@ -316,8 +331,8 @@ export default function AdminFlashcards() {
           <div className="bg-white rounded-3xl shadow-2xl">
 
             {/* Toolbar */}
-            <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-              <div className="relative flex-1 max-w-xs">
+            <div className="p-5 border-b border-slate-100 flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[180px]">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input
                   type="text"
@@ -327,8 +342,30 @@ export default function AdminFlashcards() {
                   className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:bg-white transition placeholder:text-slate-400"
                 />
               </div>
+
+              {/* Filtre semestre */}
+              <select value={filterSem} onChange={e => { setFilterSem(e.target.value); setFilterUE(''); setFilterChap(''); }}
+                className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition bg-white">
+                <option value="">Tous les semestres</option>
+                {semesters.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+
+              {/* Filtre UE (cascade depuis semestre) */}
+              <select value={filterUE} onChange={e => { setFilterUE(e.target.value); setFilterChap(''); }}
+                className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition bg-white max-w-[220px]">
+                <option value="">Toutes les UE</option>
+                {ues.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+
+              {/* Filtre chapitre (cascade depuis UE) */}
+              <select value={filterChap} onChange={e => setFilterChap(e.target.value)}
+                className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition bg-white max-w-[220px]">
+                <option value="">Tous les chapitres</option>
+                {chapters.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+
               <span className="ml-auto text-xs text-slate-400 font-medium">
-                {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
+                {filtered.length} / {items.length} flashcard{items.length !== 1 ? 's' : ''}
               </span>
             </div>
 
@@ -340,8 +377,15 @@ export default function AdminFlashcards() {
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
                 <div className="text-5xl mb-3"></div>
-                <p className="font-semibold">Aucune flashcard</p>
-                <p className="text-xs mt-1">Ajoutez votre première carte de révision</p>
+                <p className="font-semibold">Aucune flashcard trouvée</p>
+                {(search || filterSem || filterUE || filterChap) ? (
+                  <button onClick={() => { setSearch(''); setFilterSem(''); setFilterUE(''); setFilterChap(''); }}
+                    className="mt-3 text-xs text-blue-500 hover:text-blue-700 underline">
+                    Réinitialiser les filtres
+                  </button>
+                ) : (
+                  <p className="text-xs mt-1">Ajoutez votre première carte de révision</p>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
