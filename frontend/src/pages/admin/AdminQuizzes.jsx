@@ -46,8 +46,8 @@ const EMPTY_QUIZ = {
   questions:[{ text:'', explanation:'', options:[{text:'',isCorrect:true},{text:'',isCorrect:false},{text:'',isCorrect:false},{text:'',isCorrect:false}] }]
 };
 
-function QuizModal({ quiz, onClose, onSave, existingSemesters = [], existingCategories = [], existingChapters = [] }) {
-  const [form,    setForm]    = useState(quiz ? JSON.parse(JSON.stringify(quiz)) : EMPTY_QUIZ);
+function QuizModal({ quiz, preset, onClose, onSave, existingSemesters = [], existingCategories = [], existingChapters = [] }) {
+  const [form,    setForm]    = useState(quiz ? JSON.parse(JSON.stringify(quiz)) : { ...EMPTY_QUIZ, ...(preset || {}) });
   const [loading, setLoading] = useState(false);
   const [tab,     setTab]     = useState(0);
 
@@ -305,6 +305,18 @@ export default function AdminQuizzes() {
                 {chapters.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
 
+              {/* Bouton + Quiz contextuel */}
+              {(filterSem || filterUE || filterChap) && (
+                <motion.button
+                  whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                  onClick={() => setModal({ _preset: true, semester: filterSem, category: filterUE, chapter: filterChap })}
+                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-white shadow-sm whitespace-nowrap"
+                  style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Ajouter un quiz ici
+                </motion.button>
+              )}
+
               {/* Compteur résultats */}
               <span className="text-xs text-slate-400 font-medium ml-auto">
                 {filtered.length} / {quizzes.length} quiz
@@ -384,7 +396,8 @@ export default function AdminQuizzes() {
       </div>
 
       <AnimatePresence>{modal && <QuizModal
-        quiz={modal === 'new' ? null : modal}
+        quiz={modal === 'new' || modal?._preset ? null : modal}
+        preset={modal?._preset ? { semester: modal.semester, category: modal.category, chapter: modal.chapter } : null}
         onClose={() => setModal(null)}
         onSave={handleSave}
         existingSemesters={semesters}
