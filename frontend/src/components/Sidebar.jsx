@@ -214,8 +214,8 @@ export default function Sidebar({ isAdmin = false, onClose, onSearch }) {
   };
 
   /* Split student links into groups */
-  const mainLinks  = !isAdmin ? links.slice(0, 7) : links;
-  const extraLinks = !isAdmin ? links.slice(7)    : [];
+  const mainLinks  = !isAdmin ? links.slice(0, 8) : links;
+  const extraLinks = !isAdmin ? links.slice(8)    : [];
 
   return (
     <aside className="w-60 h-full flex flex-col relative overflow-hidden"
