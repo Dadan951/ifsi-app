@@ -252,20 +252,6 @@ export default function Subscription() {
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2 mt-2">
-                {[
-                  { icon: '🎓', text: 'Conçu pour les étudiants IFSI' },
-                  { icon: '🔓', text: 'Sans engagement' },
-                  { icon: '⚡', text: 'Accès immédiat' },
-                  { icon: '🔒', text: 'Paiement sécurisé Stripe' },
-                ].map((v, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.07 }}
-                    className="flex items-center gap-2 bg-white/10 border border-white/10 px-3 py-1.5 rounded-xl">
-                    <span className="text-sm">{v.icon}</span>
-                    <span className="text-white/70 text-xs font-medium">{v.text}</span>
-                  </motion.div>
-                ))}
-              </div>
             </motion.div>
           </div>
         </div>
@@ -309,7 +295,6 @@ export default function Subscription() {
 
                   {/* Card header */}
                   <div className="px-6 pt-10 pb-7 relative overflow-hidden" style={{ background: plan.gradient }}>
-                    <div className="absolute top-3 right-4 text-4xl opacity-15 select-none">{plan.icon}</div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-bold text-white/60 uppercase tracking-widest">{plan.name}</span>
                       {isCurrent && (
@@ -380,43 +365,49 @@ export default function Subscription() {
           {/* ── Comparison table ── */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
             className="mb-12 rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-white">
-
-            <div className="grid grid-cols-4 border-b border-slate-100 bg-slate-50">
-              <div className="px-6 py-4">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fonctionnalité</span>
-              </div>
-              {plans.map(p => (
-                <div key={p.id} className={`px-4 py-4 text-center ${p.popular ? 'bg-blue-50/60' : ''}`}>
-                  <div className="text-sm font-bold" style={{ color: p.accent }}>{p.name}</div>
-                  <div className="text-xs font-semibold text-slate-400">{p.price}€/mois</div>
-                  {p.id === currentSub && (
-                    <div className="text-[10px] font-bold mt-1 px-2 py-0.5 rounded-full inline-block" style={{ background: `${p.accent}18`, color: p.accent }}>
-                      ▲ actuel
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {compareRows.map((section, si) => (
-              <div key={si}>
-                <div className="grid grid-cols-4 border-b border-slate-100 bg-slate-50/60">
-                  <div className="px-6 py-2.5 col-span-4">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{section.category}</span>
-                  </div>
-                </div>
-                {section.rows.map((row, ri) => (
-                  <div key={ri} className={`grid grid-cols-4 border-b border-slate-50 ${ri % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                    <div className="px-6 py-3.5 text-sm text-slate-600 font-medium flex items-center">{row.label}</div>
-                    {row.vals.map((v, vi) => (
-                      <div key={vi} className={`px-4 py-3.5 flex items-center justify-center ${plans[vi].popular ? 'bg-blue-50/20' : ''}`}>
-                        <CmpVal v={v} col={vi} />
-                      </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px]">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    <th className="px-5 py-4 text-left w-2/5">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fonctionnalité</span>
+                    </th>
+                    {plans.map(p => (
+                      <th key={p.id} className={`px-3 py-4 text-center ${p.popular ? 'bg-blue-50/60' : ''}`}>
+                        <div className="text-sm font-bold" style={{ color: p.accent }}>{p.name}</div>
+                        <div className="text-xs font-semibold text-slate-400">{p.price}€/mois</div>
+                        {p.id === currentSub && (
+                          <div className="text-[10px] font-bold mt-1 px-2 py-0.5 rounded-full inline-block" style={{ background: `${p.accent}18`, color: p.accent }}>
+                            ▲ actuel
+                          </div>
+                        )}
+                      </th>
                     ))}
-                  </div>
-                ))}
-              </div>
-            ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {compareRows.map((section, si) => (
+                    <>
+                      <tr key={`cat-${si}`} className="border-b border-slate-100 bg-slate-50/60">
+                        <td colSpan={4} className="px-5 py-2.5">
+                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{section.category}</span>
+                        </td>
+                      </tr>
+                      {section.rows.map((row, ri) => (
+                        <tr key={`${si}-${ri}`} className={`border-b border-slate-50 ${ri % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+                          <td className="px-5 py-3 text-sm text-slate-600 font-medium">{row.label}</td>
+                          {row.vals.map((v, vi) => (
+                            <td key={vi} className={`px-3 py-3 text-center ${plans[vi].popular ? 'bg-blue-50/20' : ''}`}>
+                              <CmpVal v={v} col={vi} />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </motion.div>
 
           {/* ── Upgrade CTA for free users ── */}
