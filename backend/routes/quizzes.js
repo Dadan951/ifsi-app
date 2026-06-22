@@ -6,6 +6,7 @@ const requirePlan = require('../middleware/requirePlan');
 router.get('/', protect, ctrl.getAll);
 router.get('/admin', protect, adminOnly, ctrl.adminGetAll);
 router.get('/personal', protect, ctrl.getPersonal);
+router.get('/quota', protect, ctrl.getQuota);
 router.get('/gen-status', protect, ctrl.genStatus);
 router.post('/generate', protect, requirePlan('pro'), ctrl.generateQuiz);
 router.delete('/personal/:id', protect, ctrl.deletePersonal);

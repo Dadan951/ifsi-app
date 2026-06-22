@@ -246,6 +246,17 @@ export default function Quiz() {
   const [selectedChapter, setSelectedChapter]   = useState(null);
 
   const isPro = ['pro', 'premium'].includes(user?.subscription);
+  const [quotaModal, setQuotaModal] = useState(false);
+
+  const handlePlay = async (id) => {
+    if (!isPro) {
+      try {
+        const { data } = await axios.get(`${API_URL}/quizzes/quota`);
+        if (data.exceeded) { setQuotaModal(true); return; }
+      } catch {}
+    }
+    navigate(`/dashboard/quiz/${id}`);
+  };
 
   useEffect(() => {
     // Affiche immédiatement les données en cache si disponibles
@@ -298,6 +309,39 @@ export default function Quiz() {
 
   return (
     <DashboardLayout>
+      {/* ── Modal quota dépassé ── */}
+      <AnimatePresence>
+        {quotaModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setQuotaModal(false)}>
+            <motion.div initial={{ scale: 0.9, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Quota mensuel atteint</h3>
+              <p className="text-slate-500 text-sm mb-1">Vous avez utilisé vos <span className="font-bold text-slate-700">10 quiz gratuits</span> ce mois-ci.</p>
+              <p className="text-slate-500 text-sm mb-6">Passez à l'abonnement <span className="font-bold text-blue-600">Étudiant</span> pour accéder à des quiz illimités, des flashcards illimitées, et bien plus encore.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setQuotaModal(false)}
+                  className="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
+                  Plus tard
+                </button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/dashboard/subscription')}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+                  Voir les abonnements
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex-1 overflow-auto">
 
         {/* ── Hero ── */}
@@ -540,7 +584,7 @@ export default function Quiz() {
                           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}
                           whileHover={{ y: -4 }}
                           className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-100 transition-all cursor-pointer group"
-                          onClick={() => navigate(`/dashboard/quiz/${quiz._id}`)}
+                          onClick={() => handlePlay(quiz._id)}
                         >
                           {/* Barre de statut colorée en haut */}
                           <div className="h-1.5" style={{ background: isDone ? barColor : isResume ? '#f59e0b' : 'linear-gradient(90deg,#2563eb,#0891b2)' }}/>
@@ -623,7 +667,7 @@ export default function Quiz() {
                       <PersonalQuizList
                         quizzes={personalQuizzes}
                         onDelete={id => setPersonalQuizzes(prev => prev.filter(q => q._id !== id))}
-                        onPlay={id => navigate(`/dashboard/quiz/${id}`)}
+                        onPlay={id => handlePlay(id)}
                       />
                     )}
                   </div>
