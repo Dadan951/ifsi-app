@@ -202,7 +202,7 @@ function SectionLabel({ children }) {
 }
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────── */
-export default function Sidebar({ isAdmin = false, onClose }) {
+export default function Sidebar({ isAdmin = false, onClose, onSearch }) {
   const { user, logout } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
@@ -251,6 +251,22 @@ export default function Sidebar({ isAdmin = false, onClose }) {
           </motion.button>
         )}
       </div>
+
+      {/* ── Recherche ─────────────────────────────────────────────────── */}
+      {!isAdmin && onSearch && (
+        <div className="px-3 pt-3 pb-1 relative z-10">
+          <button
+            onClick={onSearch}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors text-left group"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span className="text-xs text-slate-400 flex-1">Rechercher…</span>
+            <kbd className="hidden lg:flex items-center gap-0.5 text-[9px] text-slate-400 border border-slate-300 rounded px-1 py-0.5 leading-none">⌘K</kbd>
+          </button>
+        </div>
+      )}
 
       {/* ── Nav links ─────────────────────────────────────────────────── */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto relative z-10">

@@ -2,9 +2,22 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import NursesLogo from './NursesLogo';
+import SearchModal from './SearchModal';
 
 export default function DashboardLayout({ children, isAdmin = false }) {
-  const [open, setOpen] = useState(false);
+  const [open,       setOpen]       = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(s => !s);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   useEffect(() => {
     const onResize = () => { if (window.innerWidth >= 1024) setOpen(false); };
@@ -31,7 +44,7 @@ export default function DashboardLayout({ children, isAdmin = false }) {
         lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:z-auto
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <Sidebar isAdmin={isAdmin} onClose={() => setOpen(false)} />
+        <Sidebar isAdmin={isAdmin} onClose={() => setOpen(false)} onSearch={() => setSearchOpen(true)} />
       </div>
 
       {/* Main content area */}
@@ -52,13 +65,25 @@ export default function DashboardLayout({ children, isAdmin = false }) {
           <Link to="/" className="hover:opacity-80 transition-opacity">
             <NursesLogo size="xs" />
           </Link>
+          {/* Mobile search button */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="ml-auto w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition flex-shrink-0"
+            aria-label="Rechercher"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
           {isAdmin && (
-            <span className="ml-auto text-xs font-bold bg-blue-100 text-blue-600 px-2.5 py-1 rounded-full">Admin</span>
+            <span className="text-xs font-bold bg-blue-100 text-blue-600 px-2.5 py-1 rounded-full">Admin</span>
           )}
         </header>
 
         {children}
       </div>
+
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }
