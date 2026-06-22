@@ -30,6 +30,8 @@ export default function QuizPlay() {
   const [score, setScore]                     = useState(0);
   const [done, setDone]                       = useState(false);
   const [answers, setAnswers]                 = useState([]);
+  const [reviewMode, setReviewMode]           = useState(false);
+  const [reviewIdx, setReviewIdx]             = useState(0);
   const [timeLeft, setTimeLeft]               = useState(null);
   const [confirmExit, setConfirmExit]         = useState(false);
 
@@ -289,95 +291,221 @@ export default function QuizPlay() {
     const pct          = Math.round((score / total) * 100);
     const wrong        = total - score;
     const passed       = pct >= 60;
-    const emoji        = pct >= 80 ? '' : pct >= 60 ? '' : '';
     const title        = pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bien joué !' : "Continue à t'entraîner !";
     const wrongAnswers = answers.filter(a => !a.isCorrect);
-    return (
-      <DashboardLayout>
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col">
-          <div className="w-full max-w-lg mx-auto my-auto">
-            <div className="bg-white rounded-3xl p-8 border border-blue-100 shadow-xl shadow-blue-100 text-center">
+    const wrongCount   = wrongAnswers.length;
 
-              {/* Emoji */}
-              <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-              </div>
-              <h2 className="text-2xl font-bold text-blue-900 mb-1">{title}</h2>
-              <p className="text-sm text-blue-400 mb-6">Quiz terminé</p>
+    /* ── Mode révision ── */
+    if (reviewMode) {
+      const ans  = answers[reviewIdx];
+      const rq   = shuffledQuestions[reviewIdx] || quiz.questions[reviewIdx];
+      const isOk = ans?.isCorrect;
 
-              {/* Stats correct / total / erreurs */}
-              <div className="flex items-center justify-center gap-6 mb-6">
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-green-500">{score}</span>
-                  <p className="text-xs text-green-400 mt-1">✓ Correct</p>
-                </div>
-                <div className="text-3xl text-blue-200">/</div>
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-blue-600">{total}</span>
-                  <p className="text-xs text-blue-400 mt-1">Total</p>
-                </div>
-                <div className="text-3xl text-blue-200">/</div>
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-red-400">{wrong}</span>
-                  <p className="text-xs text-red-300 mt-1">✗ Erreurs</p>
-                </div>
-              </div>
+      return (
+        <DashboardLayout>
+          <main className="flex-1 overflow-y-auto flex flex-col bg-slate-50">
 
-              {/* Pourcentage */}
-              <div className={`text-2xl font-bold mb-6 ${passed ? 'text-green-500' : 'text-orange-500'}`}>{pct}%</div>
-
-              {/* Barre animée */}
-              <div className="w-full h-3 bg-blue-100 rounded-full mb-6 overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 1, delay: 0.3 }}
-                  className={`h-3 rounded-full ${passed ? 'bg-green-400' : 'bg-orange-400'}`}
-                />
-              </div>
-
-              {/* Questions ratées */}
-              {wrongAnswers.length > 0 ? (
-                <div className="text-left mb-6">
-                  <p className="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide">
-                    {wrongAnswers.length} question{wrongAnswers.length > 1 ? 's' : ''} à retravailler :
-                  </p>
-                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    {wrongAnswers.map((a, i) => (
-                      <div key={i} className="bg-red-50 border border-red-100 rounded-xl p-3 text-left">
-                        <p className="text-xs font-semibold text-red-800 mb-1">{a.questionText}</p>
-                        <p className="text-xs text-red-500 flex items-start gap-1">
-                          <span className="font-bold flex-shrink-0">✗</span> Ta réponse : {a.selectedText}
-                        </p>
-                        <p className="text-xs text-green-700 flex items-start gap-1 mt-0.5">
-                          <span className="font-bold flex-shrink-0">✓</span> Bonne réponse : {a.correctText}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-green-50 rounded-xl p-4 text-center mb-6">
-                  <p className="text-sm font-semibold text-green-700">Aucune erreur, parfait !</p>
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <button onClick={() => navigate('/dashboard/quiz')}
-                  className="flex-1 py-2.5 border border-blue-200 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-50 transition">
-                  Retour aux quiz
+            {/* Header */}
+            <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }} className="px-5 pt-6 pb-5">
+              <div className="flex items-center justify-between mb-4 max-w-2xl mx-auto">
+                <button onClick={() => setReviewMode(false)}
+                  className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  Résultats
                 </button>
-                <button onClick={() => {
-                  setCurrent(0); setSelected(null); setAnswered(false);
-                  setScore(0); setDone(false); setAnswers([]);
-                  setTimeLeft(quiz.duration * 60);
-                  setShuffledQuestions(shuffleOptions(quiz.questions));
-                  setReady(true);
-                }}
-                  className="flex-1 py-2.5 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition">
-                  Recommencer
-                </button>
+                <span className="text-white/50 text-xs font-medium">Mode révision</span>
+                <span className="text-white text-sm font-bold">{reviewIdx + 1} / {total}</span>
+              </div>
+
+              {/* Indicateurs de questions */}
+              <div className="flex gap-1 flex-wrap justify-center max-w-2xl mx-auto">
+                {answers.map((a, i) => (
+                  <button key={i} onClick={() => setReviewIdx(i)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                      i === reviewIdx
+                        ? 'ring-2 ring-white scale-110 ' + (a.isCorrect ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white')
+                        : a.isCorrect ? 'bg-emerald-400/40 text-emerald-200' : 'bg-red-400/40 text-red-200'
+                    }`}>
+                    {i + 1}
+                  </button>
+                ))}
               </div>
             </div>
+
+            {/* Carte question */}
+            <div className="flex-1 p-5 max-w-2xl mx-auto w-full">
+              <motion.div key={reviewIdx} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
+
+                {/* Badge correct/incorrect */}
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-4 ${isOk ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                  {isOk
+                    ? <><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg> Bonne réponse</>
+                    : <><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Mauvaise réponse</>
+                  }
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-4">
+                  <p className="text-base font-semibold text-slate-800 mb-5 leading-relaxed">{rq?.text}</p>
+
+                  <div className="space-y-2.5">
+                    {rq?.options.map((opt, oi) => {
+                      const isSelected = opt.text === ans?.selectedText;
+                      const isCorrect  = opt.isCorrect;
+                      let cls = 'border border-slate-100 bg-slate-50 text-slate-400';
+                      if (isCorrect)                       cls = 'border-2 border-emerald-400 bg-emerald-50 text-emerald-800';
+                      else if (isSelected && !isCorrect)   cls = 'border-2 border-red-400 bg-red-50 text-red-700';
+
+                      return (
+                        <div key={oi} className={`px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-3 ${cls}`}>
+                          <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                            {isCorrect && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            )}
+                            {isSelected && !isCorrect && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            )}
+                          </div>
+                          <span>{opt.text}</span>
+                          {isSelected && isCorrect && <span className="ml-auto text-xs font-bold text-emerald-600">Ta réponse ✓</span>}
+                          {isSelected && !isCorrect && <span className="ml-auto text-xs font-bold text-red-500">Ta réponse</span>}
+                          {isCorrect && !isSelected && <span className="ml-auto text-xs font-bold text-emerald-600">Bonne réponse</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Explication */}
+                  {rq?.explanation && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                      <p className="text-xs font-bold text-blue-700 mb-1 flex items-center gap-1.5">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Explication
+                      </p>
+                      <p className="text-xs text-blue-600 leading-relaxed">{rq.explanation}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Navigation */}
+                <div className="flex gap-3">
+                  <button onClick={() => setReviewIdx(i => Math.max(0, i - 1))} disabled={reviewIdx === 0}
+                    className="flex-1 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-500 hover:bg-slate-100 transition disabled:opacity-30">
+                    ← Précédent
+                  </button>
+                  {reviewIdx < total - 1 ? (
+                    <button onClick={() => setReviewIdx(i => i + 1)}
+                      className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition"
+                      style={{ background: 'linear-gradient(135deg, #2563eb, #0891b2)' }}>
+                      Suivant →
+                    </button>
+                  ) : (
+                    <button onClick={() => setReviewMode(false)}
+                      className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition"
+                      style={{ background: 'linear-gradient(135deg, #2563eb, #0891b2)' }}>
+                      Terminer la révision
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          </main>
+        </DashboardLayout>
+      );
+    }
+
+    /* ── Écran résultats ── */
+    return (
+      <DashboardLayout>
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col bg-slate-50">
+          <div className="w-full max-w-lg mx-auto my-auto">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl text-center">
+
+              {/* Score ring */}
+              <div className="relative w-28 h-28 mx-auto mb-5">
+                <svg width="112" height="112" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="56" cy="56" r="46" fill="none" stroke="#e2e8f0" strokeWidth="8"/>
+                  <motion.circle cx="56" cy="56" r="46" fill="none"
+                    stroke={pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444'} strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 46}`}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 46 }}
+                    animate={{ strokeDashoffset: 2 * Math.PI * 46 * (1 - pct / 100) }}
+                    transition={{ duration: 1.2, delay: 0.2 }}/>
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className={`text-2xl font-black ${pct >= 80 ? 'text-emerald-600' : pct >= 60 ? 'text-amber-600' : 'text-red-500'}`}>{pct}%</span>
+                </div>
+              </div>
+
+              <h2 className="text-xl font-bold text-slate-800 mb-1">{title}</h2>
+              <p className="text-sm text-slate-400 mb-6">{quiz.title}</p>
+
+              {/* Stats */}
+              <div className="flex items-center justify-center gap-8 mb-6 py-4 border-y border-slate-100">
+                <div className="text-center">
+                  <span className="text-3xl font-black text-emerald-500">{score}</span>
+                  <p className="text-xs text-slate-400 mt-1">Correctes</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-3xl font-black text-red-400">{wrong}</span>
+                  <p className="text-xs text-slate-400 mt-1">Erreurs</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-3xl font-black text-slate-600">{total}</span>
+                  <p className="text-xs text-slate-400 mt-1">Questions</p>
+                </div>
+              </div>
+
+              {/* Indicateurs de questions */}
+              <div className="flex gap-1.5 justify-center mb-6 flex-wrap">
+                {answers.map((a, i) => (
+                  <div key={i} className={`w-6 h-2 rounded-full ${a.isCorrect ? 'bg-emerald-400' : 'bg-red-400'}`}/>
+                ))}
+              </div>
+
+              {/* Boutons d'action */}
+              <div className="flex flex-col gap-3">
+                {/* Mode révision — CTA principal si erreurs */}
+                {wrongCount > 0 && (
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => {
+                      setReviewIdx(answers.findIndex(a => !a.isCorrect));
+                      setReviewMode(true);
+                    }}
+                    className="w-full py-3.5 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2"
+                    style={{ background: 'linear-gradient(135deg, #dc2626, #ea580c)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Réviser mes {wrongCount} erreur{wrongCount > 1 ? 's' : ''}
+                  </motion.button>
+                )}
+
+                <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
+                  onClick={() => { setReviewIdx(0); setReviewMode(true); }}
+                  className="w-full py-3 rounded-2xl text-sm font-semibold text-blue-600 border border-blue-200 hover:bg-blue-50 transition flex items-center justify-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+                  Revoir toutes les questions
+                </motion.button>
+
+                <div className="flex gap-3">
+                  <button onClick={() => navigate('/dashboard/quiz')}
+                    className="flex-1 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-sm font-medium hover:bg-slate-50 transition">
+                    Retour aux quiz
+                  </button>
+                  <button onClick={() => {
+                    setCurrent(0); setSelected(null); setAnswered(false);
+                    setScore(0); setDone(false); setAnswers([]);
+                    setReviewMode(false);
+                    setTimeLeft(quiz.duration * 60);
+                    setShuffledQuestions(shuffleOptions(quiz.questions));
+                    setReady(true);
+                  }}
+                    className="flex-1 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-medium hover:bg-slate-700 transition">
+                    Recommencer
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </main>
       </DashboardLayout>
