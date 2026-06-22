@@ -428,7 +428,7 @@ export default function Subscription() {
               <div className="relative px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
                   <div className="text-white font-black text-xl mb-1">Passez à Étudiant — 9,99€/mois</div>
-                  <p className="text-blue-200/70 text-sm">Quiz illimités · Exercices · IA · Accès complet aux 9 UE du Semestre 1</p>
+                  <p className="text-blue-200/70 text-sm">Quiz · Flashcards · Exercices illimités · Fonctionnalités IA · Cours, Fiches, Annales & Médicaments</p>
                 </div>
                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
                   onClick={() => handleCheckout('pro')} disabled={!!loading}
