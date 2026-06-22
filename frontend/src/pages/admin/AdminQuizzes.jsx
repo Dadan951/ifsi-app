@@ -210,9 +210,12 @@ export default function AdminQuizzes() {
   const handleDelete = async id   => { await axios.delete(`${API_URL}/quizzes/${id}`); setDeleting(null); load(); };
 
   const semesters = [...new Set(quizzes.map(q => q.semester).filter(Boolean))].sort();
-  const ues       = [...new Set(quizzes.map(q => q.category).filter(Boolean))].sort();
+  const ues       = [...new Set(
+    quizzes.filter(q => !filterSem || q.semester === filterSem).map(q => q.category).filter(Boolean)
+  )].sort();
   const chapters  = [...new Set(
-    quizzes.filter(q => !filterUE || q.category === filterUE).map(q => q.chapter).filter(Boolean)
+    quizzes.filter(q => (!filterSem || q.semester === filterSem) && (!filterUE || q.category === filterUE))
+           .map(q => q.chapter).filter(Boolean)
   )].sort();
 
   const filtered = quizzes.filter(q => {
@@ -273,7 +276,7 @@ export default function AdminQuizzes() {
               </div>
 
               {/* Filtre semestre */}
-              <select value={filterSem} onChange={e => setFilterSem(e.target.value)}
+              <select value={filterSem} onChange={e => { setFilterSem(e.target.value); setFilterUE(''); setFilterChap(''); }}
                 className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition bg-white">
                 <option value="">Tous les semestres</option>
                 {semesters.map(s => <option key={s} value={s}>{s}</option>)}
