@@ -4,7 +4,8 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password: { type: String, required: true },
+  password: { type: String, default: null },
+  googleId:  { type: String, default: null },
   role: { type: String, enum: ['student', 'admin'], default: 'student' },
   subscription:         { type: String, enum: ['free', 'pro', 'premium'], default: 'free' },
   stripeCustomerId:     { type: String, default: null },
@@ -51,7 +52,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
+  if (!this.isModified('password') || !this.password) return;
   this.password = await bcrypt.hash(this.password, 12);
 });
 

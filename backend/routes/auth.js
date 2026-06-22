@@ -5,6 +5,46 @@ const {
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const User = require('../models/User');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const jwt = require('jsonwebtoken');
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.nursesprep.fr';
+
+passport.use(new GoogleStrategy({
+  clientID:     process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL:  'https://api.nursesprep.fr/api/auth/google/callback',
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value;
+    let user = await User.findOne({ $or: [{ googleId: profile.id }, { email }] });
+    if (!user) {
+      user = await User.create({
+        name:          profile.displayName,
+        email,
+        googleId:      profile.id,
+        emailVerified: true,
+        avatar:        profile.photos?.[0]?.value || '',
+      });
+    } else if (!user.googleId) {
+      user.googleId = profile.id;
+      if (!user.avatar) user.avatar = profile.photos?.[0]?.value || '';
+      await user.save();
+    }
+    done(null, user);
+  } catch (err) { done(err, null); }
+}));
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+
+router.get('/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=google` }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    res.redirect(`${FRONTEND_URL}/auth/google/success?token=${token}`);
+  }
+);
 
 const today = () => new Date().toISOString().split('T')[0];
 

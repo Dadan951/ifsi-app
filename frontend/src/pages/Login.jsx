@@ -486,7 +486,7 @@ export default function Login() {
             <motion.button
               whileHover={{ scale: 1.015, y: -1 }}
               whileTap={{ scale: 0.985 }}
-              onClick={() => showToast('Connexion Google — bientôt disponible')}
+              onClick={() => { window.location.href = 'https://api.nursesprep.fr/api/auth/google'; }}
               className="w-full flex items-center justify-center gap-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow"
             >
               <svg width="18" height="18" viewBox="0 0 48 48">

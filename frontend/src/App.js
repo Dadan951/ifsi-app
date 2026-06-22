@@ -35,6 +35,7 @@ import AdminMedicaments from './pages/admin/AdminMedicaments';
 import AdminAnnales from './pages/admin/AdminAnnales';
 import AdminTickets from './pages/admin/AdminTickets';
 import AdminLogs from './pages/admin/AdminLogs';
+import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
 
 function App() {
   return (
@@ -75,6 +76,9 @@ function App() {
           <Route path="/admin/annales" element={<AdminRoute><AdminAnnales /></AdminRoute>} />
           <Route path="/admin/tickets" element={<AdminRoute><AdminTickets /></AdminRoute>} />
           <Route path="/admin/logs" element={<AdminRoute><AdminLogs /></AdminRoute>} />
+
+          {/* Google OAuth callback */}
+          <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
