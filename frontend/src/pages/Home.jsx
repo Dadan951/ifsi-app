@@ -265,16 +265,22 @@ export default function Home() {
       badge: null,
     },
     {
-      title: 'Aide au stage',
-      desc: "Protocoles, fiches pratiques et mémos cliniques pour être opérationnel dès le premier jour de stage.",
-      icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2" strokeLinecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
-      badge: 'Nouveau',
+      title: 'Médicaments',
+      desc: "Base de données des médicaments courants en soins infirmiers — posologies, voies d'administration et contre-indications.",
+      icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2" strokeLinecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>,
+      badge: null,
     },
     {
-      title: 'Mise en situation',
-      desc: "Des cas cliniques complets pour t'entraîner aux épreuves de raisonnement infirmier.",
+      title: 'Groupes d\'étudiants',
+      desc: "Crée ou rejoins des groupes de révision, échange avec ta promo et progressez ensemble avant les examens.",
+      icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+      badge: null,
+    },
+    {
+      title: 'Annales',
+      desc: "Entraîne-toi sur les annales des examens IFSI pour te préparer dans les meilleures conditions.",
       icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
-      badge: 'Nouveau',
+      badge: null,
     },
   ];
 
@@ -695,17 +701,17 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Elite */}
+            {/* Étudiant Pro */}
             <div className="reveal card-hover border border-slate-200 rounded-2xl p-7" style={{ transitionDelay: '0.3s' }}>
-              <span className="text-xs font-bold text-white px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>Elite</span>
-              <h3 className="text-lg font-bold text-slate-800 mt-4 mb-1">Premium</h3>
-              <p className="text-3xl font-bold text-slate-800 mb-5">19,99 €<span className="text-sm font-normal text-slate-400"> / mois</span></p>
-              {['Quiz illimités', 'Flashcards illimitées', 'Toutes les fiches de cours', 'Cas cliniques', 'Fiches IA illimitées', 'Support prioritaire 24/7'].map((f, i) => (
+              <span className="text-xs font-bold text-white px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>Pro</span>
+              <h3 className="text-lg font-bold text-slate-800 mt-4 mb-1">Étudiant Pro</h3>
+              <p className="text-3xl font-bold text-slate-800 mb-5">14,99 €<span className="text-sm font-normal text-slate-400"> / mois</span></p>
+              {['Quiz illimités', 'Flashcards illimitées', 'Cours & Fiches illimités', 'Exercices & Cas cliniques', 'Génération de fiches par IA', 'Annales complètes', 'Support prioritaire'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-sm text-slate-600 py-2 border-b border-slate-100"><CheckIcon/>{f}</div>
               ))}
               <Link to="/register" className="block w-full mt-6 py-2.5 text-white rounded-xl text-sm font-bold transition text-center"
                 style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>
-                Passer Elite
+                Passer Pro
               </Link>
             </div>
           </div>
@@ -758,10 +764,11 @@ export default function Home() {
           </div>
           <div className="space-y-3">
             {[
-              { q: "Puis-je utiliser Nurses Prép gratuitement ?", a: "Oui, l'accès de base est gratuit avec 10 quiz et 20 flashcards par mois. Pour un accès illimité, les abonnements Pro et Elite sont disponibles." },
-              { q: "Les contenus sont-ils adaptés à mon IFSI ?", a: "Oui, tous les contenus sont basés sur le référentiel IFSI officiel (arrêté du 31 juillet 2009) et couvrent les 8 unités d'enseignement." },
-              { q: "Comment fonctionne la génération de fiches par IA ?", a: "Disponible avec l'abonnement Pro, tu colles ton cours ou importes un PDF — notre IA génère une fiche de révision structurée et colorée en quelques secondes." },
-              { q: "Puis-je résilier à tout moment ?", a: "Oui, sans engagement. Tu peux résilier depuis ton espace personnel à n'importe quel moment, sans frais." },
+              { q: "Puis-je utiliser Nurses Prép gratuitement ?", a: "Oui, l'accès Starter est entièrement gratuit : 10 quiz, 20 flashcards, 1 cours et 1 fiche de révision par mois. Pour un accès illimité, les abonnements Étudiant (9,99 €/mois) et Étudiant Pro (14,99 €/mois) sont disponibles." },
+              { q: "Les contenus sont-ils adaptés à mon IFSI ?", a: "Oui, tous les contenus sont basés sur le référentiel IFSI officiel (arrêté du 31 juillet 2009) et couvrent l'ensemble des unités d'enseignement de la S1 à la S6." },
+              { q: "Comment fonctionne la génération de fiches par IA ?", a: "Disponible avec l'abonnement Étudiant Pro, tu colles le texte de ton cours — notre IA génère une fiche de révision structurée en quelques secondes. Tu peux aussi générer des quiz personnalisés à partir de tes propres cours." },
+              { q: "Puis-je résilier à tout moment ?", a: "Oui, sans engagement. Tu peux résilier depuis ton espace personnel à n'importe quel moment, sans frais. L'accès reste actif jusqu'à la fin de la période payée." },
+              { q: "Comment fonctionnent les groupes d'étudiants ?", a: "Tu peux créer ou rejoindre des groupes de révision avec tes camarades de promo. Partage des ressources, progresse ensemble et suivez vos statistiques collectives." },
             ].map((item, i) => (
               <FaqItem key={i} q={item.q} a={item.a} delay={i * 0.1} />
             ))}
@@ -813,16 +820,15 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Offres</h4>
-                {['Gratuit', 'Pro', 'Elite', 'FAQ'].map(l => (
-                  <a key={l} href="#pricing" className="block text-xs text-slate-500 hover:text-white mb-2.5 transition">{l}</a>
+                {['Starter (gratuit)', 'Étudiant', 'Étudiant Pro', 'FAQ'].map((l, i) => (
+                  <a key={i} href="#pricing" className="block text-xs text-slate-500 hover:text-white mb-2.5 transition">{l}</a>
                 ))}
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Légal</h4>
                 {[
                   { label: 'CGU', href: '/cgu' },
-                  { label: 'RGPD', href: '/rgpd' },
-                  { label: 'Mentions légales', href: '/mentions-legales' },
+                  { label: 'Confidentialité', href: '/confidentialite' },
                   { label: 'Contact', href: 'mailto:contact@nursesprep.fr' },
                 ].map(l => (
                   <a key={l.label} href={l.href} className="block text-xs text-slate-500 hover:text-white mb-2.5 transition">{l.label}</a>

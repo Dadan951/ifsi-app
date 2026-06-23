@@ -37,6 +37,8 @@ import AdminTickets from './pages/admin/AdminTickets';
 import AdminLogs from './pages/admin/AdminLogs';
 import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
 import History from './pages/History';
+import CGU from './pages/CGU';
+import Confidentialite from './pages/Confidentialite';
 
 function App() {
   return (
@@ -48,6 +50,8 @@ function App() {
           <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/cgu" element={<CGU />} />
+          <Route path="/confidentialite" element={<Confidentialite />} />
 
           {/* Student */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
