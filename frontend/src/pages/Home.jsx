@@ -239,7 +239,6 @@ export default function Home() {
     { label: 'Fiches', href: '#fiches' },
     { label: 'Exercices', href: '#exercices' },
     { label: 'Flashcards', href: '#flashcards' },
-    { label: 'Stage', href: '#features' },
     { label: 'Médicaments', href: '#features' },
     { label: 'FAQ', href: '#faq' },
     { label: 'Contact', href: '#contact' },
