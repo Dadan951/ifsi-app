@@ -28,117 +28,145 @@ function fmtDateShort(d) {
 }
 
 /* ─── Graphique de progression ────────────────────────────────────────────── */
+const BAR_COLORS = {
+  good:   { from: '#10b981', to: '#34d399', glow: '#10b98140', label: 'Réussi',   dot: '#10b981' },
+  medium: { from: '#f59e0b', to: '#fbbf24', glow: '#f59e0b40', label: 'Passable', dot: '#f59e0b' },
+  bad:    { from: '#ef4444', to: '#f87171', glow: '#ef444440', label: 'À revoir', dot: '#ef4444' },
+};
+function barCfg(pct) {
+  if (pct >= 80) return BAR_COLORS.good;
+  if (pct >= 60) return BAR_COLORS.medium;
+  return BAR_COLORS.bad;
+}
+
 function ProgressChart({ data }) {
   const [hovered, setHovered] = useState(null);
   if (data.length < 2) return null;
 
-  const W = 560, H = 140;
-  const PAD_LEFT = 36, PAD_RIGHT = 12, PAD_TOP = 12, PAD_BOTTOM = 28;
-  const innerW = W - PAD_LEFT - PAD_RIGHT;
-  const innerH = H - PAD_TOP - PAD_BOTTOM;
+  const items    = data.slice(-12);
+  const avg      = Math.round(items.reduce((s, d) => s + d.pct, 0) / items.length);
+  const best     = Math.max(...items.map(d => d.pct));
+  const bestIdx  = items.findIndex(d => d.pct === best);
 
-  const toX = i => PAD_LEFT + (i / (data.length - 1)) * innerW;
-  const toY = pct => PAD_TOP + (1 - pct / 100) * innerH;
+  /* Tendance : 2e moitié vs 1re moitié */
+  const half = Math.floor(items.length / 2);
+  const avgFirst  = items.slice(0, half).reduce((s, d) => s + d.pct, 0) / (half || 1);
+  const avgSecond = items.slice(half).reduce((s, d) => s + d.pct, 0) / ((items.length - half) || 1);
+  const trend = avgSecond - avgFirst;
 
-  const pts = data.map((d, i) => ({
-    x: toX(i), y: toY(d.pct),
-    pct: d.pct, date: fmtDateShort(d.completedAt),
-  }));
-
-  /* Lignes de référence */
-  const refs = [
-    { pct: 80, color: '#10b981', label: '80%' },
-    { pct: 60, color: '#f59e0b', label: '60%' },
-  ];
-
-  /* Segments colorés par score du point d'arrivée */
-  const segments = pts.slice(0, -1).map((p, i) => ({
-    x1: p.x, y1: p.y, x2: pts[i + 1].x, y2: pts[i + 1].y,
-    color: scoreColor(pts[i + 1].pct).ring,
-  }));
-
-  /* Aire remplie (unique, fond bleu doux) */
-  const areaPath = `M${pts[0].x},${PAD_TOP + innerH} ` +
-    pts.map(p => `L${p.x},${p.y}`).join(' ') +
-    ` L${pts[pts.length - 1].x},${PAD_TOP + innerH} Z`;
-
-  /* Dates sur X-axis — tous les N points selon densité */
-  const step = data.length <= 8 ? 1 : data.length <= 14 ? 2 : 3;
-  const xDates = pts.filter((_, i) => i % step === 0 || i === pts.length - 1);
+  const avgCfg = barCfg(avg);
 
   return (
-    <div className="relative select-none">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full overflow-visible" style={{ height: 140 }}>
-        <defs>
-          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.12"/>
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
-          </linearGradient>
-        </defs>
+    <div className="space-y-5">
 
-        {/* Grid Y */}
-        {[0, 20, 40, 60, 80, 100].map(v => (
-          <g key={v}>
-            <line x1={PAD_LEFT} y1={toY(v)} x2={W - PAD_RIGHT} y2={toY(v)}
-              stroke={v === 0 || v === 100 ? '#e2e8f0' : '#f1f5f9'} strokeWidth="1"/>
-            <text x={PAD_LEFT - 5} y={toY(v)} textAnchor="end" dominantBaseline="middle"
-              fontSize="9" fill="#94a3b8">{v}%</text>
-          </g>
-        ))}
+      {/* ── KPIs ── */}
+      <div className="flex items-center gap-4 flex-wrap">
+        {/* Moyenne */}
+        <div className="flex-1 min-w-[120px] rounded-2xl px-5 py-4 flex items-center gap-4"
+          style={{ background: `linear-gradient(135deg, ${avgCfg.from}18, ${avgCfg.to}08)`, border: `1.5px solid ${avgCfg.from}30` }}>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Moyenne</p>
+            <p className="text-3xl font-black leading-none" style={{ color: avgCfg.from }}>{avg}%</p>
+          </div>
+          {/* Tendance */}
+          <div className={`ml-auto flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+            trend > 2  ? 'bg-emerald-100 text-emerald-700' :
+            trend < -2 ? 'bg-red-100 text-red-600' :
+                         'bg-slate-100 text-slate-500'
+          }`}>
+            {trend > 2  ? '↑' : trend < -2 ? '↓' : '→'}
+            {Math.abs(Math.round(trend))}%
+          </div>
+        </div>
 
-        {/* Lignes de référence 60% et 80% */}
-        {refs.map(r => (
-          <g key={r.pct}>
-            <line x1={PAD_LEFT} y1={toY(r.pct)} x2={W - PAD_RIGHT} y2={toY(r.pct)}
-              stroke={r.color} strokeWidth="1.5" strokeDasharray="5,3" opacity="0.6"/>
-          </g>
-        ))}
+        {/* Meilleur */}
+        <div className="rounded-2xl px-5 py-4 bg-emerald-50 border border-emerald-100 text-center min-w-[80px]">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-0.5">Meilleur</p>
+          <p className="text-2xl font-black text-emerald-600 leading-none">{best}%</p>
+        </div>
 
-        {/* Aire */}
-        <path d={areaPath} fill="url(#chartGrad)"/>
+        {/* Quiz analysés */}
+        <div className="rounded-2xl px-5 py-4 bg-slate-50 border border-slate-100 text-center min-w-[80px]">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Analysés</p>
+          <p className="text-2xl font-black text-slate-700 leading-none">{items.length}</p>
+        </div>
+      </div>
 
-        {/* Segments colorés */}
-        {segments.map((s, i) => (
-          <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
-            stroke={s.color} strokeWidth="2.5" strokeLinecap="round"/>
-        ))}
+      {/* ── Barres ── */}
+      <div>
+        {/* Zone de barres */}
+        <div className="flex items-end gap-1.5 h-28 relative">
+          {/* Zone verte subtile en fond (≥80%) */}
+          <div className="absolute inset-x-0 top-0 rounded-xl pointer-events-none"
+            style={{ height: '20%', background: 'linear-gradient(180deg,#10b98108,transparent)' }}/>
 
-        {/* Points */}
-        {pts.map((p, i) => {
-          const c = scoreColor(p.pct);
-          const isHov = hovered === i;
-          return (
-            <g key={i} style={{ cursor: 'pointer' }}
-              onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}>
-              <circle cx={p.x} cy={p.y} r={isHov ? 7 : 5} fill="white" stroke={c.ring} strokeWidth="2.5"
-                style={{ transition: 'r 0.15s' }}/>
-              {isHov && (
-                <g>
-                  <rect x={p.x - 28} y={p.y - 30} width={56} height={22} rx="6" fill="#1e293b"/>
-                  <text x={p.x} y={p.y - 16} textAnchor="middle" fontSize="11" fill="white" fontWeight="700">
-                    {p.pct}%
-                  </text>
-                  <text x={p.x} y={p.y - 4} textAnchor="middle" fontSize="8.5" fill="#94a3b8">
-                    {p.date}
-                  </text>
-                </g>
-              )}
-            </g>
-          );
-        })}
+          {items.map((d, i) => {
+            const cfg     = barCfg(d.pct);
+            const isHov   = hovered === i;
+            const isBest  = i === bestIdx;
+            const heightPct = Math.max(d.pct, 6); // minimum visible
 
-        {/* X-axis dates */}
-        {xDates.map((p, i) => (
-          <text key={i} x={p.x} y={H - 4} textAnchor="middle" fontSize="9" fill="#94a3b8">{p.date}</text>
-        ))}
-      </svg>
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end relative"
+                onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}>
 
-      {/* Légende */}
-      <div className="flex gap-4 justify-end mt-1">
-        {[{ color: '#10b981', label: '≥ 80%' }, { color: '#f59e0b', label: '≥ 60%' }, { color: '#ef4444', label: '< 60%' }].map(l => (
-          <span key={l.label} className="flex items-center gap-1.5 text-[10px] text-slate-400">
-            <span className="w-4 h-1 rounded-full inline-block" style={{ backgroundColor: l.color }}/>
-            {l.label}
+                {/* Tooltip */}
+                <AnimatePresence>
+                  {isHov && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20
+                        bg-slate-900 text-white rounded-xl px-3 py-2 text-center shadow-xl pointer-events-none whitespace-nowrap"
+                    >
+                      <p className="text-base font-black leading-none" style={{ color: cfg.from }}>{d.pct}%</p>
+                      <p className="text-[9px] text-slate-400 mt-0.5">{fmtDateShort(d.completedAt)}</p>
+                      <p className="text-[10px] font-semibold mt-0.5" style={{ color: cfg.dot }}>{cfg.label}</p>
+                      {/* Flèche */}
+                      <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-1.5 overflow-hidden">
+                        <div className="w-2 h-2 bg-slate-900 rotate-45 mx-auto -translate-y-1"/>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Barre */}
+                <motion.div
+                  initial={{ scaleY: 0, opacity: 0 }}
+                  animate={{ scaleY: 1, opacity: 1 }}
+                  transition={{ delay: i * 0.04, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    height: `${heightPct}%`,
+                    originY: 1,
+                    background: isHov || isBest
+                      ? `linear-gradient(180deg, ${cfg.from}, ${cfg.to}cc)`
+                      : `linear-gradient(180deg, ${cfg.from}cc, ${cfg.to}88)`,
+                    boxShadow: (isHov || isBest) ? `0 0 12px ${cfg.glow}` : 'none',
+                  }}
+                  className={`w-full rounded-t-xl cursor-pointer transition-all ${isBest ? 'ring-2 ring-offset-1' : ''}`}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Dates en bas */}
+        <div className="flex gap-1.5 mt-2">
+          {items.map((d, i) => (
+            <div key={i} className="flex-1 text-center">
+              <span className="text-[9px] text-slate-300">{fmtDateShort(d.completedAt)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Légende compacte */}
+      <div className="flex gap-4 justify-center">
+        {[BAR_COLORS.good, BAR_COLORS.medium, BAR_COLORS.bad].map(c => (
+          <span key={c.label} className="flex items-center gap-1.5 text-[10px] text-slate-400">
+            <span className="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: c.dot }}/>
+            {c.label}
           </span>
         ))}
       </div>
@@ -406,20 +434,15 @@ export default function History() {
           {/* ── Graphique de progression ── */}
           {chartData.length >= 2 && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
-              <div className="flex items-start justify-between mb-4">
+              className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-800">Progression</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Score (%) des {chartData.length} derniers quiz · survole un point pour voir le détail
-                  </p>
+                  <h2 className="text-sm font-black text-slate-900">Progression</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Tes {Math.min(chartData.length, 12)} derniers quiz</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-slate-400">Moyenne</span>
-                  <p className="text-base font-black" style={{ color: scoreColor(Math.round(chartData.reduce((s, d) => s + d.pct, 0) / chartData.length)).ring }}>
-                    {Math.round(chartData.reduce((s, d) => s + d.pct, 0) / chartData.length)}%
-                  </p>
-                </div>
+                <span className="text-[10px] font-semibold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full">
+                  Survole une barre pour le détail
+                </span>
               </div>
               <ProgressChart data={chartData}/>
             </motion.div>
