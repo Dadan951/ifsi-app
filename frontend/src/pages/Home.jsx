@@ -666,60 +666,175 @@ export default function Home() {
       </section>
 
       {/* ── EXERCICES PREVIEW ───────────────────────────────────────── */}
-      <section id="exercices" className="py-16 md:py-20 bg-slate-50">
+      <section id="exercices" className="py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="reveal text-center mb-12">
-            <span className="text-xs font-semibold text-cyan-600 uppercase tracking-widest">Exercices cliniques</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mt-2 mb-3">Entraîne-toi sur des cas réels</h2>
-            <p className="text-slate-500 text-sm max-w-lg mx-auto">QCM, questions ouvertes et cas cliniques complets — comme aux examens IFSI.</p>
+          <div className="reveal text-center mb-14">
+            <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest">Exercices cliniques</span>
+            <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mt-3 mb-3">Entraîne-toi sur des cas réels</h2>
+            <p className="text-slate-500 text-sm md:text-base max-w-xl mx-auto">Cas cliniques complets, QCM commentés et raisonnement infirmier — comme aux examens IFSI.</p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="reveal card-hover bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full">Cas clinique</span>
-                <span className="text-xs font-semibold bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full">Difficile</span>
-                <span className="text-xs text-slate-400 ml-auto">UE 4.4</span>
-              </div>
-              <h3 className="text-sm font-bold text-slate-800 mb-3 leading-snug">
-                M. Dupont, 67 ans, diabétique de type 2, présente une glycémie à 0,52 g/L. Il est agité et transpire abondamment.
-              </h3>
-              <div className="space-y-2 mb-4">
-                <p className="text-xs text-slate-500">1. Identifiez le problème de santé présenté.</p>
-                <p className="text-xs text-slate-500">2. Décrivez votre conduite à tenir immédiate.</p>
-              </div>
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  ~15 min
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            {/* ── Carte 1 : Cas clinique ── */}
+            <div className="reveal card-hover rounded-3xl overflow-hidden shadow-lg shadow-orange-100/60 border border-orange-100 lg:col-span-2" style={{ transitionDelay: '0s' }}>
+              {/* Header */}
+              <div className="px-6 py-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #c2410c, #ea580c)' }}>
+                <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/10"/>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-white/80 bg-white/20 px-2 py-0.5 rounded-full uppercase tracking-wide">Cas clinique</span>
+                    <span className="text-[10px] font-bold text-orange-200 bg-orange-900/40 px-2 py-0.5 rounded-full">Difficile</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-orange-200">
+                    <span className="font-semibold">UE 4.4</span>
+                    <div className="flex items-center gap-1">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      ~20 min
+                    </div>
+                  </div>
                 </div>
-                <Link to="/register" className="text-xs font-semibold text-cyan-600 hover:text-cyan-800 transition">
-                  Voir la correction →
-                </Link>
+              </div>
+
+              <div className="bg-white p-6 space-y-4">
+                {/* Patient info */}
+                <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
+                  <p className="text-[10px] font-bold text-orange-600 uppercase tracking-wide mb-2">Situation clinique</p>
+                  <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                    M. Dupont, 67 ans, diabétique de type 2 sous insuline, est retrouvé confus dans sa chambre en service de médecine. Il transpire abondamment, est pâle, et a du mal à répondre aux questions.
+                  </p>
+                </div>
+
+                {/* Constantes */}
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: 'Glycémie', val: '0,52 g/L', alert: true },
+                    { label: 'FC', val: '108 bpm', alert: true },
+                    { label: 'PA', val: '95/60 mmHg', alert: true },
+                    { label: 'SpO₂', val: '97 %', alert: false },
+                  ].map(({ label, val, alert }) => (
+                    <div key={label} className={`rounded-xl p-2.5 text-center border ${alert ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'}`}>
+                      <p className="text-[10px] text-slate-500 mb-0.5">{label}</p>
+                      <p className={`text-xs font-black ${alert ? 'text-red-600' : 'text-slate-700'}`}>{val}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Questions */}
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Questions</p>
+                  {[
+                    'Identifiez le problème de santé principal et argumentez votre réponse.',
+                    'Quelles sont les 3 premières actions infirmières à réaliser en urgence ?',
+                    'Quel traitement d\'urgence l\'IDE peut-elle administrer sans prescription médicale ?',
+                  ].map((q, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-xl px-4 py-3">
+                      <span className="w-5 h-5 rounded-full bg-orange-600 text-white text-[10px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i+1}</span>
+                      <p className="text-xs text-slate-700 leading-relaxed">{q}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Corrigé partiel */}
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide mb-2">Éléments de correction</p>
+                  <div className="space-y-1.5">
+                    {[
+                      { q: 'Problème de santé', r: 'Hypoglycémie sévère (glycémie < 0,60 g/L) avec signes neuroglycopéniques' },
+                      { q: 'Actions IDE', r: 'Appel médecin · Resucrage per os si conscient · Surveillance constantes / 15 min' },
+                      { q: 'Traitement sans prescription', r: 'Glucosé 15 g per os (3 sucres) si patient capable d\'avaler' },
+                    ].map(({ q, r }) => (
+                      <div key={q} className="flex items-start gap-2 text-xs">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0 mt-0.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span className="text-slate-700"><strong className="text-emerald-700">{q} :</strong> {r}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <Link to="/register" className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-800 transition">
+                    Voir la correction complète
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div className="reveal card-hover bg-white rounded-2xl border border-slate-200 p-6 shadow-sm" style={{ transitionDelay: '0.1s' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-semibold bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">QCM</span>
-                <span className="text-xs font-semibold bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full">Moyen</span>
-                <span className="text-xs text-slate-400 ml-auto">UE 2.11</span>
-              </div>
-              <h3 className="text-sm font-bold text-slate-800 mb-4 leading-snug">
-                Concernant la gestion des stupéfiants à l'hôpital, quelle affirmation est exacte ?
-              </h3>
-              <div className="space-y-2">
-                {[
-                  { text: "Tout infirmier peut prescrire des stupéfiants en urgence", correct: false },
-                  { text: "Les stupéfiants doivent être conservés dans une armoire fermée à clé", correct: true },
-                  { text: "La traçabilité n'est pas obligatoire en EHPAD", correct: false },
-                ].map((opt, i) => (
-                  <div key={i} className={`text-xs px-3 py-2 rounded-lg border flex items-center gap-2 cursor-pointer transition hover:border-blue-300 ${opt.correct ? 'bg-green-50 border-green-200 text-green-800' : 'bg-white border-slate-100 text-slate-600'}`}>
-                    {opt.correct && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-                    {opt.text}
+            {/* ── Carte 2 : QCM ── */}
+            <div className="reveal card-hover rounded-3xl overflow-hidden shadow-lg shadow-purple-100/60 border border-purple-100" style={{ transitionDelay: '0.15s' }}>
+              <div className="px-6 py-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #6d28d9, #7c3aed)' }}>
+                <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/10"/>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-white/80 bg-white/20 px-2 py-0.5 rounded-full uppercase tracking-wide">QCM</span>
+                    <span className="text-[10px] font-bold text-yellow-200 bg-yellow-700/40 px-2 py-0.5 rounded-full">Moyen</span>
                   </div>
-                ))}
+                  <span className="text-xs font-semibold text-purple-200">UE 2.11</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-5 space-y-4">
+                <div className="bg-purple-50 border border-purple-200 rounded-2xl p-3.5">
+                  <p className="text-[10px] font-bold text-purple-600 uppercase tracking-wide mb-1.5">Question</p>
+                  <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                    Concernant la gestion des stupéfiants à l'hôpital, quelle(s) affirmation(s) est/sont exacte(s) ?
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {[
+                    { text: "Tout infirmier peut prescrire des stupéfiants en urgence", state: 'wrong' },
+                    { text: "Les stupéfiants doivent être conservés dans une armoire sécurisée fermée à clé", state: 'correct' },
+                    { text: "La traçabilité n'est pas obligatoire en EHPAD", state: 'wrong' },
+                    { text: "Chaque administration doit être tracée dans le registre de stupéfiants", state: 'correct' },
+                  ].map((opt, i) => (
+                    <div key={i} className={`text-xs px-3.5 py-2.5 rounded-xl border flex items-start gap-2.5 ${
+                      opt.state === 'correct'
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                        : 'bg-red-50 border-red-200 text-red-700 line-through opacity-70'
+                    }`}>
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${opt.state === 'correct' ? 'bg-emerald-500' : 'bg-red-400'}`}>
+                        {opt.state === 'correct'
+                          ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          : <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        }
+                      </span>
+                      {opt.text}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Explication */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+                  <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wide mb-1.5">Explication</p>
+                  <p className="text-xs text-amber-900 leading-relaxed">
+                    Selon l'art. R.5132-34 du CSP, les stupéfiants doivent être conservés sous clé et tracés dans un registre spécial à chaque entrée/sortie. Seul le médecin peut les prescrire.
+                  </p>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100">
+                  {[['78 %', 'Taux réussite'], ['2 400', 'Tentatives'], ['2,4 min', 'Durée moy.']].map(([v, l]) => (
+                    <div key={l} className="text-center">
+                      <p className="text-sm font-black text-purple-600">{v}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{l}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+
+          </div>
+
+          <div className="text-center mt-10 reveal">
+            <Link to="/register"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold text-white transition hover:-translate-y-0.5"
+              style={{ background: 'linear-gradient(135deg, #c2410c, #ea580c)', boxShadow: '0 6px 20px rgba(234,88,12,0.35)' }}>
+              Accéder à tous les exercices
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </Link>
+            <p className="text-xs text-slate-400 mt-3">+200 exercices · Cas cliniques, QCM, Mises en situation professionnelle</p>
           </div>
         </div>
       </section>
