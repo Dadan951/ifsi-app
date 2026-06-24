@@ -16,6 +16,28 @@ const HEADING_COLORS = [
   { text: '#047857', bg: '#ecfdf5', border: '#a7f3d0' }, // vert  — Partie 4
 ];
 
+/* ─── Renderer inline pour fond sombre (hero) ───────────────────────────── */
+function renderHeroInline(str) {
+  if (!str) return null;
+  const parts = [];
+  const re = /(__.*?__|\*\*.*?\*\*|\*.*?\*)/g;
+  let last = 0, m;
+  while ((m = re.exec(str)) !== null) {
+    if (m.index > last) parts.push(<span key={`t${m.index}`} className="text-blue-100/80">{str.slice(last, m.index)}</span>);
+    const raw = m[0];
+    if (raw.startsWith('**')) {
+      parts.push(<strong key={m.index} className="font-bold text-white">{raw.slice(2, -2)}</strong>);
+    } else if (raw.startsWith('__')) {
+      parts.push(<span key={m.index} className="underline decoration-2 underline-offset-2 text-white">{raw.slice(2, -2)}</span>);
+    } else {
+      parts.push(<em key={m.index} className="italic text-blue-200/70">{raw.slice(1, -1)}</em>);
+    }
+    last = m.index + raw.length;
+  }
+  if (last < str.length) parts.push(<span key="end" className="text-blue-100/80">{str.slice(last)}</span>);
+  return parts;
+}
+
 /* ─── Renderer Markdown léger ────────────────────────────────────────────── */
 function RichContent({ text, partieIndex = 0 }) {
   if (!text) return <span className="italic text-slate-400">Contenu non renseigné</span>;
@@ -370,7 +392,11 @@ export default function MedicamentDetail() {
           <div className="relative z-10">
             <h1 className="text-3xl font-bold text-white mb-1">{drug.name}</h1>
             {drug.genericName && <p className="text-blue-200/70 italic text-sm mb-4">{drug.genericName}</p>}
-            {drug.description && <p className="text-blue-100/80 text-sm leading-relaxed max-w-2xl">{drug.description}</p>}
+            {drug.description && (
+              <p className="text-sm leading-relaxed max-w-2xl">
+                {renderHeroInline(drug.description)}
+              </p>
+            )}
             {drug.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
                 {drug.tags.map(tag => (
@@ -458,16 +484,62 @@ export default function MedicamentDetail() {
             {hasMedias && (
               <div ref={el => { sectionRefs.current[displaySections.length + 1] = el; }}
                 className="scroll-mt-6 mb-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed20,#7c3aed10)', border: '1.5px solid #ddd6fe' }}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                      <polygon points="23 7 16 12 23 17 23 7"/>
+                      <rect x="1" y="5" width="15" height="14" rx="2"/>
                     </svg>
                   </div>
-                  <h2 className="text-lg font-bold text-slate-800">Médias</h2>
+                  <h2 className="text-lg font-bold text-slate-800">Médias & Ressources pédagogiques</h2>
                 </div>
-                <div className="ml-3 sm:ml-14 pl-3 sm:pl-5 border-l-2 border-purple-100 rounded-sm">
-                  <p className="text-sm text-slate-600 leading-relaxed">{mediasSection.content}</p>
+
+                {/* Texte descriptif rendu en markdown */}
+                {mediasSection.content && (
+                  <div className="mb-5 ml-3 sm:ml-14 pl-3 sm:pl-5 border-l-2 border-purple-100 rounded-sm">
+                    <RichContent text={mediasSection.content} partieIndex={2} />
+                  </div>
+                )}
+
+                {/* Ressources externes fixes */}
+                <div className="ml-3 sm:ml-14 grid sm:grid-cols-2 gap-3">
+                  {[
+                    {
+                      name: 'ANSM',
+                      desc: 'Agence nationale de sécurité du médicament',
+                      icon: '🏛️',
+                      bg: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8',
+                    },
+                    {
+                      name: 'Vidal',
+                      desc: 'Base de données médicaments de référence',
+                      icon: '📖',
+                      bg: '#f0fdf4', border: '#bbf7d0', text: '#15803d',
+                    },
+                    {
+                      name: 'HAS',
+                      desc: 'Haute Autorité de Santé — recommandations',
+                      icon: '📋',
+                      bg: '#fef3c7', border: '#fde68a', text: '#b45309',
+                    },
+                    {
+                      name: 'RCP',
+                      desc: 'Résumé des Caractéristiques du Produit',
+                      icon: '📄',
+                      bg: '#f5f3ff', border: '#ddd6fe', text: '#6d28d9',
+                    },
+                  ].map(r => (
+                    <div key={r.name}
+                      className="flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all"
+                      style={{ backgroundColor: r.bg, borderColor: r.border }}>
+                      <span className="text-xl flex-shrink-0">{r.icon}</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold" style={{ color: r.text }}>{r.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{r.desc}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
