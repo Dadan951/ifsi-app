@@ -1269,60 +1269,167 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ─────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-16 md:py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4 md:px-8">
-          <div className="reveal text-center mb-12">
-            <span className="text-xs font-semibold text-cyan-600 uppercase tracking-widest">Tarifs</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mt-2 mb-3">Choisis ton offre</h2>
-            <p className="text-slate-500 text-sm">Commence gratuitement, évolue quand tu veux. Sans engagement.</p>
+      <section id="pricing" className="py-16 md:py-24 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
+          <div className="reveal text-center mb-14">
+            <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest">Tarifs</span>
+            <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mt-3 mb-3">Choisis ton offre</h2>
+            <p className="text-slate-500 text-sm md:text-base">Commence gratuitement, évolue quand tu veux. Sans engagement.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free */}
-            <div className="reveal card-hover border border-slate-200 rounded-2xl p-7">
-              <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Gratuit</span>
-              <h3 className="text-lg font-bold text-slate-800 mt-4 mb-1">Starter</h3>
-              <p className="text-3xl font-bold text-slate-800 mb-5">0 €<span className="text-sm font-normal text-slate-400"> / mois</span></p>
-              {['10 quiz / mois', '20 flashcards'].map((f, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-sm text-slate-600 py-2 border-b border-slate-100"><CheckIcon/>{f}</div>
-              ))}
-              {['Fiches de cours', 'Cas cliniques', 'Support prioritaire'].map((f, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-sm text-slate-300 py-2 border-b border-slate-100"><CrossIcon/>{f}</div>
-              ))}
-              <Link to="/register" className="block w-full mt-6 py-2.5 border-2 border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:border-cyan-400 hover:text-cyan-700 transition text-center">
-                Commencer
-              </Link>
-            </div>
 
-            {/* Pro */}
-            <div className="reveal relative rounded-2xl p-7 card-hover" style={{ background: 'linear-gradient(145deg,#0f172a,#164e8a)', transitionDelay: '0.15s' }}>
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap"
-                style={{ background: 'linear-gradient(135deg,#0891b2,#164e8a)' }}>
-                Le plus populaire
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+
+            {/* ── Starter ── */}
+            <div className="reveal card-hover rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-sm" style={{ transitionDelay: '0s' }}>
+              <div className="px-7 pt-7 pb-5">
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full uppercase tracking-wide">Gratuit</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-1">Starter</h3>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className="text-4xl font-black text-slate-900">0</span>
+                  <span className="text-2xl font-bold text-slate-900 mb-0.5">€</span>
+                  <span className="text-sm text-slate-400 mb-1">/ mois</span>
+                </div>
+                <p className="text-xs text-slate-400 mb-6">Pour commencer sans risque</p>
+                <div className="space-y-1 mb-6">
+                  {[
+                    { t: '10 quiz / mois', ok: true },
+                    { t: '20 flashcards / mois', ok: true },
+                    { t: '1 fiche de cours / mois', ok: true },
+                    { t: 'Fiches illimitées', ok: false },
+                    { t: 'Exercices & Cas cliniques', ok: false },
+                    { t: 'Génération IA', ok: false },
+                    { t: 'Annales complètes', ok: false },
+                    { t: 'Support prioritaire', ok: false },
+                  ].map(({ t, ok }) => (
+                    <div key={t} className={`flex items-center gap-2.5 py-1.5 text-xs ${ok ? 'text-slate-700' : 'text-slate-300'}`}>
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${ok ? 'bg-emerald-100' : 'bg-slate-100'}`}>
+                        {ok
+                          ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          : <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        }
+                      </span>
+                      {t}
+                    </div>
+                  ))}
+                </div>
               </div>
-              <span className="text-xs font-semibold bg-cyan-500 text-white px-3 py-1 rounded-full">Pro</span>
-              <h3 className="text-lg font-bold text-white mt-4 mb-1">Étudiant</h3>
-              <p className="text-3xl font-bold text-white mb-5">9,99 €<span className="text-sm font-normal text-blue-300"> / mois</span></p>
-              {['Quiz illimités', 'Flashcards illimitées', 'Toutes les fiches de cours', 'Cas cliniques', 'Fiches personnelles IA'].map((f, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-sm text-blue-100 py-2 border-b border-white/10"><CheckIcon/>{f}</div>
-              ))}
-              <Link to="/register" className="block w-full mt-6 py-2.5 bg-cyan-500 text-white rounded-xl text-sm font-bold hover:bg-cyan-400 transition text-center shadow-lg shadow-cyan-500/30">
-                Passer Pro
-              </Link>
+              <div className="px-7 pb-7">
+                <Link to="/register" className="block w-full py-3 border-2 border-slate-200 text-slate-600 rounded-2xl text-sm font-bold hover:border-cyan-400 hover:text-cyan-700 transition text-center">
+                  Commencer gratuitement
+                </Link>
+              </div>
             </div>
 
-            {/* Étudiant Pro */}
-            <div className="reveal card-hover border border-slate-200 rounded-2xl p-7" style={{ transitionDelay: '0.3s' }}>
-              <span className="text-xs font-bold text-white px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>Pro</span>
-              <h3 className="text-lg font-bold text-slate-800 mt-4 mb-1">Étudiant Pro</h3>
-              <p className="text-3xl font-bold text-slate-800 mb-5">14,99 €<span className="text-sm font-normal text-slate-400"> / mois</span></p>
-              {['Quiz illimités', 'Flashcards illimitées', 'Cours & Fiches illimités', 'Exercices & Cas cliniques', 'Génération de fiches par IA', 'Annales complètes', 'Support prioritaire'].map((f, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-sm text-slate-600 py-2 border-b border-slate-100"><CheckIcon/>{f}</div>
-              ))}
-              <Link to="/register" className="block w-full mt-6 py-2.5 text-white rounded-xl text-sm font-bold transition text-center"
-                style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>
-                Passer Pro
-              </Link>
+            {/* ── Étudiant (featured) ── */}
+            <div className="reveal relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/30" style={{ transitionDelay: '0.12s', background: 'linear-gradient(160deg,#0f172a 0%,#1e3a6e 50%,#164e8a 100%)' }}>
+              {/* Badge populaire */}
+              <div className="absolute -top-px left-1/2 -translate-x-1/2">
+                <div className="text-white text-[10px] font-black px-5 py-1.5 rounded-b-xl shadow-lg whitespace-nowrap"
+                  style={{ background: 'linear-gradient(135deg,#0891b2,#06b6d4)' }}>
+                  ⭐ Le plus populaire
+                </div>
+              </div>
+              <div className="px-7 pt-9 pb-5">
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/20 border border-cyan-500/30 px-2.5 py-1 rounded-full uppercase tracking-wide">Recommandé</span>
+                </div>
+                <h3 className="text-xl font-black text-white mb-1">Étudiant</h3>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className="text-4xl font-black text-white">9,99</span>
+                  <span className="text-2xl font-bold text-white mb-0.5">€</span>
+                  <span className="text-sm text-blue-300 mb-1">/ mois</span>
+                </div>
+                <p className="text-xs text-blue-400 mb-6">L'accès complet à la plateforme</p>
+                <div className="space-y-1 mb-6">
+                  {[
+                    'Quiz illimités',
+                    'Flashcards illimitées',
+                    'Toutes les fiches de cours',
+                    'Exercices & Cas cliniques',
+                    'Fiches personnalisées par IA',
+                    'Annales complètes',
+                    'Base médicaments complète',
+                    'Support prioritaire',
+                  ].map(f => (
+                    <div key={f} className="flex items-center gap-2.5 py-1.5 text-xs text-blue-100">
+                      <span className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 bg-cyan-500/30">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      {f}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="px-7 pb-7">
+                <Link to="/register"
+                  className="block w-full py-3.5 rounded-2xl text-sm font-black text-slate-900 text-center transition hover:opacity-90 shadow-lg shadow-cyan-400/30"
+                  style={{ background: 'linear-gradient(135deg,#06b6d4,#0891b2)' }}>
+                  Commencer maintenant
+                </Link>
+                <p className="text-[10px] text-blue-400/70 text-center mt-3">Sans engagement · Résiliation en 1 clic</p>
+              </div>
             </div>
+
+            {/* ── Étudiant Pro ── */}
+            <div className="reveal card-hover rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-sm" style={{ transitionDelay: '0.24s' }}>
+              <div className="h-1.5 w-full" style={{ background: 'linear-gradient(90deg,#0f172a,#164e8a,#0891b2)' }}/>
+              <div className="px-7 pt-6 pb-5">
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="text-[10px] font-bold text-white px-2.5 py-1 rounded-full uppercase tracking-wide"
+                    style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>Étudiant Pro</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-1">Étudiant Pro</h3>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className="text-4xl font-black text-slate-900">14,99</span>
+                  <span className="text-2xl font-bold text-slate-900 mb-0.5">€</span>
+                  <span className="text-sm text-slate-400 mb-1">/ mois</span>
+                </div>
+                <p className="text-xs text-slate-400 mb-6">Pour ceux qui visent l'excellence</p>
+
+                {/* Tout Étudiant + extras */}
+                <div className="bg-slate-50 rounded-xl px-3 py-2 mb-3 flex items-center gap-2">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <p className="text-xs font-semibold text-slate-600">Tout le plan Étudiant, plus :</p>
+                </div>
+                <div className="space-y-1 mb-6">
+                  {[
+                    { t: 'Génération IA illimitée', highlight: true },
+                    { t: 'Quiz personnalisés par IA', highlight: true },
+                    { t: 'Groupes illimités', highlight: false },
+                    { t: 'Statistiques avancées', highlight: false },
+                    { t: 'Export PDF des fiches', highlight: false },
+                    { t: 'Support dédié 24h', highlight: true },
+                  ].map(({ t, highlight }) => (
+                    <div key={t} className="flex items-center gap-2.5 py-1.5 text-xs text-slate-700">
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${highlight ? 'bg-blue-100' : 'bg-emerald-100'}`}>
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={highlight ? '#1d4ed8' : '#16a34a'} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <span className={highlight ? 'font-semibold text-blue-800' : ''}>{t}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="px-7 pb-7">
+                <Link to="/register"
+                  className="block w-full py-3 text-white rounded-2xl text-sm font-bold text-center transition hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg,#0f172a,#164e8a)' }}>
+                  Choisir Étudiant Pro
+                </Link>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Garantie */}
+          <div className="reveal flex items-center justify-center gap-3 mt-8 text-xs text-slate-400">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Paiement sécurisé par Stripe</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300"/>
+            <span>Sans engagement · Résiliation immédiate</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300"/>
+            <span>14 jours satisfait ou remboursé</span>
           </div>
         </div>
       </section>
