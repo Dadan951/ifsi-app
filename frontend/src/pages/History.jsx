@@ -194,154 +194,126 @@ function ScoreRing({ pct, size = 52 }) {
   );
 }
 
-/* ─── Panneau de détail ───────────────────────────────────────────────────── */
-function DetailPanel({ item, onClose, navigate, token }) {
+/* ─── Accordéon de détail (inline, style FAQ) ────────────────────────────── */
+function QuizAccordion({ item, token, navigate, isOpen }) {
   const [answers, setAnswers] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const fetched = useState(false);
 
   useEffect(() => {
-    if (!item?.quizId) { setLoading(false); return; }
+    if (!isOpen || fetched[0] || !item.quizId) return;
+    fetched[1](true);
+    setLoading(true);
     axios.get(`${API_URL}/quizzes/${item.quizId}/progress`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => setAnswers(r.data?.answers || []))
       .catch(() => setAnswers([]))
       .finally(() => setLoading(false));
-  }, [item?.quizId, token]);
+  }, [isOpen]);
 
-  if (!item) return null;
-  const c    = scoreColor(item.pct);
-  const diff = DIFF_COLOR[item.difficulty] || DIFF_COLOR.medium;
+  const c       = scoreColor(item.pct);
   const correct = answers?.filter(a => a.isCorrect).length ?? item.score;
   const wrong   = answers ? answers.length - correct : (item.total - item.score);
 
   return (
-    <>
-      {/* Overlay */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-        onClick={onClose}/>
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+      className="overflow-hidden"
+    >
+      <div className="px-4 pb-4 pt-1">
+        {/* Séparateur */}
+        <div className="h-px bg-slate-100 mb-4"/>
 
-      {/* Panel */}
-      <motion.aside
-        initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-        className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col overflow-hidden"
-      >
-        {/* Header */}
-        <div className="flex-shrink-0 px-6 py-5 border-b border-slate-100">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                {item.semester && (
-                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{item.semester}</span>
-                )}
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${diff.bg} ${diff.text}`}>{diff.label}</span>
-              </div>
-              <h2 className="text-base font-black text-slate-900 leading-snug">{item.title}</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                {item.category}{item.chapter ? ` · ${item.chapter}` : ''} · {fmtDate(item.completedAt)}
-              </p>
-            </div>
-            <button onClick={onClose}
-              className="flex-shrink-0 w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition text-slate-500">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+        {/* Score résumé */}
+        <div className="flex items-center gap-4 p-4 rounded-2xl mb-4" style={{ backgroundColor: c.bg }}>
+          <ScoreRing pct={item.pct} size={56}/>
+          <div className="flex-1">
+            <p className="text-xl font-black leading-none" style={{ color: c.text }}>{item.score}/{item.total}</p>
+            <p className="text-xs font-semibold mt-1" style={{ color: c.text }}>{c.label}</p>
           </div>
-
-          {/* Score summary */}
-          <div className="flex items-center gap-4 mt-4 p-4 rounded-2xl" style={{ backgroundColor: c.bg }}>
-            <ScoreRing pct={item.pct} size={60}/>
-            <div className="flex-1">
-              <p className="text-2xl font-black" style={{ color: c.text }}>{item.score}/{item.total}</p>
-              <p className="text-xs font-semibold mt-0.5" style={{ color: c.text }}>{c.label}</p>
+          <div className="flex gap-4 text-center">
+            <div>
+              <p className="text-lg font-black text-emerald-600">{correct}</p>
+              <p className="text-[10px] text-slate-400">correct{correct > 1 ? 'es' : 'e'}</p>
             </div>
-            <div className="flex gap-3 text-center">
-              <div>
-                <p className="text-lg font-black text-emerald-600">{correct}</p>
-                <p className="text-[10px] text-slate-400">correctes</p>
-              </div>
-              <div className="w-px bg-slate-200"/>
-              <div>
-                <p className="text-lg font-black text-red-500">{wrong}</p>
-                <p className="text-[10px] text-slate-400">incorrectes</p>
-              </div>
+            <div className="w-px bg-slate-200"/>
+            <div>
+              <p className="text-lg font-black text-red-500">{wrong}</p>
+              <p className="text-[10px] text-slate-400">incorrect{wrong > 1 ? 'es' : 'e'}</p>
             </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mt-3 h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-2 rounded-full transition-all" style={{ width: `${item.pct}%`, backgroundColor: c.ring }}/>
           </div>
         </div>
+        {/* Barre de score */}
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-5">
+          <motion.div initial={{ width: 0 }} animate={{ width: `${item.pct}%` }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            className="h-1.5 rounded-full" style={{ backgroundColor: c.ring }}/>
+        </div>
 
-        {/* Questions list */}
-        <div className="flex-1 overflow-auto px-6 py-4">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"/>
-            </div>
-          ) : answers && answers.length > 0 ? (
-            <div className="space-y-3">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-                Détail des {answers.length} questions
-              </p>
-              {answers.map((a, i) => (
-                <motion.div key={i}
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  className={`rounded-2xl border p-3.5 ${a.isCorrect
-                    ? 'bg-emerald-50 border-emerald-200'
-                    : 'bg-red-50 border-red-200'}`}>
-                  <div className="flex items-start gap-2.5">
-                    <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${a.isCorrect ? 'bg-emerald-500' : 'bg-red-400'}`}>
-                      {a.isCorrect
-                        ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        : <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                      }
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-700 leading-relaxed">
-                        <span className="text-slate-400 mr-1">Q{i + 1}.</span>
-                        {a.questionText || `Question ${i + 1}`}
+        {/* Questions */}
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <div className="w-7 h-7 border-[3px] border-blue-400 border-t-transparent rounded-full animate-spin"/>
+          </div>
+        ) : answers && answers.length > 0 ? (
+          <div className="space-y-2.5">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              Détail des {answers.length} questions
+            </p>
+            {answers.map((a, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.025 }}
+                className={`rounded-xl border p-3 ${a.isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
+                <div className="flex items-start gap-2.5">
+                  <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${a.isCorrect ? 'bg-emerald-500' : 'bg-red-400'}`}>
+                    {a.isCorrect
+                      ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      : <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-slate-700 leading-relaxed">
+                      <span className="text-slate-400 mr-1">Q{i + 1}.</span>
+                      {a.questionText || `Question ${i + 1}`}
+                    </p>
+                    <div className="mt-1.5 space-y-1">
+                      <p className={`text-[11px] font-medium px-2.5 py-1 rounded-lg ${a.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700 line-through opacity-70'}`}>
+                        Ta réponse : {a.selectedText || '—'}
                       </p>
-                      <div className="mt-2 space-y-1">
-                        <p className={`text-[11px] font-medium px-2.5 py-1 rounded-lg ${a.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700 line-through opacity-70'}`}>
-                          Ta réponse : {a.selectedText || '—'}
+                      {!a.isCorrect && a.correctText && (
+                        <p className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">
+                          Bonne réponse : {a.correctText}
                         </p>
-                        {!a.isCorrect && a.correctText && (
-                          <p className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">
-                            Bonne réponse : {a.correctText}
-                          </p>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-slate-400">
-              <div className="text-4xl mb-3">📋</div>
-              <p className="text-sm font-medium">Détail des questions non disponible</p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        {item.quizId && (
-          <div className="flex-shrink-0 px-6 py-4 border-t border-slate-100">
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-              onClick={() => { navigate(`/dashboard/quiz/${item.quizId}`); onClose(); }}
-              className="w-full py-3 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2 transition"
-              style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-              Refaire ce quiz
-            </motion.button>
+                </div>
+              </motion.div>
+            ))}
           </div>
+        ) : (
+          <p className="text-xs text-slate-400 text-center py-4">Détail des questions non disponible</p>
         )}
-      </motion.aside>
-    </>
+
+        {/* Refaire */}
+        {item.quizId && (
+          <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+            onClick={e => { e.stopPropagation(); navigate(`/dashboard/quiz/${item.quizId}`); }}
+            className="mt-4 w-full py-2.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 transition"
+            style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Refaire ce quiz
+          </motion.button>
+        )}
+      </div>
+    </motion.div>
   );
 }
 
@@ -354,7 +326,7 @@ export default function History() {
   const [search,      setSearch]      = useState('');
   const [filterSem,   setFilterSem]   = useState('');
   const [sort,        setSort]        = useState('date');
-  const [selected,    setSelected]    = useState(null);
+  const [openId,      setOpenId]      = useState(null);
 
   useEffect(() => {
     axios.get(`${API_URL}/quizzes/history`, { headers: { Authorization: `Bearer ${token}` } })
@@ -495,16 +467,22 @@ export default function History() {
             </motion.div>
           ) : (
             <div className="space-y-3">
-              <AnimatePresence>
-                {filtered.map((item, i) => {
-                  const diff = DIFF_COLOR[item.difficulty] || DIFF_COLOR.medium;
-                  const c    = scoreColor(item.pct);
-                  return (
-                    <motion.div key={item._id}
-                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i < 10 ? i * 0.04 : 0 }}
-                      onClick={() => setSelected(item)}
-                      className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all p-4 flex items-center gap-4 cursor-pointer group">
+              {filtered.map((item, i) => {
+                const diff   = DIFF_COLOR[item.difficulty] || DIFF_COLOR.medium;
+                const c      = scoreColor(item.pct);
+                const isOpen = openId === item._id;
+                return (
+                  <motion.div key={item._id}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i < 10 ? i * 0.04 : 0 }}
+                    className={`bg-white rounded-2xl border shadow-sm transition-all overflow-hidden ${
+                      isOpen ? 'border-blue-200 shadow-blue-50' : 'border-slate-100 hover:border-slate-200 hover:shadow-md'
+                    }`}>
+
+                    {/* ── Ligne cliquable ── */}
+                    <button
+                      onClick={() => setOpenId(isOpen ? null : item._id)}
+                      className="w-full p-4 flex items-center gap-4 cursor-pointer group text-left">
 
                       <ScoreRing pct={item.pct}/>
 
@@ -517,7 +495,7 @@ export default function History() {
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${diff.bg} ${diff.text}`}>{diff.label}</span>
                           )}
                         </div>
-                        <p className="text-sm font-semibold text-slate-800 truncate group-hover:text-blue-700 transition-colors">{item.title}</p>
+                        <p className={`text-sm font-semibold truncate transition-colors ${isOpen ? 'text-blue-700' : 'text-slate-800 group-hover:text-blue-600'}`}>{item.title}</p>
                         <p className="text-xs text-slate-400 truncate mt-0.5">
                           {item.category}{item.chapter ? ` · ${item.chapter}` : ''}
                         </p>
@@ -528,32 +506,36 @@ export default function History() {
                         <div className="text-[11px] text-slate-400 mt-0.5">{fmtDate(item.completedAt)}</div>
                       </div>
 
-                      {/* Icône "voir détail" */}
-                      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-blue-100 group-hover:text-blue-600 flex items-center justify-center transition text-slate-400">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <polyline points="9 18 15 12 9 6"/>
+                      {/* Chevron animé */}
+                      <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.25 }}
+                        className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          isOpen ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
+                        }`}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <polyline points="6 9 12 15 18 9"/>
                         </svg>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+                      </motion.div>
+                    </button>
+
+                    {/* ── Accordéon de détail ── */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <QuizAccordion
+                          item={item}
+                          token={token}
+                          navigate={navigate}
+                          isOpen={isOpen}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Panneau de détail ── */}
-      <AnimatePresence>
-        {selected && (
-          <DetailPanel
-            item={selected}
-            token={token}
-            navigate={navigate}
-            onClose={() => setSelected(null)}
-          />
-        )}
-      </AnimatePresence>
     </DashboardLayout>
   );
 }
