@@ -453,59 +453,214 @@ export default function Home() {
       </section>
 
       {/* ── FICHES PREVIEW ──────────────────────────────────────────── */}
-      <section id="fiches" className="py-16 md:py-20 bg-white">
+      <section id="fiches" className="py-16 md:py-24 bg-gradient-to-b from-white to-slate-50">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="reveal text-center mb-12">
-            <span className="text-xs font-semibold text-cyan-600 uppercase tracking-widest">Fiches de révision</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mt-2 mb-3">Des fiches claires et structurées</h2>
-            <p className="text-slate-500 text-sm max-w-lg mx-auto">Chaque fiche résume l'essentiel d'un cours avec définitions, points clés, schémas et valeurs à retenir.</p>
+          <div className="reveal text-center mb-14">
+            <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Fiches de révision</span>
+            <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mt-3 mb-3">Des vraies fiches, comme en cours</h2>
+            <p className="text-slate-500 text-sm md:text-base max-w-xl mx-auto">Définitions, valeurs normales, seuils d'alerte, protocoles — structurés et prêts à réviser.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { title: "Hémostase", cat: "UE 2.4", color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe',
-                sections: [
-                  { icon: 'definition', label: "Définition", content: "Ensemble des mécanismes qui arrêtent un saignement et maintiennent l'intégrité vasculaire." },
-                  { icon: 'key_points', label: "Points clés", items: ["Hémostase primaire → clou plaquettaire", "Coagulation → fibrine", "Fibrinolyse → dissolution"] },
-                  { icon: 'values', label: "Valeurs normales", items: ["Plaquettes : 150 000 – 400 000 /mm³", "TQ : 11 – 13 s", "TCA : 30 – 40 s"] },
-                ]
-              },
-              { title: "Score de Glasgow", cat: "UE 2.2", color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe',
-                sections: [
-                  { icon: 'definition', label: "Définition", content: "Échelle d'évaluation de la conscience, de 3 (coma) à 15 (conscient)." },
-                  { icon: 'schema', label: "Composantes (E+V+M)", steps: ["Yeux (4)", "Voix (5)", "Moteur (6)"] },
-                  { icon: 'caution', label: "Seuils critiques", items: ["< 8 → coma → risque fausse route", "≤ 13 → TC grave"] },
-                ]
-              },
-              { title: "Les 5 droits du médicament", cat: "UE 2.11", color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0',
-                sections: [
-                  { icon: 'remember', label: "Règle des 5 B", content: "Bon médicament · Bonne dose · Bon patient · Bonne voie · Bon moment" },
-                  { icon: 'caution', label: "Erreurs fréquentes", items: ["Confusion de noms proches", "Erreur de calcul de dose", "Mauvaise voie d'administration"] },
-                ]
-              },
-            ].map((fiche, idx) => (
-              <div key={idx} className="reveal card-hover rounded-2xl overflow-hidden border cursor-pointer" style={{ borderColor: fiche.border, transitionDelay: `${idx*0.1}s` }}>
-                <div className="px-5 py-3.5" style={{ backgroundColor: fiche.color }}>
-                  <h3 className="text-sm font-bold text-white">{fiche.title}</h3>
-                  <p className="text-xs text-white/70">{fiche.cat}</p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            {/* ── Fiche 1 : Constantes vitales ── */}
+            <div className="reveal card-hover rounded-3xl overflow-hidden shadow-lg shadow-blue-100/60 border border-blue-100" style={{ transitionDelay: '0s' }}>
+              {/* Header */}
+              <div className="px-6 py-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1d4ed8, #0891b2)' }}>
+                <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/10"/>
+                <div className="absolute -right-1 -bottom-6 w-14 h-14 rounded-full bg-white/5"/>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-blue-200 uppercase tracking-widest">UE 4.1 · S1</span>
+                    <h3 className="text-base font-black text-white mt-1">Constantes vitales de l'adulte</h3>
+                    <p className="text-xs text-blue-200/80 mt-0.5">Valeurs de référence &amp; seuils d'alerte</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  </div>
                 </div>
-                <div className="p-4 space-y-3" style={{ backgroundColor: fiche.bg }}>
-                  {fiche.sections.map((s, si) => (
-                    <div key={si} className="bg-white rounded-xl p-3 border" style={{ borderColor: fiche.border }}>
-                      <p className="text-xs font-bold mb-1.5" style={{ color: fiche.color }}>{s.label}</p>
-                      {s.content && <p className="text-xs text-slate-600">{s.content}</p>}
-                      {s.items && <ul className="space-y-1">{s.items.map((item,ii) => <li key={ii} className="text-xs text-slate-600 flex items-start gap-1.5"><span className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: fiche.color }}/>{item}</li>)}</ul>}
-                      {s.steps && <div className="flex flex-wrap gap-1.5">{s.steps.map((step, si2) => <span key={si2} className="text-xs px-2 py-0.5 rounded-lg font-medium" style={{ backgroundColor: fiche.border, color: fiche.color }}>{step}</span>)}</div>}
+              </div>
+              {/* Body */}
+              <div className="bg-white p-5 space-y-3">
+                {/* Tableau valeurs */}
+                <div className="rounded-2xl border border-blue-100 overflow-hidden">
+                  <div className="grid grid-cols-3 bg-blue-50 px-3 py-2">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase">Paramètre</span>
+                    <span className="text-[10px] font-bold text-blue-600 uppercase">Normal</span>
+                    <span className="text-[10px] font-bold text-red-500 uppercase">Alerte</span>
+                  </div>
+                  {[
+                    { p: 'Fréq. cardiaque', n: '60 – 100 bpm', a: '< 50 ou > 120' },
+                    { p: 'Fréq. respiratoire', n: '12 – 20 /min', a: '< 10 ou > 25' },
+                    { p: 'SpO₂', n: '95 – 100 %', a: '< 94 %' },
+                    { p: 'PA systolique', n: '100 – 140 mmHg', a: '< 90 ou > 180' },
+                    { p: 'Température', n: '36,5 – 37,5 °C', a: '< 35 ou > 38,5' },
+                    { p: 'Diurèse', n: '1 à 2 L / 24 h', a: '< 400 mL / 24 h' },
+                    { p: 'Glycémie', n: '0,70 – 1,10 g/L', a: '< 0,60 ou > 2,00' },
+                  ].map((r, i) => (
+                    <div key={i} className={`grid grid-cols-3 px-3 py-2 border-t border-blue-50 ${i % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'}`}>
+                      <span className="text-xs font-semibold text-slate-700">{r.p}</span>
+                      <span className="text-xs text-emerald-700 font-medium">{r.n}</span>
+                      <span className="text-xs text-red-500 font-medium">{r.a}</span>
                     </div>
                   ))}
                 </div>
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <p className="text-xs text-amber-800"><strong>Oligurie</strong> : diurèse &lt; 0,5 mL/kg/h — surveiller la fonction rénale</p>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* ── Fiche 2 : Score de Glasgow ── */}
+            <div className="reveal card-hover rounded-3xl overflow-hidden shadow-lg shadow-violet-100/60 border border-violet-100" style={{ transitionDelay: '0.1s' }}>
+              <div className="px-6 py-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #6d28d9, #a21caf)' }}>
+                <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/10"/>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-violet-200 uppercase tracking-widest">UE 2.2 · S1</span>
+                    <h3 className="text-base font-black text-white mt-1">Score de Glasgow (GCS)</h3>
+                    <p className="text-xs text-violet-200/80 mt-0.5">Évaluation de la conscience — 3 à 15 pts</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-5 space-y-3">
+                {/* E - Yeux */}
+                <div className="rounded-2xl border border-violet-100 overflow-hidden">
+                  <div className="flex items-center justify-between bg-violet-50 px-4 py-2">
+                    <span className="text-xs font-bold text-violet-700">E — Ouverture des yeux</span>
+                    <span className="text-[10px] font-bold text-violet-500">/ 4 pts</span>
+                  </div>
+                  {[['Spontanée','4'],['À la voix','3'],['À la douleur','2'],['Aucune','1']].map(([l,v],i)=>(
+                    <div key={i} className="flex justify-between px-4 py-1.5 border-t border-violet-50 text-xs">
+                      <span className="text-slate-600">{l}</span>
+                      <span className="font-bold text-violet-600 w-5 text-center">{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* V - Voix */}
+                <div className="rounded-2xl border border-fuchsia-100 overflow-hidden">
+                  <div className="flex items-center justify-between bg-fuchsia-50 px-4 py-2">
+                    <span className="text-xs font-bold text-fuchsia-700">V — Réponse verbale</span>
+                    <span className="text-[10px] font-bold text-fuchsia-500">/ 5 pts</span>
+                  </div>
+                  {[['Orientée','5'],['Confuse','4'],['Mots inappropriés','3'],['Sons incompréhensibles','2'],['Aucune','1']].map(([l,v],i)=>(
+                    <div key={i} className="flex justify-between px-4 py-1.5 border-t border-fuchsia-50 text-xs">
+                      <span className="text-slate-600">{l}</span>
+                      <span className="font-bold text-fuchsia-600 w-5 text-center">{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* M - Moteur */}
+                <div className="rounded-2xl border border-purple-100 overflow-hidden">
+                  <div className="flex items-center justify-between bg-purple-50 px-4 py-2">
+                    <span className="text-xs font-bold text-purple-700">M — Réponse motrice</span>
+                    <span className="text-[10px] font-bold text-purple-500">/ 6 pts</span>
+                  </div>
+                  {[['Obéit aux ordres','6'],['Localise la douleur','5'],['Retrait (flexion)','4'],['Flexion anormale','3'],['Extension','2'],['Aucune','1']].map(([l,v],i)=>(
+                    <div key={i} className="flex justify-between px-4 py-1.5 border-t border-purple-50 text-xs">
+                      <span className="text-slate-600">{l}</span>
+                      <span className="font-bold text-purple-600 w-5 text-center">{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Seuils */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+                    <p className="text-lg font-black text-red-600">≤ 8</p>
+                    <p className="text-[10px] font-bold text-red-500 mt-0.5">Coma — intubation</p>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+                    <p className="text-lg font-black text-amber-600">≤ 13</p>
+                    <p className="text-[10px] font-bold text-amber-500 mt-0.5">TC grave — urgence</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Fiche 3 : Hémostase ── */}
+            <div className="reveal card-hover rounded-3xl overflow-hidden shadow-lg shadow-emerald-100/60 border border-emerald-100" style={{ transitionDelay: '0.2s' }}>
+              <div className="px-6 py-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #065f46, #0891b2)' }}>
+                <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/10"/>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest">UE 2.4 · S1</span>
+                    <h3 className="text-base font-black text-white mt-1">Hémostase</h3>
+                    <p className="text-xs text-emerald-200/80 mt-0.5">Mécanismes, biologie &amp; traitements</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-5 space-y-3">
+                {/* Définition */}
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide mb-1">Définition</p>
+                  <p className="text-xs text-slate-700 leading-relaxed">Ensemble des mécanismes permettant d'arrêter un saignement et de maintenir la perméabilité vasculaire.</p>
+                </div>
+                {/* 3 phases */}
+                <div className="rounded-2xl border border-emerald-100 overflow-hidden">
+                  <div className="bg-emerald-50 px-4 py-2">
+                    <span className="text-xs font-bold text-emerald-700">Les 3 phases</span>
+                  </div>
+                  {[
+                    { phase: '① Hémostase primaire', desc: 'Vasoconstriction + clou plaquettaire (plaquettes + vWF)', time: '3 – 5 min' },
+                    { phase: '② Coagulation', desc: 'Cascade des facteurs → thrombine → fibrine (caillot)', time: '5 – 10 min' },
+                    { phase: '③ Fibrinolyse', desc: 'Dissolution du caillot par la plasmine (D-Dimères)', time: 'J2 – J5' },
+                  ].map((r, i) => (
+                    <div key={i} className="px-4 py-2.5 border-t border-emerald-50">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-xs font-bold text-emerald-700">{r.phase}</span>
+                        <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{r.time}</span>
+                      </div>
+                      <p className="text-xs text-slate-500">{r.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Valeurs bio */}
+                <div className="rounded-2xl border border-slate-100 overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-2">
+                    <span className="text-xs font-bold text-slate-600">Valeurs biologiques normales</span>
+                  </div>
+                  {[
+                    ['Plaquettes', '150 000 – 400 000 /mm³'],
+                    ['TP (Taux de prothrombine)', '70 – 100 %'],
+                    ['TCA', '30 – 40 s (ratio < 1,2)'],
+                    ['Fibrinogène', '2 – 4 g/L'],
+                    ['D-Dimères', '< 500 µg/L'],
+                  ].map(([k, v], i) => (
+                    <div key={i} className={`flex justify-between px-4 py-2 border-t border-slate-50 text-xs ${i%2===0?'bg-white':'bg-slate-50/50'}`}>
+                      <span className="text-slate-600 font-medium">{k}</span>
+                      <span className="text-emerald-700 font-bold">{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Traitements */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                  <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide mb-1.5">Traitements courants</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Héparine (HBPM)', 'AVK (Warfarine)', 'Aspirine', 'Clopidogrel', 'Vitamine K'].map(t => (
+                      <span key={t} className="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div className="text-center mt-8 reveal">
-            <Link to="/register" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-cyan-700 border-2 border-cyan-300 hover:bg-cyan-50 transition">
+
+          <div className="text-center mt-10 reveal">
+            <Link to="/register"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold text-white transition hover:-translate-y-0.5"
+              style={{ background: 'linear-gradient(135deg,#164e8a,#0891b2)', boxShadow: '0 6px 20px rgba(8,145,178,0.35)' }}>
               Accéder à toutes les fiches
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </Link>
+            <p className="text-xs text-slate-400 mt-3">+50 fiches disponibles · Hémato, Cardio, Pharma, Pneumo…</p>
           </div>
         </div>
       </section>
