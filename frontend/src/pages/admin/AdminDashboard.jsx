@@ -524,6 +524,9 @@ export default function AdminDashboard() {
                 </div>
               </motion.div>
 
+              {/* ── Seeds Panel ──────────────────────────────────────── */}
+              <SeedPanel />
+
               {/* ── Push Notifications Panel ─────────────────────────── */}
               <PushPanel />
 
@@ -532,6 +535,109 @@ export default function AdminDashboard() {
         </div>
       </main>
     </DashboardLayout>
+  );
+}
+
+/* ── Seeds Panel ─────────────────────────────────────────────────────────── */
+const SEEDS = [
+  {
+    id: 'exercises-s1',
+    label: 'Exercices — S1 UE 1.1',
+    desc: 'Sociologie, anthropologie et psychologie',
+    count: '3 exercices',
+    endpoint: '/admin/seed-exercises-s1',
+    grad: 'linear-gradient(135deg,#c2410c,#ea580c)',
+    icon: (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    ),
+  },
+];
+
+function SeedPanel() {
+  const [results, setResults] = useState({});
+  const [loading, setLoading] = useState({});
+
+  const runSeed = async (seed) => {
+    setLoading(l => ({ ...l, [seed.id]: true }));
+    setResults(r => ({ ...r, [seed.id]: null }));
+    try {
+      const res = await axios.post(`${API_URL}${seed.endpoint}`);
+      setResults(r => ({ ...r, [seed.id]: { ok: true, msg: res.data.message } }));
+    } catch (err) {
+      setResults(r => ({ ...r, [seed.id]: { ok: false, msg: err.response?.data?.message || 'Erreur' } }));
+    } finally {
+      setLoading(l => ({ ...l, [seed.id]: false }));
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.78 }}
+      className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-3"
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg,#c2410c,#ea580c)' }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+            <polyline points="16 16 12 12 8 16"/>
+            <line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          </svg>
+        </div>
+        <p className="text-xs font-semibold text-slate-700">Insérer du contenu</p>
+      </div>
+      <p className="text-[10px] text-slate-400 leading-relaxed -mt-1">
+        Lance l'insertion de contenu pédagogique directement en base de données.
+      </p>
+
+      {SEEDS.map(seed => (
+        <div key={seed.id} className="rounded-xl border border-slate-100 overflow-hidden">
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: seed.grad }}>
+              {seed.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-slate-800 truncate">{seed.label}</p>
+              <p className="text-[10px] text-slate-400 truncate">{seed.desc} · {seed.count}</p>
+            </div>
+            <button
+              onClick={() => runSeed(seed)}
+              disabled={loading[seed.id]}
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+              style={{ background: seed.grad }}
+            >
+              {loading[seed.id]
+                ? <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+                : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
+              }
+              {loading[seed.id] ? 'En cours…' : 'Insérer'}
+            </button>
+          </div>
+          {results[seed.id] && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+              className={`px-3 py-2 text-[10px] font-medium flex items-center gap-1.5 ${
+                results[seed.id].ok ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+              }`}
+            >
+              {results[seed.id].ok
+                ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                : <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              }
+              {results[seed.id].msg}
+            </motion.div>
+          )}
+        </div>
+      ))}
+    </motion.div>
   );
 }
 
