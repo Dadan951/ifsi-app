@@ -218,12 +218,15 @@ module.exports = async (req, res) => {
               if (nbCorrect !== 1) throw new Error(`"${q.text.slice(0,40)}" : ${nbCorrect} bonne(s) réponse(s)`);
             }
 
+            // chapter = sous-thème IA si plusieurs, sinon titre du cours
+            const quizChapter = chapters.length === 1 ? chap : chapterDef.title;
+
             await Quiz.create({
               title:       quizTitle,
               description: `${qs.length} questions · "${chapterDef.title}" (${ueLabel}, ${semester})`,
               semester,
               category,
-              chapter:     chap,
+              chapter:     quizChapter,
               questions:   qs.map(q => ({
                 text:        q.text,
                 type:        'qcm',

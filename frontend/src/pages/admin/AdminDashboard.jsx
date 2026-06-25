@@ -770,6 +770,20 @@ function SeedPanel() {
                   Durée estimée · Quiz : ~{Math.ceil(aiCount.total * 3 / 60)} min · Flashcards : ~{Math.ceil(aiCount.total * 2 / 60)} min · Les deux : ~{Math.ceil(aiCount.total * 5 / 60)} min
                 </p>
               )}
+              {/* Bouton reset pour nettoyer les quiz/flashcards de test */}
+              <button
+                onClick={async () => {
+                  if (!window.confirm('Supprimer TOUS les quiz et flashcards générés ? (irréversible)')) return;
+                  try {
+                    const r = await axios.delete(`${API_URL}/admin/generated-content`, { headers: { Authorization: `Bearer ${token}` } });
+                    alert(r.data.message);
+                    setAiCount(c => c ? { ...c, quizDone: 0, flashDone: 0 } : c);
+                  } catch (e) { alert('Erreur : ' + (e.response?.data?.error || e.message)); }
+                }}
+                className="w-full py-1.5 rounded-lg text-[9px] font-semibold text-red-400 border border-red-100 hover:bg-red-50 transition"
+              >
+                🗑 Réinitialiser (supprimer quiz + flashcards générés)
+              </button>
             </div>
           )}
 

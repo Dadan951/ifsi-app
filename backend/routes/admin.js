@@ -63,6 +63,15 @@ router.post('/seed-cours-files', require('../seeds/seedCours_route'));
 router.post('/seed-cours-zip',   uploadZip.single('zip'), require('../seeds/seedCoursZip_route'));
 router.post('/seed-annales-zip',          uploadZip.single('zip'), require('../seeds/seedAnnalesZip_route'));
 router.post('/generate-content-lessons', require('../seeds/generateContentFromLessons_route'));
+router.delete('/generated-content', async (req, res) => {
+  try {
+    const Quiz      = require('../models/Quiz');
+    const Flashcard = require('../models/Flashcard');
+    const qDel = await Quiz.deleteMany({ isPersonal: false, title: /^Quiz — / });
+    const fDel = await Flashcard.deleteMany({ isPublished: true });
+    res.json({ ok: true, message: `${qDel.deletedCount} quiz et ${fDel.deletedCount} flashcards supprimés` });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 router.get('/generate-content-lessons/count', async (req, res) => {
   try {
     const Lesson   = require('../models/Lesson');
