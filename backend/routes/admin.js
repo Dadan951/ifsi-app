@@ -63,6 +63,21 @@ router.post('/seed-cours-files', require('../seeds/seedCours_route'));
 router.post('/seed-cours-zip',   uploadZip.single('zip'), require('../seeds/seedCoursZip_route'));
 router.post('/seed-annales-zip',          uploadZip.single('zip'), require('../seeds/seedAnnalesZip_route'));
 router.post('/generate-content-lessons', require('../seeds/generateContentFromLessons_route'));
+router.get('/lessons-inventory', async (req, res) => {
+  try {
+    const Lesson  = require('../models/Lesson');
+    const lessons = await Lesson.find({}).select('title semester category').lean();
+    const grouped = {};
+    for (const l of lessons) {
+      const sem = l.semester || 'Non classé';
+      const ue  = l.category || 'UE inconnue';
+      if (!grouped[sem]) grouped[sem] = {};
+      if (!grouped[sem][ue]) grouped[sem][ue] = [];
+      grouped[sem][ue].push(l.title);
+    }
+    res.json({ total: lessons.length, grouped });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 router.post('/fix-ue-labels', async (req, res) => {
   const UE_MAP = {
     '1.1':'UE 1.1 — Psychologie, sociologie, anthropologie','1.2':'UE 1.2 — Santé publique et économie de la santé','1.3':'UE 1.3 — Législation, éthique, déontologie',
