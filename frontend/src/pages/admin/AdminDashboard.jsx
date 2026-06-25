@@ -609,7 +609,7 @@ function SeedPanel() {
   const [zipFiles, setZipFiles] = useState({});
   const { token } = useAuth();
 
-  const runSeed = async (seed, aiMode = null) => {
+  const runSeed = async (seed, aiMode = null, isTest = false) => {
     setLoading(l => ({ ...l, [seed.id]: true }));
     setResults(r => ({ ...r, [seed.id]: null }));
     try {
@@ -629,8 +629,10 @@ function SeedPanel() {
           onUploadProgress: () => {},
         });
       } else if (seed.aiMode) {
-        const params = aiMode ? `?mode=${aiMode}` : '';
-        res = await axios.post(`${API_URL}${seed.endpoint}${params}`, {}, {
+        const params = new URLSearchParams();
+        if (aiMode) params.set('mode', aiMode);
+        if (isTest) params.set('test', 'true');
+        res = await axios.post(`${API_URL}${seed.endpoint}?${params}`, {}, {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 600000,
         });
@@ -681,10 +683,20 @@ function SeedPanel() {
               <p className="text-[10px] text-slate-400 truncate">{seed.desc} · {seed.count}</p>
             </div>
             {seed.aiMode ? (
-              <div className="flex gap-1.5 flex-shrink-0">
+              <div className="flex flex-wrap gap-1.5 flex-shrink-0 justify-end">
+                {/* Bouton test 1 cours */}
+                <button
+                  onClick={() => runSeed(seed, 'both', true)}
+                  disabled={loading[seed.id]}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition hover:opacity-90 disabled:opacity-50 border"
+                  style={{ color: '#7c3aed', borderColor: '#7c3aed', background: 'white' }}
+                >
+                  {loading[seed.id] ? '…' : '🧪 Tester (1 cours)'}
+                </button>
+                {/* Boutons principaux */}
                 {[['quiz','Quiz'],['flashcards','Flashcards'],['both','Les deux']].map(([mode, label]) => (
                   <button key={mode}
-                    onClick={() => runSeed(seed, mode)}
+                    onClick={() => runSeed(seed, mode, false)}
                     disabled={loading[seed.id]}
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                     style={{ background: seed.grad }}
