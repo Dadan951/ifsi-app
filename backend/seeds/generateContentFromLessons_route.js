@@ -104,16 +104,20 @@ module.exports = async (req, res) => {
   let quizInserted = 0, flashInserted = 0, skipped = 0, errors = 0;
 
   try {
-    // Récupérer tous les cours publiés avec assez de texte
-    let lessons = await Lesson.find({
-      isPublished: true,
-      $expr: { $gte: [{ $strLenCP: { $ifNull: ['$content', ''] } }, MIN_CONTENT] },
-    }).select('title semester category chapter content').lean();
+    // Récupérer tous les cours publiés puis filtrer côté JS
+    const allLessons = await Lesson.find({ isPublished: true })
+      .select('title semester category chapter content').lean();
+
+    let lessons = allLessons.filter(l => (l.content || '').length >= MIN_CONTENT);
 
     if (!lessons.length) {
+      const total = allLessons.length;
+      if (total === 0) {
+        return res.json({ ok: false, message: 'Aucun cours en base. Importe d\'abord les cours (Option A).' });
+      }
       return res.json({
         ok: false,
-        message: `Aucun cours avec suffisamment de texte (minimum ${MIN_CONTENT} caractères). Les PDFs scannés sont ignorés automatiquement. Importe d'abord les cours (Option A).`,
+        message: `${total} cours trouvés en base mais aucun avec suffisamment de texte (minimum ${MIN_CONTENT} caractères). La plupart sont des PDFs scannés (images). Vérifie dans /admin/lessons que les cours ont bien du contenu texte.`,
       });
     }
 
