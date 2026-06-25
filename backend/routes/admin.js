@@ -60,7 +60,8 @@ router.post('/seed-flashcards-s1', require('../seeds/seedFlashcardsSemestre1_rou
 router.post('/seed-medicaments', require('../seeds/seedMedicaments_route'));
 router.post('/migrate-buprenorphine', require('../seeds/migrateBuprenorphine'));
 router.post('/seed-cours-files', require('../seeds/seedCours_route'));
-router.post('/seed-cours-zip', uploadZip.single('zip'), require('../seeds/seedCoursZip_route'));
+router.post('/seed-cours-zip',   uploadZip.single('zip'), require('../seeds/seedCoursZip_route'));
+router.post('/seed-annales-zip', uploadZip.single('zip'), require('../seeds/seedAnnalesZip_route'));
 
 /* ── POST /admin/seed-s1-20 ──────────────────────────────────────────────── */
 router.post('/seed-s1-20', async (req, res) => {
