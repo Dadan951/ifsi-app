@@ -721,12 +721,12 @@ function SeedPanel() {
             <div className="px-3 pb-3 space-y-2">
               {/* Compteur */}
               {aiCount && (() => {
-                // Répartition 8/10/15 : 1/3 chacun
+                // Répartition 15/20/30 : 1/3 chacun
                 const n   = aiCount.total;
-                const n15 = Math.floor(n / 3);
-                const n10 = Math.floor(n / 3);
-                const n8  = n - n15 - n10;
-                const totalQ = n8 * 8 + n10 * 10 + n15 * 15;
+                const n30 = Math.floor(n / 3);
+                const n20 = Math.floor(n / 3);
+                const n15 = n - n30 - n20;
+                const totalQ = n15 * 15 + n20 * 20 + n30 * 30;
                 return (
                   <div className="space-y-2">
                     <div className="grid grid-cols-3 gap-2 text-center">
@@ -744,9 +744,9 @@ function SeedPanel() {
                       </div>
                     </div>
                     <div className="flex gap-1.5 justify-center text-[9px] text-slate-400">
-                      <span className="bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">{n8} quiz × 8 q.</span>
-                      <span className="bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">{n10} quiz × 10 q.</span>
-                      <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium">{n15} quiz × 15 q.</span>
+                      <span className="bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">{n15} quiz × 15 q.</span>
+                      <span className="bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">{n20} quiz × 20 q.</span>
+                      <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium">{n30} quiz × 30 q.</span>
                     </div>
                   </div>
                 );
@@ -768,7 +768,7 @@ function SeedPanel() {
               </div>
               {aiCount && (
                 <p className="text-[9px] text-slate-400 text-center">
-                  Durée estimée · Quiz : ~{Math.ceil(aiCount.total * 2 / 60)} min · Flashcards : ~{Math.ceil(aiCount.total * 2 / 60)} min · Les deux : ~{Math.ceil(aiCount.total * 4 / 60)} min
+                  Durée estimée · Quiz : ~{Math.ceil(aiCount.total * 3 / 60)} min · Flashcards : ~{Math.ceil(aiCount.total * 2 / 60)} min · Les deux : ~{Math.ceil(aiCount.total * 5 / 60)} min
                 </p>
               )}
             </div>

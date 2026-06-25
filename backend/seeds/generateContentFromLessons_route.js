@@ -7,19 +7,19 @@ const Flashcard = require('../models/Flashcard');
 const MODEL          = 'claude-haiku-4-5-20251001';
 const MIN_CONTENT    = 100; // chars : en dessous on génère depuis les connaissances IA
 
-// Répartition homogène : index % 3 → 8 / 10 / 15 questions
+// Répartition homogène : index % 3 → 15 / 20 / 30 questions
 function questionCount(index) {
   const cycle = index % 3;
-  if (cycle === 0) return 8;
-  if (cycle === 1) return 10;
-  return 15;
+  if (cycle === 0) return 15;
+  if (cycle === 1) return 20;
+  return 30;
 }
 
 // Durée estimée du quiz (minutes) selon nombre de questions
 function quizDuration(n) {
-  if (n <= 8)  return 7;
-  if (n <= 10) return 10;
-  return 15;
+  if (n <= 15) return 12;
+  if (n <= 20) return 18;
+  return 25;
 }
 
 /* ─── Prompt QCM ─────────────────────────────────────────────────────────── */
