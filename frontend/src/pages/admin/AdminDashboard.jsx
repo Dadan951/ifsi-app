@@ -721,33 +721,32 @@ function SeedPanel() {
             <div className="px-3 pb-3 space-y-2">
               {/* Compteur */}
               {aiCount && (() => {
-                // Répartition 15/20/30 : 1/3 chacun
-                const n   = aiCount.total;
-                const n30 = Math.floor(n / 3);
-                const n20 = Math.floor(n / 3);
-                const n15 = n - n30 - n20;
-                const totalQ = n15 * 15 + n20 * 20 + n30 * 30;
+                const n = aiCount.total;
+                // L'IA décide du nb de quiz par cours (1 à 4 selon richesse)
+                // Estimation : en moyenne 2 quiz/cours, 10 questions/quiz
+                const quizMin  = n;           // minimum : 1 quiz par cours
+                const quizMax  = n * 4;       // maximum : 4 quiz par cours
+                const qMin     = n * 8;       // min questions (1 quiz × 8)
+                const qMax     = n * 4 * 15;  // max questions (4 quiz × 15)
                 return (
                   <div className="space-y-2">
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-violet-50 rounded-lg py-2">
-                        <p className="text-base font-black text-violet-700">{n}</p>
-                        <p className="text-[9px] text-violet-400 font-medium">quiz générés</p>
+                      <div className="bg-violet-50 rounded-lg py-2 px-1">
+                        <p className="text-sm font-black text-violet-700">{quizMin}–{quizMax}</p>
+                        <p className="text-[9px] text-violet-400 font-medium">quiz estimés</p>
                       </div>
-                      <div className="bg-blue-50 rounded-lg py-2">
-                        <p className="text-base font-black text-blue-700">{totalQ}</p>
-                        <p className="text-[9px] text-blue-400 font-medium">questions total</p>
+                      <div className="bg-blue-50 rounded-lg py-2 px-1">
+                        <p className="text-sm font-black text-blue-700">{qMin}–{qMax}</p>
+                        <p className="text-[9px] text-blue-400 font-medium">questions</p>
                       </div>
-                      <div className="bg-indigo-50 rounded-lg py-2">
-                        <p className="text-base font-black text-indigo-700">{n * 12}</p>
+                      <div className="bg-indigo-50 rounded-lg py-2 px-1">
+                        <p className="text-sm font-black text-indigo-700">{n * 12}</p>
                         <p className="text-[9px] text-indigo-400 font-medium">flashcards</p>
                       </div>
                     </div>
-                    <div className="flex gap-1.5 justify-center text-[9px] text-slate-400">
-                      <span className="bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">{n15} quiz × 15 q.</span>
-                      <span className="bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">{n20} quiz × 20 q.</span>
-                      <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium">{n30} quiz × 30 q.</span>
-                    </div>
+                    <p className="text-[9px] text-slate-400 text-center leading-relaxed">
+                      L'IA analyse chaque cours et crée <strong>1 à 4 quiz de 8–15 questions</strong> selon sa richesse
+                    </p>
                   </div>
                 );
               })()}

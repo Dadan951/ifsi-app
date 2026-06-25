@@ -4,57 +4,85 @@ const Lesson    = require('../models/Lesson');
 const Quiz      = require('../models/Quiz');
 const Flashcard = require('../models/Flashcard');
 
-const MODEL          = 'claude-haiku-4-5-20251001';
-const MIN_CONTENT    = 100; // chars : en dessous on génère depuis les connaissances IA
+const MODEL      = 'claude-haiku-4-5-20251001';
+const MIN_CONTENT = 100;
 
-// Répartition homogène : index % 3 → 15 / 20 / 30 questions
-function questionCount(index) {
-  const cycle = index % 3;
-  if (cycle === 0) return 15;
-  if (cycle === 1) return 20;
-  return 30;
-}
-
-// Durée estimée du quiz (minutes) selon nombre de questions
+/* ─── Durée estimée ──────────────────────────────────────────────────────── */
 function quizDuration(n) {
-  if (n <= 15) return 12;
-  if (n <= 20) return 18;
-  return 25;
+  if (n <= 8)  return 7;
+  if (n <= 10) return 10;
+  return 13;
 }
 
-/* ─── Prompt QCM ─────────────────────────────────────────────────────────── */
-function promptQCM(title, ueLabel, semester, content, nbQuestions) {
-  const hasContent = content && content.length >= MIN_CONTENT;
-  const source = hasContent
-    ? `Contenu du cours :\n---\n${content.slice(0, 6000)}\n---`
-    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français sur ce sujet)`;
+function difficultyLabel(n) {
+  if (n <= 8)  return 'easy';
+  if (n <= 10) return 'medium';
+  return 'hard';
+}
 
-  const difficulty = nbQuestions === 8
-    ? 'Niveau accessible — questions de définition et de reconnaissance (quiz rapide)'
-    : nbQuestions === 10
-    ? 'Niveau standard — mélange définitions, mécanismes et application clinique'
-    : 'Niveau complet — questions approfondies incluant raisonnement clinique, valeurs précises et gestes infirmiers';
+/* ─── Prompt 1 : analyse du cours → chapitres ───────────────────────────── */
+function promptAnalyse(title, ueLabel, semester) {
+  return `Tu es un expert du programme IFSI français (référentiel 2009 réformé).
 
-  return `Tu es un formateur IFSI expert en France. Génère exactement ${nbQuestions} questions QCM pour des étudiants infirmiers.
-
-Cours : "${title}"
+Analyse ce cours : "${title}"
 UE : ${ueLabel}
 Semestre : ${semester}
-Niveau : ${difficulty}
+
+Décompose ce cours en chapitres/thèmes distincts tels qu'ils sont réellement enseignés dans les IFSI en France.
+Attribue à chaque chapitre un nombre de questions QCM adapté à sa richesse (entre 8 et 15).
+
+Règles de décomposition :
+- Cours court ou introduction → 1 chapitre
+- Cours standard → 2 chapitres
+- Cours riche (plusieurs mécanismes, traitements, complications) → 3 chapitres
+- Cours très complet (ex: pharmacologie, infectiologie) → 4 chapitres maximum
+- Chaque chapitre doit pouvoir générer des questions DISTINCTES des autres chapitres
+
+Réponds UNIQUEMENT en JSON valide :
+{
+  "chapters": [
+    { "title": "Titre précis du chapitre 1", "questions": 10 },
+    { "title": "Titre précis du chapitre 2", "questions": 8 }
+  ]
+}`;
+}
+
+/* ─── Prompt 2 : génération QCM pour un chapitre ────────────────────────── */
+function promptQCM(courseTitle, chapterTitle, ueLabel, semester, content, nbQuestions) {
+  const hasContent = content && content.length >= MIN_CONTENT;
+  const source = hasContent
+    ? `Extrait du cours :\n---\n${content.slice(0, 5000)}\n---`
+    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français)`;
+
+  const niveauLabel = nbQuestions <= 8
+    ? 'Niveau accessible — définitions et reconnaissances'
+    : nbQuestions <= 10
+    ? 'Niveau standard — mécanismes et application clinique'
+    : 'Niveau complet — raisonnement clinique, valeurs précises, gestes infirmiers';
+
+  return `Tu es un formateur IFSI expert en France. Génère exactement ${nbQuestions} questions QCM.
+
+Cours : "${courseTitle}"
+Chapitre ciblé : "${chapterTitle}"
+UE : ${ueLabel}
+Semestre : ${semester}
+Niveau : ${niveauLabel}
 ${source}
 
-Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
+IMPORTANT : Les questions doivent porter UNIQUEMENT sur le chapitre "${chapterTitle}", pas sur le cours en général.
+
+Réponds UNIQUEMENT en JSON valide :
 {
   "questions": [
     {
-      "text": "Question précise et sans ambiguïté ?",
+      "text": "Question précise sur ${chapterTitle} ?",
       "options": [
-        { "text": "Proposition A complète", "isCorrect": false },
-        { "text": "Proposition B complète", "isCorrect": true },
-        { "text": "Proposition C complète", "isCorrect": false },
-        { "text": "Proposition D complète", "isCorrect": false }
+        { "text": "Proposition A", "isCorrect": false },
+        { "text": "Proposition B", "isCorrect": true },
+        { "text": "Proposition C", "isCorrect": false },
+        { "text": "Proposition D", "isCorrect": false }
       ],
-      "explanation": "Explication concise de pourquoi cette réponse est correcte."
+      "explanation": "Explication concise de la bonne réponse."
     }
   ]
 }
@@ -62,26 +90,25 @@ Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
 Règles :
 - Exactement ${nbQuestions} questions, pas une de plus, pas une de moins
 - 1 seule bonne réponse par question, toujours 4 options
-- Varier : définitions, mécanismes physiopathologiques, traitements, signes cliniques, rôle infirmier, surveillance
-- Conforme au référentiel de formation infirmier français
-- Options incorrectes plausibles (pas fantaisistes)`;
+- Options incorrectes plausibles (jamais fantaisistes)
+- Conforme au référentiel infirmier français`;
 }
 
 /* ─── Prompt Flashcards ──────────────────────────────────────────────────── */
 function promptFlashcards(title, ueLabel, semester, content) {
   const hasContent = content && content.length >= MIN_CONTENT;
   const source = hasContent
-    ? `Contenu du cours :\n---\n${content.slice(0, 6000)}\n---`
-    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français sur ce sujet)`;
+    ? `Extrait du cours :\n---\n${content.slice(0, 5000)}\n---`
+    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français)`;
 
-  return `Tu es un formateur IFSI expert en France. Génère 12 flashcards de révision pour des étudiants infirmiers.
+  return `Tu es un formateur IFSI expert en France. Génère 12 flashcards de révision.
 
 Cours : "${title}"
 UE : ${ueLabel}
 Semestre : ${semester}
 ${source}
 
-Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
+Réponds UNIQUEMENT en JSON valide :
 {
   "flashcards": [
     {
@@ -94,23 +121,23 @@ Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
 
 Règles :
 - Exactement 12 flashcards
-- Recto : un seul concept / terme / question par carte
-- Verso : réponse directe, complète, sans reformuler le recto
+- Recto : un seul concept par carte
+- Verso : réponse directe et complète
 - Couvrir les notions essentielles : définitions, valeurs clés, signes, traitements, surveillance infirmière
 - Conforme au référentiel IFSI français`;
 }
 
 /* ─── Appel Anthropic ────────────────────────────────────────────────────── */
-async function callAI(client, prompt) {
+async function callAI(client, prompt, maxTokens = 4000) {
   const msg = await client.messages.create({
     model:      MODEL,
-    max_tokens: 2500,
+    max_tokens: maxTokens,
     messages:   [{ role: 'user', content: prompt }],
   });
   const raw   = msg.content[0]?.text || '';
   const start = raw.indexOf('{');
   const end   = raw.lastIndexOf('}');
-  if (start === -1 || end === -1) throw new Error('Réponse IA non-JSON');
+  if (start === -1 || end === -1) throw new Error('Réponse IA non-JSON : ' + raw.slice(0, 100));
   return JSON.parse(raw.slice(start, end + 1));
 }
 
@@ -121,67 +148,79 @@ module.exports = async (req, res) => {
     return res.status(503).json({ ok: false, message: 'ANTHROPIC_API_KEY non configurée dans les variables Railway' });
   }
 
-  const mode    = req.query.mode || 'both';   // 'quiz' | 'flashcards' | 'both'
-  const testMode = req.query.test === 'true';  // ne traiter que 1 cours pour vérifier
+  const mode     = req.query.mode || 'both';
+  const testMode = req.query.test === 'true';
 
   const client = new Anthropic({ apiKey });
   const log    = [];
   let quizInserted = 0, flashInserted = 0, skipped = 0, errors = 0;
 
   try {
-    // Récupérer tous les cours (sans filtre isPublished pour éviter les problèmes)
     const allLessons = await Lesson.find({})
       .select('title semester category chapter content').lean();
 
     if (allLessons.length === 0) {
-      return res.json({ ok: false, message: 'Aucun cours en base. Importe d\'abord les cours (Option A).' });
+      return res.json({ ok: false, message: "Aucun cours en base. Importe d'abord les cours (Option A)." });
     }
 
-    const withText = allLessons.filter(l => (l.content || '').length >= MIN_CONTENT);
-    const noText   = allLessons.filter(l => (l.content || '').length < MIN_CONTENT);
-    console.log(`[GenContent] Total: ${allLessons.length} | avec texte: ${withText.length} | PDFs scannés: ${noText.length}`);
-
-    // On traite TOUS les cours — l'IA génère depuis ses connaissances si le PDF est scanné
-    let lessons = allLessons;
-
-    if (testMode) {
-      lessons = lessons.slice(0, 1); // test sur 1 seul cours
-    }
-
-    console.log(`[GenContent] ${lessons.length} cours éligibles, mode=${mode}, test=${testMode}`);
+    let lessons = testMode ? allLessons.slice(0, 1) : allLessons;
+    console.log(`[GenContent] ${lessons.length} cours, mode=${mode}, test=${testMode}`);
 
     for (let idx = 0; idx < lessons.length; idx++) {
       const lesson = lessons[idx];
       const { title, semester, category, chapter, content } = lesson;
-      const ueLabel  = category || 'UE inconnue';
-      const chap     = chapter || title;
-      const nbQ      = questionCount(idx); // 8 / 10 / 15 en rotation
+      const ueLabel = category || 'UE inconnue';
+      const chap    = chapter || title;
 
-      console.log(`[GenContent] → [${idx+1}/${lessons.length}] ${title} (${nbQ} questions)`);
+      console.log(`[GenContent] → [${idx+1}/${lessons.length}] ${title}`);
 
       // ── QUIZ ──
       if (mode === 'quiz' || mode === 'both') {
-        const exists = await Quiz.findOne({ title: `Quiz — ${title}`, category }).lean();
-        if (exists) {
-          skipped++;
-          log.push(`⊘ Quiz déjà présent : ${title}`);
-        } else {
+        // Étape 1 : analyser le cours pour obtenir ses chapitres
+        let chapters;
+        try {
+          const analysis = await callAI(client, promptAnalyse(title, ueLabel, semester), 800);
+          chapters = analysis.chapters;
+          if (!Array.isArray(chapters) || chapters.length === 0) throw new Error('Aucun chapitre retourné');
+          // Sécurité : max 4 chapitres, questions entre 8 et 15
+          chapters = chapters.slice(0, 4).map(c => ({
+            title:     c.title,
+            questions: Math.min(15, Math.max(8, parseInt(c.questions) || 10)),
+          }));
+          console.log(`[GenContent]   → ${chapters.length} chapitre(s) détecté(s)`);
+        } catch (e) {
+          // Fallback : 1 seul quiz de 10 questions sur le cours entier
+          chapters = [{ title, questions: 10 }];
+          log.push(`⚠ Analyse impossible pour "${title}" → 1 quiz de 10 questions`);
+        }
+        await new Promise(r => setTimeout(r, 500));
+
+        // Étape 2 : générer 1 quiz par chapitre
+        for (const chapterDef of chapters) {
+          const quizTitle = chapters.length === 1
+            ? `Quiz — ${title}`
+            : `Quiz — ${title} · ${chapterDef.title}`;
+
+          const exists = await Quiz.findOne({ title: quizTitle, category }).lean();
+          if (exists) {
+            skipped++;
+            log.push(`⊘ Quiz déjà présent : ${quizTitle}`);
+            continue;
+          }
+
           try {
-            const parsed = await callAI(client, promptQCM(title, ueLabel, semester, content, nbQ));
+            const parsed = await callAI(client, promptQCM(title, chapterDef.title, ueLabel, semester, content, chapterDef.questions));
             const qs = parsed.questions;
             if (!qs?.length) throw new Error('0 questions retournées');
 
-            // Vérification : chaque question doit avoir exactement 1 bonne réponse
             for (const q of qs) {
               const nbCorrect = q.options.filter(o => o.isCorrect).length;
-              if (nbCorrect !== 1) throw new Error(`Question "${q.text.slice(0,40)}…" : ${nbCorrect} bonne(s) réponse(s)`);
+              if (nbCorrect !== 1) throw new Error(`"${q.text.slice(0,40)}" : ${nbCorrect} bonne(s) réponse(s)`);
             }
 
-            const diffLabel = nbQ === 8 ? 'easy' : nbQ === 10 ? 'medium' : 'hard';
-
             await Quiz.create({
-              title:       `Quiz — ${title}`,
-              description: `${qs.length} questions sur "${title}" (${ueLabel}, ${semester})`,
+              title:       quizTitle,
+              description: `${qs.length} questions · "${chapterDef.title}" (${ueLabel}, ${semester})`,
               semester,
               category,
               chapter:     chap,
@@ -191,18 +230,19 @@ module.exports = async (req, res) => {
                 explanation: q.explanation || '',
                 options:     q.options,
               })),
-              difficulty:  diffLabel,
-              duration:    quizDuration(nbQ),
+              difficulty:  difficultyLabel(chapterDef.questions),
+              duration:    quizDuration(chapterDef.questions),
               isPublished: true,
             });
 
             quizInserted++;
-            log.push(`✓ Quiz (${qs.length} questions) : [${semester}] ${ueLabel} — ${title}`);
+            log.push(`✓ Quiz (${qs.length} q.) : [${semester}] ${ueLabel} — ${chapterDef.title}`);
           } catch (e) {
             errors++;
-            log.push(`✗ Quiz ERREUR "${title}" : ${e.message}`);
-            console.error(`[GenContent] Quiz erreur "${title}":`, e.message);
+            log.push(`✗ Quiz ERREUR "${quizTitle}" : ${e.message}`);
+            console.error(`[GenContent] Quiz erreur:`, e.message);
           }
+          await new Promise(r => setTimeout(r, 800));
         }
       }
 
@@ -234,23 +274,20 @@ module.exports = async (req, res) => {
           } catch (e) {
             errors++;
             log.push(`✗ Flashcards ERREUR "${title}" : ${e.message}`);
-            console.error(`[GenContent] Flash erreur "${title}":`, e.message);
+            console.error(`[GenContent] Flash erreur:`, e.message);
           }
+          await new Promise(r => setTimeout(r, 800));
         }
       }
-
-      // Pause anti-rate-limit Anthropic
-      await new Promise(r => setTimeout(r, 1000));
     }
 
-    // Construire le résumé avec les détails de localisation
     const generated = log.filter(l => l.startsWith('✓'));
     const locationHint = generated.length
       ? generated.map(l => l.replace('✓ ', '')).join(' | ')
       : '';
 
     const summary = testMode
-      ? `TEST OK — Généré sur : ${locationHint}. Va dans Quiz ou Flashcards et navigue vers ce semestre/UE pour vérifier.`
+      ? `TEST OK — ${quizInserted} quiz · ${flashInserted} flashcards. Généré sur : ${locationHint}. Va dans Quiz ou Flashcards et navigue vers ce semestre/UE pour vérifier.`
       : `${quizInserted} quiz · ${flashInserted} flashcards générés · ${skipped} doublons ignorés · ${errors} erreurs`;
 
     res.json({ ok: true, message: summary, quizInserted, flashInserted, skipped, errors, log });
