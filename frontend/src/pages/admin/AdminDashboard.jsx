@@ -678,6 +678,19 @@ function SeedPanel() {
         Lance l'insertion de contenu pédagogique directement en base de données.
       </p>
 
+      {/* Migration : corriger les labels UE des cours déjà importés */}
+      <button
+        onClick={async () => {
+          try {
+            const r = await axios.post(`${API_URL}/admin/fix-ue-labels`, {}, { headers: { Authorization: `Bearer ${token}` } });
+            alert(r.data.message);
+          } catch (e) { alert('Erreur : ' + (e.response?.data?.error || e.message)); }
+        }}
+        className="w-full py-2 rounded-xl text-[10px] font-semibold text-emerald-600 border border-emerald-200 hover:bg-emerald-50 transition"
+      >
+        🔧 Corriger les labels UE (migration)
+      </button>
+
       {SEEDS.map(seed => (
         <div key={seed.id} className="rounded-xl border border-slate-100 overflow-hidden">
           <div className="flex items-center gap-3 px-3 py-2.5">
