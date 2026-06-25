@@ -5,19 +5,21 @@ const Quiz      = require('../models/Quiz');
 const Flashcard = require('../models/Flashcard');
 
 const MODEL          = 'claude-haiku-4-5-20251001';
-const MIN_CONTENT    = 100; // chars minimum pour qu'un cours soit utilisable
+const MIN_CONTENT    = 100; // chars : en dessous on génère depuis les connaissances IA
 
 /* ─── Prompt QCM ─────────────────────────────────────────────────────────── */
 function promptQCM(title, ueLabel, semester, content) {
-  return `Tu es un formateur IFSI expert. Génère 8 questions QCM rigoureuses à partir de ce cours infirmier.
+  const hasContent = content && content.length >= MIN_CONTENT;
+  const source = hasContent
+    ? `Contenu du cours :\n---\n${content.slice(0, 6000)}\n---`
+    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français sur ce sujet)`;
+
+  return `Tu es un formateur IFSI expert en France. Génère 8 questions QCM rigoureuses pour des étudiants infirmiers.
 
 Cours : "${title}"
 UE : ${ueLabel}
 Semestre : ${semester}
-Contenu du cours :
----
-${content.slice(0, 6000)}
----
+${source}
 
 Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
 {
@@ -30,49 +32,50 @@ Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
         { "text": "Proposition C complète", "isCorrect": false },
         { "text": "Proposition D complète", "isCorrect": false }
       ],
-      "explanation": "Explication concise de pourquoi B est correct et les autres non."
+      "explanation": "Explication concise de pourquoi cette réponse est correcte."
     }
   ]
 }
 
-Règles strictes :
-- Exactement 8 questions tirées UNIQUEMENT du contenu fourni
+Règles :
+- Exactement 8 questions
 - 1 seule bonne réponse par question, toujours 4 options
-- Varier les types : définitions, mécanismes physiopathologiques, traitements, signes cliniques, gestes infirmiers
-- Niveau examen IFSI réaliste (ni trop facile ni hors programme)
-- Les options incorrectes doivent être plausibles (pas fantaisistes)
-- Ne jamais inventer des données absentes du cours`;
+- Varier : définitions, mécanismes physiopathologiques, traitements, signes cliniques, rôle infirmier
+- Niveau examen IFSI réaliste, conforme au référentiel de formation français
+- Options incorrectes plausibles (pas fantaisistes)`;
 }
 
 /* ─── Prompt Flashcards ──────────────────────────────────────────────────── */
 function promptFlashcards(title, ueLabel, semester, content) {
-  return `Tu es un formateur IFSI expert. Génère 12 flashcards de révision à partir de ce cours infirmier.
+  const hasContent = content && content.length >= MIN_CONTENT;
+  const source = hasContent
+    ? `Contenu du cours :\n---\n${content.slice(0, 6000)}\n---`
+    : `(PDF non lisible — génère depuis tes connaissances approfondies du programme IFSI français sur ce sujet)`;
+
+  return `Tu es un formateur IFSI expert en France. Génère 12 flashcards de révision pour des étudiants infirmiers.
 
 Cours : "${title}"
 UE : ${ueLabel}
 Semestre : ${semester}
-Contenu du cours :
----
-${content.slice(0, 6000)}
----
+${source}
 
 Réponds UNIQUEMENT en JSON valide (aucun texte avant ou après) :
 {
   "flashcards": [
     {
-      "front": "Terme, notion clé ou question courte à retenir (1 ligne max)",
-      "back": "Réponse claire, mémorisable, complète (2-4 lignes max)",
-      "hint": "Moyen mnémotechnique court ou contexte clinique (optionnel, peut être vide)"
+      "front": "Terme, notion clé ou question courte (1 ligne max)",
+      "back": "Réponse claire et mémorisable (2-4 lignes max)",
+      "hint": "Moyen mnémotechnique ou contexte clinique (peut être vide)"
     }
   ]
 }
 
-Règles strictes :
-- Exactement 12 flashcards tirées UNIQUEMENT du contenu fourni
+Règles :
+- Exactement 12 flashcards
 - Recto : un seul concept / terme / question par carte
-- Verso : réponse directe, sans reformuler le recto
-- Couvrir les notions les plus importantes du cours (définitions, valeurs clés, signes, traitements, rôle infirmier)
-- Ne jamais inventer des données absentes du cours`;
+- Verso : réponse directe, complète, sans reformuler le recto
+- Couvrir les notions essentielles : définitions, valeurs clés, signes, traitements, surveillance infirmière
+- Conforme au référentiel IFSI français`;
 }
 
 /* ─── Appel Anthropic ────────────────────────────────────────────────────── */
@@ -108,23 +111,16 @@ module.exports = async (req, res) => {
     const allLessons = await Lesson.find({})
       .select('title semester category chapter content').lean();
 
-    const withText  = allLessons.filter(l => (l.content || '').length >= MIN_CONTENT);
-    const noText    = allLessons.filter(l => (l.content || '').length < MIN_CONTENT);
-
-    console.log(`[GenContent] Total en base: ${allLessons.length}, avec texte: ${withText.length}, sans texte: ${noText.length}`);
-
     if (allLessons.length === 0) {
       return res.json({ ok: false, message: 'Aucun cours en base. Importe d\'abord les cours (Option A).' });
     }
 
-    let lessons = withText;
+    const withText = allLessons.filter(l => (l.content || '').length >= MIN_CONTENT);
+    const noText   = allLessons.filter(l => (l.content || '').length < MIN_CONTENT);
+    console.log(`[GenContent] Total: ${allLessons.length} | avec texte: ${withText.length} | PDFs scannés: ${noText.length}`);
 
-    if (!lessons.length) {
-      return res.json({
-        ok: false,
-        message: `${allLessons.length} cours trouvés en base, mais tous sont des PDFs scannés (pas de texte extractible). L'IA ne peut pas générer de contenu sans texte. (PDFs scannés ignorés : ${noText.map(l => l.title).slice(0,3).join(', ')}…)`,
-      });
-    }
+    // On traite TOUS les cours — l'IA génère depuis ses connaissances si le PDF est scanné
+    let lessons = allLessons;
 
     if (testMode) {
       lessons = lessons.slice(0, 1); // test sur 1 seul cours
