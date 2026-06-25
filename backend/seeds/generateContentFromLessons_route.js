@@ -87,10 +87,12 @@ Réponds UNIQUEMENT en JSON valide :
   ]
 }
 
-Règles :
+Règles ABSOLUES :
 - Exactement ${nbQuestions} questions, pas une de plus, pas une de moins
 - 1 seule bonne réponse par question, toujours 4 options
-- Options incorrectes plausibles (jamais fantaisistes)
+- LONGUEUR DES OPTIONS : toutes les options doivent être de longueur similaire (±5 mots). La bonne réponse ne doit PAS être plus longue que les mauvaises. Si la bonne réponse est longue, rends les mauvaises tout aussi longues.
+- POSITION : varie la position de la bonne réponse (A, B, C ou D) de façon aléatoire — ne mets pas toujours la bonne réponse en B ou en dernière position.
+- Options incorrectes plausibles et crédibles (jamais fantaisistes ni évidentes)
 - Conforme au référentiel infirmier français`;
 }
 
