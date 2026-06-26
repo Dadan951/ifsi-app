@@ -1,7 +1,6 @@
 'use strict';
-const AdmZip   = require('adm-zip');
-const pdfParse = require('pdf-parse');
-const Lesson   = require('../models/Lesson');
+const AdmZip = require('adm-zip');
+const Lesson = require('../models/Lesson');
 
 /* ─── Mapping UE complet ─────────────────────────────────────────────────── */
 const UE_MAP = {
@@ -58,12 +57,6 @@ function cleanTitle(filename) {
   return filename.replace(/\.pdf$/i,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
 }
 
-async function extractText(buf) {
-  try {
-    const d = await pdfParse(buf, { max: 8 });
-    return (d.text || '').trim().slice(0, 8000);
-  } catch { return ''; }
-}
 
 module.exports = async (req, res) => {
   const files = req.files;
@@ -110,13 +103,12 @@ module.exports = async (req, res) => {
         }
 
         try {
-          const buf     = entry.getData();
-          const content = await extractText(buf);
-
+          // Ne pas stocker le binaire PDF en mémoire/MongoDB
+          // (PDFs scannés → l'IA génère depuis ses connaissances IFSI)
           await Lesson.create({
             title,
             type:        'cours',
-            content,
+            content:     '',
             summary:     '',
             semester,
             category,
@@ -124,11 +116,7 @@ module.exports = async (req, res) => {
             tags:        [ueCode, semester].filter(Boolean),
             difficulty:  'medium',
             isPublished: true,
-            fileData:    buf,
-            fileMimeType:'application/pdf',
-            fileName:    filename,
-            fileSize:    buf.length,
-            hasFile:     true,
+            hasFile:     false,
           });
 
           inserted++;
