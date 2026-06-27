@@ -170,6 +170,20 @@ function ActionCard3D({ to, label, desc, icon, color, darkColor, grad }) {
   );
 }
 
+/* ─── Scroll-reveal avec vague ───────────────────────────────────────────── */
+function ScrollReveal({ children, delay = 0, x = 0, y = 36, scale = 0.94 }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y, x, scale }}
+      whileInView={{ opacity: 1, y: 0, x: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-55px' }}
+      transition={{ type: 'spring', stiffness: 280, damping: 26, delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 /* ─── Horizontal progress bar (clay inset) ────────────────────────────────── */
 function ProgressBar({ value, max, color, label, sublabel }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
@@ -408,23 +422,25 @@ export default function Dashboard() {
           </motion.div>
 
           {/* ── STAT CARDS ────────────────────────────────────────────────── */}
-          <motion.div
-            initial="hidden" animate="show"
-            variants={{ hidden:{}, show:{ transition:{ staggerChildren:0.08, delayChildren:0.1 } } }}
-            style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:14 }}
-          >
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(170px, 1fr))', gap:14 }}>
             {STATS.map((s, i) => (
-              <motion.div key={i} variants={{ hidden:{ opacity:0, y:20, scale:0.96 }, show:{ opacity:1, y:0, scale:1, transition:{ duration:0.45, ease:[0.16,1,0.3,1] } } }}>
+              <motion.div
+                key={i}
+                initial={{ opacity:0, y:32, scale:0.92 }}
+                whileInView={{ opacity:1, y:0, scale:1 }}
+                viewport={{ once:true, margin:'-40px' }}
+                transition={{ type:'spring', stiffness:300, damping:26, delay: i * 0.09 }}
+              >
                 <Tilt3D depth={6}>
                   <Card style={{ padding:'22px 24px', cursor:'default' }}>
-                    {/* Colored top bar */}
                     <div style={{ height:4, borderRadius:99, background:`linear-gradient(90deg, ${s.color}, ${s.color}88)`, marginBottom:16 }}/>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
                       <div style={{ width:42, height:42, borderRadius:14, background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:s.color, boxShadow:clay.sm }}>
                         {s.icon}
                       </div>
                       <motion.div
-                        initial={{ scale:0 }} animate={{ scale:1 }}
+                        initial={{ scale:0 }} whileInView={{ scale:1 }}
+                        viewport={{ once:true }}
                         transition={{ delay:0.3+i*0.07, ...spring }}
                         style={{ width:10, height:10, borderRadius:'50%', background:s.color, boxShadow:`0 0 12px ${s.color}` }}
                       />
@@ -435,7 +451,7 @@ export default function Dashboard() {
                 </Tilt3D>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* ── MAIN GRID ─────────────────────────────────────────────────── */}
           <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:20 }} className="dashboard-grid">
@@ -445,7 +461,7 @@ export default function Dashboard() {
             <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
               {/* Daily goals */}
-              <motion.div {...fade(0.2)}>
+              <ScrollReveal delay={0.05}>
                 <Card style={{ padding:'26px 28px' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:22 }}>
                     <div>
@@ -465,34 +481,43 @@ export default function Dashboard() {
                     {GOALS.map((g, i) => <ProgressBar key={i} {...g} />)}
                   </div>
                 </Card>
-              </motion.div>
+              </ScrollReveal>
 
               {/* Quick actions */}
-              <motion.div {...fade(0.3)}>
-                <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:14, paddingLeft:4 }}>Accès rapide</h2>
-                <motion.div
-                  initial="hidden" animate="show"
-                  variants={{ hidden:{}, show:{ transition:{ staggerChildren:0.06, delayChildren:0.25 } } }}
-                  style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12 }}
+              <div>
+                <ScrollReveal delay={0} y={20} scale={1}>
+                  <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:14, paddingLeft:4 }}>Accès rapide</h2>
+                </ScrollReveal>
+                {/* perspective sur le container = les rotateX des cartes sont dans le même espace 3D */}
+                <div
+                  style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, perspective:1400, perspectiveOrigin:'50% 0%' }}
                   className="actions-grid"
                 >
-                  <style>{`.actions-grid { @media(max-width:600px){ grid-template-columns:repeat(2,1fr) !important; } }`}</style>
+                  <style>{`
+                    .actions-grid { @media(max-width:600px){ grid-template-columns:repeat(2,1fr) !important; gap:10px !important; } }
+                    .actions-grid { @media(max-width:400px){ grid-template-columns:repeat(2,1fr) !important; } }
+                  `}</style>
                   {ACTIONS.map((a, i) => (
                     <motion.div
                       key={i}
-                      variants={{ hidden:{ opacity:0, y:18, scale:0.92 }, show:{ opacity:1, y:0, scale:1, transition:{ duration:0.45, ease:[0.16,1,0.3,1] } } }}
+                      initial={{ opacity:0, y:55, rotateX:28, scale:0.88 }}
+                      whileInView={{ opacity:1, y:0, rotateX:0, scale:1 }}
+                      viewport={{ once:true, margin:'-45px' }}
+                      transition={{ type:'spring', stiffness:260, damping:22, delay: i * 0.07 }}
+                      style={{ transformOrigin:'center bottom' }}
                     >
                       <ActionCard3D {...a} />
                     </motion.div>
                   ))}
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
 
             {/* RIGHT SIDEBAR */}
-            <motion.div {...fade(0.25)} style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
               {/* Streak card */}
+              <ScrollReveal delay={0.08} x={24} y={0}>
               <Card style={{ padding:'24px', position:'relative', overflow:'hidden' }}>
                 <div style={{ position:'absolute', top:-20, right:-20, width:100, height:100, borderRadius:'50%', background:'radial-gradient(circle,rgba(249,115,22,0.18),transparent)', pointerEvents:'none' }} aria-hidden/>
                 <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:16 }}>
@@ -523,8 +548,10 @@ export default function Dashboard() {
                 </div>
                 <p style={{ fontSize:10, color:C.muted, marginTop:6 }}>Objectif : 7 jours</p>
               </Card>
+              </ScrollReveal>
 
               {/* Tip card */}
+              <ScrollReveal delay={0.14} x={24} y={0}>
               <Card style={{ padding:'22px' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
                   <div style={{ width:30, height:30, borderRadius:10, background:'#fffbeb', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:clay.sm }}>
@@ -551,10 +578,11 @@ export default function Dashboard() {
                   ))}
                 </div>
               </Card>
+              </ScrollReveal>
 
               {/* Upgrade card — free only */}
               {user?.subscription === 'free' && (
-                <motion.div initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }} transition={{ delay:0.45 }}>
+                <ScrollReveal delay={0.20} x={24} y={0}>
                   <Card style={{ padding:'24px', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, border:'none', boxShadow:clay.btn(C.indigo), position:'relative', overflow:'hidden' }}>
                     <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.15),transparent 60%)', pointerEvents:'none' }} aria-hidden/>
                     <div style={{ position:'relative' }}>
@@ -575,10 +603,10 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   </Card>
-                </motion.div>
+                </ScrollReveal>
               )}
 
-            </motion.div>
+            </div>
           </div>
         </div>
       </main>
