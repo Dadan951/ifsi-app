@@ -29,28 +29,26 @@ Analyse ce cours : "${title}"
 UE : ${ueLabel}
 Semestre : ${semester}
 
-Décompose ce cours en chapitres/thèmes distincts tels qu'ils sont réellement enseignés dans les IFSI en France.
-Pour chaque chapitre, détermine librement le nombre de questions QCM selon la richesse réelle du sujet.
+En te basant sur tes connaissances approfondies du contenu réel de ce cours en IFSI, décompose-le en chapitres/thèmes pédagogiques distincts.
 
-Règles de décomposition :
-- Cours court ou introduction → 1 chapitre
-- Cours standard → 2 chapitres
-- Cours riche (plusieurs mécanismes, traitements, complications) → 3 chapitres
-- Cours très complet (ex: pharmacologie, infectiologie) → 4 chapitres maximum
-- Chaque chapitre doit pouvoir générer des questions DISTINCTES des autres chapitres
+LIBERTÉ TOTALE sur le nombre de chapitres :
+- Si le cours est court, introductif ou peu dense → 1 seul chapitre
+- Si le cours est standard → 2 à 3 chapitres
+- Si le cours est riche (plusieurs mécanismes, pathologies, traitements) → 4 à 6 chapitres
+- Si le cours est très complet (ex: pharmacologie complète, infectiologie, soins complexes) → autant de chapitres que nécessaire
+- Chaque chapitre doit couvrir un thème DISTINCT avec suffisamment de contenu pour générer des questions uniques
 
-Règles sur le nombre de questions :
-- Minimum : 8 questions par chapitre
-- Maximum absolu : 20 questions par chapitre
-- Adapte librement selon la richesse du contenu (pas de quota imposé entre 8 et 20)
-- Un sujet riche en définitions, valeurs, médicaments, signes cliniques → 15 à 20 questions
-- Un sujet introductif ou court → 8 à 10 questions
+LIBERTÉ TOTALE sur le nombre de questions par chapitre :
+- Minimum absolu : 8 questions
+- Maximum absolu : 20 questions
+- Choisis librement selon la densité pédagogique du chapitre
+- Beaucoup de définitions, valeurs, médicaments, signes, gestes → 16 à 20 questions
+- Chapitre introductif ou transversal → 8 à 12 questions
 
 Réponds UNIQUEMENT en JSON valide :
 {
   "chapters": [
-    { "title": "Titre précis du chapitre 1", "questions": 15 },
-    { "title": "Titre précis du chapitre 2", "questions": 20 }
+    { "title": "Titre précis du chapitre", "questions": 14 }
   ]
 }`;
 }
@@ -195,7 +193,7 @@ module.exports = async (req, res) => {
           chapters = analysis.chapters;
           if (!Array.isArray(chapters) || chapters.length === 0) throw new Error('Aucun chapitre retourné');
           // Sécurité : max 4 chapitres, questions entre 8 et 15
-          chapters = chapters.slice(0, 4).map(c => ({
+          chapters = chapters.map(c => ({
             title:     c.title,
             questions: Math.min(20, Math.max(8, parseInt(c.questions) || 10)),
           }));

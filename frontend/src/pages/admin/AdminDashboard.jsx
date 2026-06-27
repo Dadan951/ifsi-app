@@ -778,10 +778,10 @@ function SeedPanel() {
               {/* Compteur */}
               {aiCount && (() => {
                 const n = aiCount.total;
-                const quizMin  = n;           // minimum : 1 quiz par cours
-                const quizMax  = n * 4;       // maximum : 4 quiz par cours
-                const qMin     = n * 8;       // min questions (1 quiz × 8)
-                const qMax     = n * 4 * 20;  // max questions (4 quiz × 20)
+                const quizMin  = n;            // minimum : 1 quiz par cours
+                const quizMax  = n * 6;        // estimation haute : cours très riches
+                const qMin     = n * 8;        // min : 1 quiz × 8 questions
+                const qMax     = n * 6 * 20;   // max : 6 quiz × 20 questions
                 return (
                   <div className="space-y-2">
                     <div className="grid grid-cols-3 gap-2 text-center">
@@ -799,7 +799,7 @@ function SeedPanel() {
                       </div>
                     </div>
                     <p className="text-[9px] text-slate-400 text-center leading-relaxed">
-                      L'IA analyse chaque cours et crée <strong>1 à 4 quiz de 8–20 questions</strong> selon sa richesse
+                      L'IA décide librement du <strong>nombre de quiz et de questions</strong> selon la richesse du cours
                     </p>
                   </div>
                 );
