@@ -86,6 +86,17 @@ function Tilt3D({ children, style = {}, className = '', scale = 1.02, depth = 8 
   );
 }
 
+/* ─── Mobile detection ───────────────────────────────────────────────────── */
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener('resize', fn, { passive: true });
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return mobile;
+}
+
 /* ─── Clay Card ───────────────────────────────────────────────────────────── */
 function Card({ children, style = {}, className = '' }) {
   return (
@@ -101,6 +112,9 @@ function Card({ children, style = {}, className = '' }) {
 /* ─── Action Card 3D — vrai effet clay extrudé ────────────────────────────── */
 function ActionCard3D({ to, label, desc, icon, color, darkColor, grad }) {
   const [state, setState] = useState('idle'); // idle | hovered | pressed
+  const isMob = useIsMobile();
+
+  // Motion values toujours déclarés (règle des hooks) mais utilisés seulement sur desktop
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const rotX = useTransform(my, [-0.5, 0.5], [12, -12]);
@@ -114,58 +128,56 @@ function ActionCard3D({ to, label, desc, icon, color, darkColor, grad }) {
     pressed: `inset 0 3px 8px rgba(0,0,0,0.25), inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 0 ${darkColor}, 0 4px 12px ${color}33`,
   };
 
+  const cardContent = (
+    <motion.div
+      animate={{
+        y: state === 'pressed' ? 7 : (!isMob && state === 'hovered') ? -8 : 0,
+        scale: state === 'pressed' ? 0.95 : (!isMob && state === 'hovered') ? 1.04 : 1,
+      }}
+      transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+      onHoverStart={() => !isMob && setState('hovered')}
+      onHoverEnd={() => !isMob && setState('idle')}
+      onTapStart={() => setState('pressed')}
+      onTap={() => setState(isMob ? 'idle' : 'hovered')}
+      onTapCancel={() => setState('idle')}
+      style={{
+        background: `linear-gradient(${grad})`,
+        borderRadius: 22,
+        padding: isMob ? '18px 14px 16px' : '22px 18px 20px',
+        minHeight: isMob ? 130 : 158,
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: shadows[state],
+        transition: 'box-shadow 0.14s ease',
+      }}
+    >
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(148deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.07) 38%, transparent 68%)', borderRadius:22, pointerEvents:'none' }} aria-hidden/>
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:44, background:'linear-gradient(to top, rgba(0,0,0,0.22), transparent)', borderRadius:'0 0 22px 22px', pointerEvents:'none' }} aria-hidden/>
+      <div style={{ width:isMob?38:46, height:isMob?38:46, borderRadius:isMob?12:14, marginBottom:isMob?10:14, background:'rgba(255,255,255,0.22)', border:'1px solid rgba(255,255,255,0.38)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow:'0 4px 14px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)', flexShrink:0 }}>
+        {icon}
+      </div>
+      <p style={{ fontSize:isMob?12:13, fontWeight:800, color:'#fff', marginBottom:2, fontFamily:'Nunito,sans-serif', lineHeight:1.2 }}>{label}</p>
+      <p style={{ fontSize:10, color:'rgba(255,255,255,0.72)', marginBottom:isMob?8:14, lineHeight:1.4 }}>{desc}</p>
+      <div style={{ display:'flex', alignItems:'center', gap:3, color:'rgba(255,255,255,0.92)', fontSize:11, fontWeight:700 }}>
+        Ouvrir <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </motion.div>
+  );
+
   return (
     <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>
-      <div style={{ perspective: 900 }}>
-        <motion.div
-          style={{ rotateX: sRotX, rotateY: sRotY }}
-          onMouseMove={e => {
-            const r = e.currentTarget.getBoundingClientRect();
-            mx.set((e.clientX - r.left) / r.width - 0.5);
-            my.set((e.clientY - r.top) / r.height - 0.5);
-          }}
-          onMouseLeave={() => { mx.set(0); my.set(0); }}
-        >
+      {isMob ? cardContent : (
+        <div style={{ perspective: 900 }}>
           <motion.div
-            animate={{
-              y: state === 'pressed' ? 7 : state === 'hovered' ? -8 : 0,
-              scale: state === 'pressed' ? 0.95 : state === 'hovered' ? 1.04 : 1,
-            }}
-            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-            onHoverStart={() => setState('hovered')}
-            onHoverEnd={() => setState('idle')}
-            onTapStart={() => setState('pressed')}
-            onTap={() => setState('hovered')}
-            onTapCancel={() => setState('idle')}
-            style={{
-              background: `linear-gradient(${grad})`,
-              borderRadius: 22,
-              padding: '22px 18px 20px',
-              minHeight: 158,
-              cursor: 'pointer',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: shadows[state],
-              transition: 'box-shadow 0.14s ease',
-            }}
+            style={{ rotateX: sRotX, rotateY: sRotY }}
+            onMouseMove={e => { const r=e.currentTarget.getBoundingClientRect(); mx.set((e.clientX-r.left)/r.width-0.5); my.set((e.clientY-r.top)/r.height-0.5); }}
+            onMouseLeave={() => { mx.set(0); my.set(0); }}
           >
-            {/* Top-left shine */}
-            <div style={{ position:'absolute', inset:0, background:'linear-gradient(148deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.07) 38%, transparent 68%)', borderRadius:22, pointerEvents:'none' }} aria-hidden/>
-            {/* Bottom dark vignette (inner depth) */}
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:52, background:'linear-gradient(to top, rgba(0,0,0,0.22), transparent)', borderRadius:'0 0 22px 22px', pointerEvents:'none' }} aria-hidden/>
-            {/* Icon frosted pill */}
-            <div style={{ width:46, height:46, borderRadius:14, marginBottom:14, background:'rgba(255,255,255,0.22)', border:'1px solid rgba(255,255,255,0.38)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow:'0 4px 14px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)', backdropFilter:'blur(6px)', flexShrink:0 }}>
-              {icon}
-            </div>
-            <p style={{ fontSize:13, fontWeight:800, color:'#fff', marginBottom:3, fontFamily:'Nunito,sans-serif', lineHeight:1.2 }}>{label}</p>
-            <p style={{ fontSize:10, color:'rgba(255,255,255,0.72)', marginBottom:14, lineHeight:1.5 }}>{desc}</p>
-            <div style={{ display:'flex', alignItems:'center', gap:3, color:'rgba(255,255,255,0.92)', fontSize:11, fontWeight:700 }}>
-              Ouvrir
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
+            {cardContent}
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
+      )}
     </Link>
   );
 }
@@ -245,6 +257,7 @@ const fade = (delay = 0) => ({ initial: { opacity: 0, y: 20 }, animate: { opacit
 export default function Dashboard() {
   const { user, token, refreshUser } = useAuth();
   const p = user?.progress || {};
+  const isMobile = useIsMobile();
 
   const [greeting,      setGreeting]      = useState('');
   const [streak,        setStreak]        = useState(p.streak || 0);
@@ -343,15 +356,16 @@ export default function Dashboard() {
         @keyframes floatC { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-10px,20px) scale(1.04)} 66%{transform:translate(16px,6px)} }
         * { font-family: 'DM Sans', system-ui, sans-serif; }
         h1,h2,h3,.nunito { font-family: 'Nunito', sans-serif !important; }
+        @media(max-width:768px){ .blob { animation-play-state: paused !important; display: none; } }
       `}</style>
 
       <main style={{ flex: 1, overflowY: 'auto', background: C.bg, position: 'relative' }}>
 
-        {/* ── Ambient blobs ───────────────────────────────────────────────── */}
-        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }} aria-hidden>
-          <div style={{ position:'absolute', width:500, height:500, top:-100, right:-80, borderRadius:'50%', background:'radial-gradient(circle,rgba(79,70,229,0.10),transparent 70%)', filter:'blur(30px)', animation:'floatA 20s ease-in-out infinite' }}/>
-          <div style={{ position:'absolute', width:350, height:350, bottom:80, left:-60, borderRadius:'50%', background:'radial-gradient(circle,rgba(236,72,153,0.08),transparent 70%)', filter:'blur(30px)', animation:'floatB 24s ease-in-out infinite' }}/>
-          <div style={{ position:'absolute', width:280, height:280, top:'45%', left:'40%', borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.06),transparent 70%)', filter:'blur(40px)', animation:'floatC 28s ease-in-out infinite' }}/>
+        {/* ── Ambient blobs (desktop only — blur retiré pour perf mobile) ──── */}
+        <div className="blob" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }} aria-hidden>
+          <div style={{ position:'absolute', width:700, height:700, top:-200, right:-150, borderRadius:'50%', background:'radial-gradient(circle,rgba(79,70,229,0.09) 0%,transparent 65%)', animation:'floatA 20s ease-in-out infinite', willChange:'transform' }}/>
+          <div style={{ position:'absolute', width:500, height:500, bottom:0, left:-100, borderRadius:'50%', background:'radial-gradient(circle,rgba(236,72,153,0.07) 0%,transparent 65%)', animation:'floatB 24s ease-in-out infinite', willChange:'transform' }}/>
+          <div style={{ position:'absolute', width:400, height:400, top:'40%', left:'35%', borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.05) 0%,transparent 65%)', animation:'floatC 28s ease-in-out infinite', willChange:'transform' }}/>
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1152, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -422,40 +436,89 @@ export default function Dashboard() {
           </motion.div>
 
           {/* ── STAT CARDS ────────────────────────────────────────────────── */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(170px, 1fr))', gap:14 }}>
-            {STATS.map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity:0, y:32, scale:0.92 }}
-                whileInView={{ opacity:1, y:0, scale:1 }}
-                viewport={{ once:true, margin:'-40px' }}
-                transition={{ type:'spring', stiffness:300, damping:26, delay: i * 0.09 }}
-              >
-                <Tilt3D depth={6}>
-                  <Card style={{ padding:'22px 24px', cursor:'default' }}>
-                    <div style={{ height:4, borderRadius:99, background:`linear-gradient(90deg, ${s.color}, ${s.color}88)`, marginBottom:16 }}/>
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-                      <div style={{ width:42, height:42, borderRadius:14, background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:s.color, boxShadow:clay.sm }}>
-                        {s.icon}
-                      </div>
-                      <motion.div
-                        initial={{ scale:0 }} whileInView={{ scale:1 }}
-                        viewport={{ once:true }}
-                        transition={{ delay:0.3+i*0.07, ...spring }}
-                        style={{ width:10, height:10, borderRadius:'50%', background:s.color, boxShadow:`0 0 12px ${s.color}` }}
-                      />
+          {isMobile ? (
+            /* Mobile : 2×2 compact, icon + chiffre côte à côte */
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:10 }}>
+              {STATS.map((s, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity:0, y:20 }}
+                  whileInView={{ opacity:1, y:0 }}
+                  viewport={{ once:true, margin:'-10px' }}
+                  transition={{ duration:0.3, ease:[0.16,1,0.3,1], delay: i * 0.05 }}
+                >
+                  <div style={{ background:C.card, borderRadius:18, boxShadow:clay.sm, border:`1px solid ${C.border}`, padding:'13px 14px', display:'flex', alignItems:'center', gap:10 }}>
+                    <div style={{ width:36, height:36, borderRadius:12, background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:s.color, flexShrink:0 }}>
+                      {s.icon}
                     </div>
-                    <p className="nunito" style={{ fontSize:34, fontWeight:900, color:C.text, lineHeight:1, fontVariantNumeric:'tabular-nums', marginBottom:4 }}>{s.val}</p>
-                    <p style={{ fontSize:12, color:C.muted, fontWeight:500 }}>{s.label}</p>
-                  </Card>
-                </Tilt3D>
-              </motion.div>
-            ))}
-          </div>
+                    <div style={{ minWidth:0 }}>
+                      <p className="nunito" style={{ fontSize:22, fontWeight:900, color:C.text, lineHeight:1.1, fontVariantNumeric:'tabular-nums' }}>{s.val}</p>
+                      <p style={{ fontSize:10, color:C.muted, lineHeight:1.3, marginTop:1 }}>{s.label}</p>
+                    </div>
+                    <div style={{ width:6, height:6, borderRadius:'50%', background:s.color, boxShadow:`0 0 6px ${s.color}`, marginLeft:'auto', flexShrink:0 }}/>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            /* Desktop : 4 cards avec tilt */
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:14 }}>
+              {STATS.map((s, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity:0, y:32, scale:0.92 }}
+                  whileInView={{ opacity:1, y:0, scale:1 }}
+                  viewport={{ once:true, margin:'-40px' }}
+                  transition={{ type:'spring', stiffness:300, damping:26, delay: i * 0.09 }}
+                >
+                  <Tilt3D depth={6}>
+                    <Card style={{ padding:'22px 24px', cursor:'default' }}>
+                      <div style={{ height:4, borderRadius:99, background:`linear-gradient(90deg, ${s.color}, ${s.color}88)`, marginBottom:16 }}/>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+                        <div style={{ width:42, height:42, borderRadius:14, background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:s.color, boxShadow:clay.sm }}>
+                          {s.icon}
+                        </div>
+                        <div style={{ width:10, height:10, borderRadius:'50%', background:s.color, boxShadow:`0 0 12px ${s.color}` }}/>
+                      </div>
+                      <p className="nunito" style={{ fontSize:34, fontWeight:900, color:C.text, lineHeight:1, fontVariantNumeric:'tabular-nums', marginBottom:4 }}>{s.val}</p>
+                      <p style={{ fontSize:12, color:C.muted, fontWeight:500 }}>{s.label}</p>
+                    </Card>
+                  </Tilt3D>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
-          {/* ── MAIN GRID ─────────────────────────────────────────────────── */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:20 }} className="dashboard-grid">
-            <style>{`.dashboard-grid { @media(max-width:900px){ grid-template-columns:1fr !important; } }`}</style>
+          {/* ── ACTIONS rapide (mobile : avant les objectifs) ──────────────── */}
+          {isMobile && (
+            <div>
+              <motion.h2
+                className="nunito"
+                initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }}
+                viewport={{ once:true, margin:'-10px' }}
+                transition={{ duration:0.3 }}
+                style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:12, paddingLeft:2 }}
+              >
+                Accès rapide
+              </motion.h2>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:10 }}>
+                {ACTIONS.map((a, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity:0, y:22, scale:0.94 }}
+                    whileInView={{ opacity:1, y:0, scale:1 }}
+                    viewport={{ once:true, margin:'-30px' }}
+                    transition={{ type:'spring', stiffness:300, damping:26, delay: i * 0.055 }}
+                  >
+                    <ActionCard3D {...a} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── MAIN GRID (desktop) ───────────────────────────────────────── */}
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 340px', gap:20 }}>
 
             {/* LEFT */}
             <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
@@ -483,34 +546,30 @@ export default function Dashboard() {
                 </Card>
               </ScrollReveal>
 
-              {/* Quick actions */}
-              <div>
-                <ScrollReveal delay={0} y={20} scale={1}>
-                  <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:14, paddingLeft:4 }}>Accès rapide</h2>
-                </ScrollReveal>
-                {/* perspective sur le container = les rotateX des cartes sont dans le même espace 3D */}
-                <div
-                  style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, perspective:1400, perspectiveOrigin:'50% 0%' }}
-                  className="actions-grid"
-                >
-                  <style>{`
-                    .actions-grid { @media(max-width:600px){ grid-template-columns:repeat(2,1fr) !important; gap:10px !important; } }
-                    .actions-grid { @media(max-width:400px){ grid-template-columns:repeat(2,1fr) !important; } }
-                  `}</style>
-                  {ACTIONS.map((a, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity:0, y:55, rotateX:28, scale:0.88 }}
-                      whileInView={{ opacity:1, y:0, rotateX:0, scale:1 }}
-                      viewport={{ once:true, margin:'-45px' }}
-                      transition={{ type:'spring', stiffness:260, damping:22, delay: i * 0.07 }}
-                      style={{ transformOrigin:'center bottom' }}
-                    >
-                      <ActionCard3D {...a} />
-                    </motion.div>
-                  ))}
+              {/* Quick actions (desktop only — mobile is rendered above) */}
+              {!isMobile && (
+                <div>
+                  <ScrollReveal delay={0} y={20} scale={1}>
+                    <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:14, paddingLeft:4 }}>Accès rapide</h2>
+                  </ScrollReveal>
+                  <div
+                    style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, perspective:1400, perspectiveOrigin:'50% 0%' }}
+                  >
+                    {ACTIONS.map((a, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity:0, y:50, rotateX:24, scale:0.90 }}
+                        whileInView={{ opacity:1, y:0, rotateX:0, scale:1 }}
+                        viewport={{ once:true, margin:'-45px' }}
+                        transition={{ type:'spring', stiffness:260, damping:22, delay: i * 0.07 }}
+                        style={{ transformOrigin:'center bottom' }}
+                      >
+                        <ActionCard3D {...a} />
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* RIGHT SIDEBAR */}
