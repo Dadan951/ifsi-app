@@ -98,6 +98,78 @@ function Card({ children, style = {}, className = '' }) {
   );
 }
 
+/* ─── Action Card 3D — vrai effet clay extrudé ────────────────────────────── */
+function ActionCard3D({ to, label, desc, icon, color, darkColor, grad }) {
+  const [state, setState] = useState('idle'); // idle | hovered | pressed
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rotX = useTransform(my, [-0.5, 0.5], [12, -12]);
+  const rotY = useTransform(mx, [-0.5, 0.5], [-12, 12]);
+  const sRotX = useSpring(rotX, { stiffness: 500, damping: 32 });
+  const sRotY = useSpring(rotY, { stiffness: 500, damping: 32 });
+
+  const shadows = {
+    idle:    `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${darkColor}, 0 14px 30px ${color}55, 0 24px 48px rgba(0,0,0,0.12)`,
+    hovered: `inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -3px 0 rgba(0,0,0,0.18), 0 14px 0 ${darkColor}, 0 22px 44px ${color}66, 0 36px 72px rgba(0,0,0,0.18)`,
+    pressed: `inset 0 3px 8px rgba(0,0,0,0.25), inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 0 ${darkColor}, 0 4px 12px ${color}33`,
+  };
+
+  return (
+    <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>
+      <div style={{ perspective: 900 }}>
+        <motion.div
+          style={{ rotateX: sRotX, rotateY: sRotY }}
+          onMouseMove={e => {
+            const r = e.currentTarget.getBoundingClientRect();
+            mx.set((e.clientX - r.left) / r.width - 0.5);
+            my.set((e.clientY - r.top) / r.height - 0.5);
+          }}
+          onMouseLeave={() => { mx.set(0); my.set(0); }}
+        >
+          <motion.div
+            animate={{
+              y: state === 'pressed' ? 7 : state === 'hovered' ? -8 : 0,
+              scale: state === 'pressed' ? 0.95 : state === 'hovered' ? 1.04 : 1,
+            }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            onHoverStart={() => setState('hovered')}
+            onHoverEnd={() => setState('idle')}
+            onTapStart={() => setState('pressed')}
+            onTap={() => setState('hovered')}
+            onTapCancel={() => setState('idle')}
+            style={{
+              background: `linear-gradient(${grad})`,
+              borderRadius: 22,
+              padding: '22px 18px 20px',
+              minHeight: 158,
+              cursor: 'pointer',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: shadows[state],
+              transition: 'box-shadow 0.14s ease',
+            }}
+          >
+            {/* Top-left shine */}
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(148deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.07) 38%, transparent 68%)', borderRadius:22, pointerEvents:'none' }} aria-hidden/>
+            {/* Bottom dark vignette (inner depth) */}
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:52, background:'linear-gradient(to top, rgba(0,0,0,0.22), transparent)', borderRadius:'0 0 22px 22px', pointerEvents:'none' }} aria-hidden/>
+            {/* Icon frosted pill */}
+            <div style={{ width:46, height:46, borderRadius:14, marginBottom:14, background:'rgba(255,255,255,0.22)', border:'1px solid rgba(255,255,255,0.38)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow:'0 4px 14px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)', backdropFilter:'blur(6px)', flexShrink:0 }}>
+              {icon}
+            </div>
+            <p style={{ fontSize:13, fontWeight:800, color:'#fff', marginBottom:3, fontFamily:'Nunito,sans-serif', lineHeight:1.2 }}>{label}</p>
+            <p style={{ fontSize:10, color:'rgba(255,255,255,0.72)', marginBottom:14, lineHeight:1.5 }}>{desc}</p>
+            <div style={{ display:'flex', alignItems:'center', gap:3, color:'rgba(255,255,255,0.92)', fontSize:11, fontWeight:700 }}>
+              Ouvrir
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </Link>
+  );
+}
+
 /* ─── Horizontal progress bar (clay inset) ────────────────────────────────── */
 function ProgressBar({ value, max, color, label, sublabel }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
@@ -226,14 +298,14 @@ export default function Dashboard() {
   ];
 
   const ACTIONS = [
-    { to: '/dashboard/quiz',         label: 'Quiz',        desc: 'QCM & questions',       icon: Icon.quiz,   grad: `135deg, #4338ca, ${C.indigo}`, color: C.indigo  },
-    { to: '/dashboard/flashcards',   label: 'Flashcards',  desc: 'Mémorisation rapide',   icon: Icon.flash,  grad: `135deg, #6d28d9, ${C.violet}`, color: C.violet  },
-    { to: '/dashboard/exercises',    label: 'Exercices',   desc: 'Cas cliniques',         icon: Icon.exo,    grad: `135deg, #0e7490, ${C.teal}`,   color: C.teal    },
-    { to: '/dashboard/cours',        label: 'Cours',       desc: 'Leçons & fiches',       icon: Icon.book,   grad: `135deg, #15803d, #10b981`,     color: '#10b981' },
-    { to: '/dashboard/annales',      label: 'Annales',     desc: 'Sujets passés',         icon: Icon.annale, grad: `135deg, #1d4ed8, #3b82f6`,     color: '#3b82f6' },
-    { to: '/dashboard/medicaments',  label: 'Médicaments', desc: 'Base pharma',           icon: Icon.pill,   grad: `135deg, #b91c1c, ${C.red}`,    color: C.red     },
-    { to: '/dashboard/groups',       label: 'Groupes',     desc: 'Réviser ensemble',      icon: Icon.group,  grad: `135deg, #c2410c, ${C.orange}`, color: C.orange  },
-    { to: '/dashboard/subscription', label: 'Abonnement',  desc: 'Gérer mon offre',       icon: Icon.card,   grad: `135deg, #be185d, ${C.pink}`,   color: C.pink    },
+    { to: '/dashboard/quiz',         label: 'Quiz',        desc: 'QCM & questions',       icon: Icon.quiz,   grad: `135deg, #4338ca, ${C.indigo}`, color: C.indigo,  darkColor: '#312e81' },
+    { to: '/dashboard/flashcards',   label: 'Flashcards',  desc: 'Mémorisation rapide',   icon: Icon.flash,  grad: `135deg, #6d28d9, ${C.violet}`, color: C.violet,  darkColor: '#4c1d95' },
+    { to: '/dashboard/exercises',    label: 'Exercices',   desc: 'Cas cliniques',         icon: Icon.exo,    grad: `135deg, #0e7490, ${C.teal}`,   color: C.teal,    darkColor: '#164e63' },
+    { to: '/dashboard/cours',        label: 'Cours',       desc: 'Leçons & fiches',       icon: Icon.book,   grad: `135deg, #15803d, #10b981`,     color: '#10b981', darkColor: '#064e3b' },
+    { to: '/dashboard/annales',      label: 'Annales',     desc: 'Sujets passés',         icon: Icon.annale, grad: `135deg, #1d4ed8, #3b82f6`,     color: '#3b82f6', darkColor: '#1e3a8a' },
+    { to: '/dashboard/medicaments',  label: 'Médicaments', desc: 'Base pharma',           icon: Icon.pill,   grad: `135deg, #b91c1c, ${C.red}`,    color: C.red,     darkColor: '#7f1d1d' },
+    { to: '/dashboard/groups',       label: 'Groupes',     desc: 'Réviser ensemble',      icon: Icon.group,  grad: `135deg, #c2410c, ${C.orange}`, color: C.orange,  darkColor: '#7c2d12' },
+    { to: '/dashboard/subscription', label: 'Abonnement',  desc: 'Gérer mon offre',       icon: Icon.card,   grad: `135deg, #be185d, ${C.pink}`,   color: C.pink,    darkColor: '#831843' },
   ];
 
   async function saveGoals() {
@@ -406,24 +478,11 @@ export default function Dashboard() {
                 >
                   <style>{`.actions-grid { @media(max-width:600px){ grid-template-columns:repeat(2,1fr) !important; } }`}</style>
                   {ACTIONS.map((a, i) => (
-                    <motion.div key={i} variants={{ hidden:{ opacity:0, y:16, scale:0.94 }, show:{ opacity:1, y:0, scale:1, transition:{ duration:0.4, ease:[0.16,1,0.3,1] } } }}>
-                      <Link to={a.to} style={{ textDecoration:'none', display:'block' }}>
-                        <motion.div
-                          whileHover={{ scale:1.04, y:-3 }}
-                          whileTap={{ scale:0.93, boxShadow:clay.pressed }}
-                          transition={spring}
-                          style={{ background:`linear-gradient(${a.grad})`, borderRadius:22, padding:'20px 16px', boxShadow:clay.btn(a.color), cursor:'pointer', position:'relative', overflow:'hidden', minHeight:130 }}
-                        >
-                          {/* Shine */}
-                          <div style={{ position:'absolute', top:0, left:0, right:0, height:'50%', background:'linear-gradient(180deg,rgba(255,255,255,0.18),transparent)', borderRadius:'22px 22px 0 0', pointerEvents:'none' }} aria-hidden/>
-                          <div style={{ color:'#fff', marginBottom:12 }}>{a.icon}</div>
-                          <p style={{ fontSize:13, fontWeight:800, color:'#fff', marginBottom:4, fontFamily:'Nunito,sans-serif', lineHeight:1.2 }}>{a.label}</p>
-                          <p style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:10 }}>{a.desc}</p>
-                          <div style={{ display:'flex', alignItems:'center', gap:2, color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:600 }}>
-                            Ouvrir {Icon.arrow}
-                          </div>
-                        </motion.div>
-                      </Link>
+                    <motion.div
+                      key={i}
+                      variants={{ hidden:{ opacity:0, y:18, scale:0.92 }, show:{ opacity:1, y:0, scale:1, transition:{ duration:0.45, ease:[0.16,1,0.3,1] } } }}
+                    >
+                      <ActionCard3D {...a} />
                     </motion.div>
                   ))}
                 </motion.div>
