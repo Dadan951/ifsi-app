@@ -541,37 +541,6 @@ export default function AdminDashboard() {
 /* ── Seeds Panel ─────────────────────────────────────────────────────────── */
 const SEEDS = [
   {
-    id: 'exercises-s1',
-    label: 'Exercices — S1 UE 1.1',
-    desc: 'Sociologie, anthropologie et psychologie',
-    count: '3 exercices',
-    endpoint: '/admin/seed-exercises-s1',
-    grad: 'linear-gradient(135deg,#c2410c,#ea580c)',
-    icon: (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/>
-        <line x1="16" y1="17" x2="8" y2="17"/>
-      </svg>
-    ),
-  },
-  {
-    id: 'cours-zip',
-    label: 'Cours — Import ZIP complet',
-    desc: '1A S1/S2 · 2A S3/S4 · UE 1.1, 1.3, 2.5, 2.7, 2.8, 2.11',
-    count: '~62 cours PDF',
-    endpoint: '/admin/seed-cours-zip',
-    grad: 'linear-gradient(135deg,#1d4ed8,#0891b2)',
-    zipField: 'zip',
-    icon: (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-      </svg>
-    ),
-  },
-  {
     id: 'annales-zip',
     label: 'Annales — Import ZIP complet',
     desc: '1A 2018→2026 · 2A 2018-2019 · Paris Cité, UPEC, Sorbonne…',
