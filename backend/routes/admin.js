@@ -569,4 +569,35 @@ router.post('/seed-new-quizzes', async (req, res) => {
 /* ── POST /admin/seed-exercises-s1 ───────────────────────────────────────── */
 router.post('/seed-exercises-s1', require('../seeds/seedExercises_route'));
 
+/* ── Bulk actions ─────────────────────────────────────────────────────────── */
+const Quiz      = require('../models/Quiz');
+const Flashcard = require('../models/Flashcard');
+const Lesson    = require('../models/Lesson');
+const Exercise  = require('../models/Exercise');
+
+async function bulkHandler(Model) {
+  return async (req, res) => {
+    const { ids, action, value } = req.body;
+    if (!ids?.length) return res.status(400).json({ ok: false, message: 'Aucun id reçu' });
+    try {
+      if (action === 'delete') {
+        const r = await Model.deleteMany({ _id: { $in: ids } });
+        return res.json({ ok: true, count: r.deletedCount });
+      }
+      if (action === 'publish') {
+        const r = await Model.updateMany({ _id: { $in: ids } }, { isPublished: value !== false });
+        return res.json({ ok: true, count: r.modifiedCount });
+      }
+      res.status(400).json({ ok: false, message: 'Action inconnue' });
+    } catch (e) {
+      res.status(500).json({ ok: false, message: e.message });
+    }
+  };
+}
+
+router.post('/bulk/quizzes',    async (...a) => (await bulkHandler(Quiz))(...a));
+router.post('/bulk/flashcards', async (...a) => (await bulkHandler(Flashcard))(...a));
+router.post('/bulk/lessons',    async (...a) => (await bulkHandler(Lesson))(...a));
+router.post('/bulk/exercises',  async (...a) => (await bulkHandler(Exercise))(...a));
+
 module.exports = router;

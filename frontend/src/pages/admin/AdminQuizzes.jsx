@@ -199,15 +199,36 @@ export default function AdminQuizzes() {
   const [filterDiff, setFilterDiff] = useState('');
   const [filterUE,   setFilterUE]   = useState('');
   const [filterChap, setFilterChap] = useState('');
+  const [selected,   setSelected]   = useState(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const load = () => {
     setLoading(true);
+    setSelected(new Set());
     axios.get(`${API_URL}/quizzes/admin`).then(r => setQuizzes(r.data)).finally(() => setLoading(false));
   };
   useEffect(load, []);
 
   const handleSave   = async data => { if (data._id) await axios.put(`${API_URL}/quizzes/${data._id}`, data); else await axios.post(`${API_URL}/quizzes`, data); load(); };
   const handleDelete = async id   => { await axios.delete(`${API_URL}/quizzes/${id}`); setDeleting(null); load(); };
+
+  const toggleOne = id => setSelected(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleAll = () => {
+    if (selected.size === filtered.length) setSelected(new Set());
+    else setSelected(new Set(filtered.map(q => q._id)));
+  };
+  const bulkAction = async (action, value) => {
+    if (!selected.size) return;
+    if (action === 'delete' && !window.confirm(`Supprimer ${selected.size} quiz ?`)) return;
+    setBulkLoading(true);
+    try {
+      await axios.post(`${API_URL}/admin/bulk/quizzes`, { ids: [...selected], action, value }, { headers: { Authorization: `Bearer ${token}` } });
+      load();
+    } catch (e) { alert('Erreur : ' + (e.response?.data?.message || e.message)); }
+    finally { setBulkLoading(false); }
+  };
 
   const semesters = [...new Set(quizzes.map(q => q.semester).filter(Boolean))].sort();
   const ues       = [...new Set(
@@ -323,6 +344,34 @@ export default function AdminQuizzes() {
               </span>
             </div>
 
+            {/* Barre actions groupées */}
+            <AnimatePresence>
+              {selected.size > 0 && (
+                <motion.div initial={{opacity:0,y:-8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}}
+                  className="px-5 py-3 bg-blue-50 border-b border-blue-100 flex items-center gap-3 flex-wrap">
+                  <span className="text-xs font-bold text-blue-700">{selected.size} sélectionné{selected.size > 1 ? 's' : ''}</span>
+                  <div className="flex gap-2 flex-wrap">
+                    <button onClick={() => bulkAction('publish', true)} disabled={bulkLoading}
+                      className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition disabled:opacity-50">
+                      ✓ Publier
+                    </button>
+                    <button onClick={() => bulkAction('publish', false)} disabled={bulkLoading}
+                      className="px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg transition disabled:opacity-50">
+                      ○ Brouillon
+                    </button>
+                    <button onClick={() => bulkAction('delete')} disabled={bulkLoading}
+                      className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition disabled:opacity-50">
+                      🗑 Supprimer
+                    </button>
+                    <button onClick={() => setSelected(new Set())} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+                      ✕ Désélectionner
+                    </button>
+                  </div>
+                  {bulkLoading && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin ml-1"/>}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {loading ? (
               <div className="flex justify-center py-16"><div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"/></div>
             ) : filtered.length === 0 ? (
@@ -341,6 +390,10 @@ export default function AdminQuizzes() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200">
+                      <th className="px-4 py-3.5">
+                        <input type="checkbox" checked={filtered.length > 0 && selected.size === filtered.length}
+                          onChange={toggleAll} className="rounded accent-blue-600 cursor-pointer w-3.5 h-3.5"/>
+                      </th>
                       {['Titre', 'Semestre', 'Catégorie (UE)', 'Chapitre', 'Difficulté', 'Questions', 'Durée', 'Statut', ''].map(h => (
                         <th key={h} className="px-4 py-3.5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
@@ -349,7 +402,11 @@ export default function AdminQuizzes() {
                   <tbody>
                     {filtered.map((q, i) => (
                       <motion.tr key={q._id} initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} transition={{delay: Math.min(i, 20) * 0.02}}
-                        className="border-b border-slate-100 hover:bg-blue-50/30 transition-all group">
+                        className={`border-b border-slate-100 hover:bg-blue-50/30 transition-all group ${selected.has(q._id) ? 'bg-blue-50' : ''}`}>
+                        <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
+                          <input type="checkbox" checked={selected.has(q._id)} onChange={() => toggleOne(q._id)}
+                            className="rounded accent-blue-600 cursor-pointer w-3.5 h-3.5"/>
+                        </td>
                         <td className="px-4 py-3.5 text-sm font-semibold text-slate-800">
                           <span className="block max-w-[200px] truncate" title={q.title}>{q.title}</span>
                         </td>
