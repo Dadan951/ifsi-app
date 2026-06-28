@@ -1,3 +1,9 @@
+/**
+ * Quiz — Clay 3D Light
+ * Design cohérent avec Dashboard (même tokens, clay shadows, Nunito+DM Sans)
+ * Logique 100% identique, uniquement la couche visuelle est refaite
+ */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,47 +12,127 @@ import DashboardLayout from '../components/DashboardLayout';
 import { API_URL, useAuth } from '../context/AuthContext';
 import { getCache, setCache } from '../utils/cache';
 
-/* ─── Category colour palette ──────────────────────────────────────────────── */
+/* ─── Design tokens (identiques au Dashboard) ────────────────────────────── */
+const C = {
+  bg:     '#EEF2FF',
+  card:   '#FFFFFF',
+  text:   '#1e1b4b',
+  muted:  '#6b7280',
+  border: '#e0e7ff',
+  indigo: '#4F46E5',
+  violet: '#7C3AED',
+  teal:   '#0891b2',
+  pink:   '#EC4899',
+  amber:  '#F59E0B',
+  green:  '#10B981',
+  red:    '#DC2626',
+};
+
+const clay = {
+  card: `inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.03), 0 4px 0 rgba(0,0,0,0.06), 0 12px 28px rgba(79,70,229,0.08), 0 24px 48px rgba(0,0,0,0.04)`,
+  sm:   `inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 0 rgba(0,0,0,0.07), 0 8px 16px rgba(0,0,0,0.07)`,
+  btn:  (hex, dark) => `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${dark}, 0 14px 28px ${hex}55`,
+};
+
 const PALETTE = [
-  { from: '#6366f1', to: '#8b5cf6', emoji: '' },
-  { from: '#0891b2', to: '#0284c7', emoji: '' },
-  { from: '#059669', to: '#047857', emoji: '' },
-  { from: '#dc2626', to: '#db2777', emoji: '' },
-  { from: '#ea580c', to: '#d97706', emoji: '' },
-  { from: '#7c3aed', to: '#6d28d9', emoji: '' },
-  { from: '#0f766e', to: '#0891b2', emoji: '' },
-  { from: '#be185d', to: '#9333ea', emoji: '' },
+  { from: '#4F46E5', to: '#7C3AED', dark: '#312e81' },
+  { from: '#0891b2', to: '#0284c7', dark: '#164e63' },
+  { from: '#059669', to: '#047857', dark: '#064e3b' },
+  { from: '#dc2626', to: '#db2777', dark: '#7f1d1d' },
+  { from: '#ea580c', to: '#d97706', dark: '#7c2d12' },
+  { from: '#7c3aed', to: '#6d28d9', dark: '#4c1d95' },
+  { from: '#0f766e', to: '#0891b2', dark: '#134e4a' },
+  { from: '#be185d', to: '#9333ea', dark: '#701a75' },
 ];
 
-const diffColors = { easy: 'bg-emerald-100 text-emerald-700', medium: 'bg-amber-100 text-amber-700', hard: 'bg-red-100 text-red-700' };
-const diffLabel  = { easy: 'Facile', medium: 'Moyen', hard: 'Difficile' };
+const DIFF = {
+  easy:   { label: 'Facile',    bg: '#dcfce7', color: '#15803d' },
+  medium: { label: 'Moyen',     bg: '#fef9c3', color: '#854d0e' },
+  hard:   { label: 'Difficile', bg: '#fee2e2', color: '#991b1b' },
+};
 
-function ChevronRight({ className = '' }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className={className}>
-      <polyline points="9 18 15 12 9 6"/>
-    </svg>
-  );
-}
+const sp = { type: 'spring', stiffness: 300, damping: 24 };
 
+/* ─── Breadcrumb ─────────────────────────────────────────────────────────── */
 function Breadcrumb({ items }) {
   return (
-    <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-6 flex-wrap">
+    <nav style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', marginBottom:20 }}>
       {items.map((item, i) => (
-        <span key={i} className="flex items-center gap-1.5">
-          {i > 0 && <ChevronRight className="w-3 h-3" />}
-          {item.onClick ? (
-            <button onClick={item.onClick} className="hover:text-blue-600 transition font-medium">{item.label}</button>
-          ) : (
-            <span className="text-slate-700 font-semibold">{item.label}</span>
-          )}
+        <span key={i} style={{ display:'flex', alignItems:'center', gap:6 }}>
+          {i > 0 && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.muted} strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>}
+          {item.onClick
+            ? <button onClick={item.onClick} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:600, color:C.indigo, padding:0, fontFamily:'DM Sans,sans-serif' }}>{item.label}</button>
+            : <span style={{ fontSize:12, fontWeight:700, color:C.text, fontFamily:'Nunito,sans-serif' }}>{item.label}</span>
+          }
         </span>
       ))}
     </nav>
   );
 }
 
-/* ─── Quiz Generator ────────────────────────────────────────────────────────── */
+/* ─── Section header ─────────────────────────────────────────────────────── */
+function SectionHeader({ title, sub }) {
+  return (
+    <div style={{ marginBottom:22 }}>
+      <h2 style={{ fontSize:20, fontWeight:900, color:C.text, fontFamily:'Nunito,sans-serif', lineHeight:1.2, marginBottom:4 }}>{title}</h2>
+      {sub && <p style={{ fontSize:13, color:C.muted }}>{sub}</p>}
+    </div>
+  );
+}
+
+/* ─── Clay chip (diff / status) ──────────────────────────────────────────── */
+function Chip({ label, bg, color }) {
+  return (
+    <span style={{ fontSize:11, fontWeight:700, background:bg, color, borderRadius:99, padding:'4px 10px', fontFamily:'Nunito,sans-serif', whiteSpace:'nowrap' }}>
+      {label}
+    </span>
+  );
+}
+
+/* ─── Gradient semestre / UE card (3D clay) ─────────────────────────────── */
+function GradCard({ pal, title, sub, sub2, onClick, progress }) {
+  const [state, setState] = useState('idle');
+  const shadows = {
+    idle:    clay.btn(pal.from, pal.dark),
+    hovered: `inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -3px 0 rgba(0,0,0,0.18), 0 14px 0 ${pal.dark}, 0 22px 44px ${pal.from}66`,
+    pressed: `inset 0 3px 8px rgba(0,0,0,0.25), 0 2px 0 ${pal.dark}, 0 4px 12px ${pal.from}33`,
+  };
+  return (
+    <motion.button
+      onClick={onClick}
+      animate={{ y: state === 'pressed' ? 6 : state === 'hovered' ? -8 : 0, scale: state === 'pressed' ? 0.96 : state === 'hovered' ? 1.03 : 1 }}
+      transition={sp}
+      onHoverStart={() => setState('hovered')} onHoverEnd={() => setState('idle')}
+      onTapStart={() => setState('pressed')} onTap={() => setState('hovered')} onTapCancel={() => setState('idle')}
+      style={{ textAlign:'left', border:'none', cursor:'pointer', borderRadius:24, padding:'22px 20px', background:`linear-gradient(135deg, ${pal.from}, ${pal.to})`, position:'relative', overflow:'hidden', boxShadow:shadows[state], transition:'box-shadow 0.14s ease', width:'100%' }}
+    >
+      {/* shine */}
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(148deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.06) 40%, transparent 65%)', borderRadius:24, pointerEvents:'none' }} aria-hidden/>
+      {/* bottom vignette */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:40, background:'linear-gradient(to top, rgba(0,0,0,0.18), transparent)', borderRadius:'0 0 24px 24px', pointerEvents:'none' }} aria-hidden/>
+
+      <div style={{ position:'relative' }}>
+        <h3 style={{ fontSize:14, fontWeight:900, color:'#fff', fontFamily:'Nunito,sans-serif', lineHeight:1.3, marginBottom:4 }}>{title}</h3>
+        <p style={{ fontSize:11, color:'rgba(255,255,255,0.75)', marginBottom: sub2 ? 2 : 14 }}>{sub}</p>
+        {sub2 && <p style={{ fontSize:11, color:'rgba(255,255,255,0.9)', fontWeight:700, marginBottom:14 }}>{sub2}</p>}
+
+        {progress != null && (
+          <div style={{ height:4, background:'rgba(255,255,255,0.25)', borderRadius:99, overflow:'hidden', marginBottom:12 }}>
+            <div style={{ height:'100%', borderRadius:99, background:'rgba(255,255,255,0.9)', width:`${progress}%`, transition:'width 0.8s ease' }}/>
+          </div>
+        )}
+
+        <div style={{ display:'flex', justifyContent:'flex-end' }}>
+          <div style={{ width:30, height:30, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'1px solid rgba(255,255,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
+/* ─── Quiz Generator ─────────────────────────────────────────────────────── */
 function QuizGenerator({ onGenerated }) {
   const [courseText, setCourseText] = useState('');
   const [title, setTitle]           = useState('');
@@ -78,79 +164,90 @@ function QuizGenerator({ onGenerated }) {
 
   const charCount = courseText.length;
   const isReady   = charCount >= 50 && status?.remaining > 0;
-  const inputCls  = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition placeholder:text-slate-400';
+
+  const inputStyle = {
+    width:'100%', padding:'10px 14px', borderRadius:14, border:`1.5px solid ${C.border}`,
+    background:C.card, fontSize:13, color:C.text, outline:'none', fontFamily:'DM Sans,sans-serif',
+    boxSizing:'border-box', transition:'border-color 0.2s',
+  };
 
   return (
-    <div className="max-w-2xl">
+    <div style={{ maxWidth:680 }}>
       {status && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-700">Générations aujourd'hui</span>
-            <span className={`text-xs font-bold ${status.remaining === 0 ? 'text-red-500' : 'text-blue-600'}`}>{status.used} / {status.limit}</span>
+        <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
+          style={{ background:C.card, borderRadius:20, boxShadow:clay.card, border:`1px solid ${C.border}`, padding:'18px 22px', marginBottom:16 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+            <span style={{ fontSize:12, fontWeight:700, color:C.text, fontFamily:'Nunito,sans-serif' }}>Générations aujourd'hui</span>
+            <span style={{ fontSize:12, fontWeight:800, color:status.remaining === 0 ? C.red : C.indigo, fontFamily:'Nunito,sans-serif' }}>{status.used} / {status.limit}</span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div className={`h-2 rounded-full transition-all ${status.remaining === 0 ? 'bg-red-400' : 'bg-blue-500'}`}
-              style={{ width: `${(status.used / status.limit) * 100}%` }}/>
+          <div style={{ height:8, background:C.border, borderRadius:99, overflow:'hidden', boxShadow:'inset 0 2px 4px rgba(0,0,0,0.06)' }}>
+            <motion.div
+              initial={{ width:0 }} animate={{ width:`${(status.used/status.limit)*100}%` }}
+              transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
+              style={{ height:'100%', borderRadius:99, background:status.remaining===0 ? `linear-gradient(90deg,${C.red},#f87171)` : `linear-gradient(90deg,${C.indigo},${C.violet})` }}
+            />
           </div>
-          <p className="text-xs text-slate-400 mt-1.5">
-            {status.remaining > 0
-              ? `${status.remaining} génération${status.remaining > 1 ? 's' : ''} restante${status.remaining > 1 ? 's' : ''} aujourd'hui`
-              : 'Limite journalière atteinte — réessayez demain'}
+          <p style={{ fontSize:11, color:C.muted, marginTop:6 }}>
+            {status.remaining > 0 ? `${status.remaining} génération${status.remaining>1?'s':''} restante${status.remaining>1?'s':''} aujourd'hui` : 'Limite journalière atteinte — réessayez demain'}
           </p>
-        </div>
+        </motion.div>
       )}
 
-      <form onSubmit={handleGenerate} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <motion.form onSubmit={handleGenerate} initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+        style={{ background:C.card, borderRadius:24, boxShadow:clay.card, border:`1px solid ${C.border}`, padding:'24px 26px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:14, marginBottom:14 }}>
+          {[
+            { label:'Titre du quiz', val:title, set:setTitle, ph:'Ex: Cours sur l\'hémostase' },
+            { label:'UE / Catégorie', val:category, set:setCategory, ph:'Ex: UE 2.2' },
+            { label:'Chapitre', val:chapter, set:setChapter, ph:'Ex: Hémostase primaire' },
+          ].map(f => (
+            <div key={f.label}>
+              <label style={{ fontSize:11, fontWeight:700, color:C.muted, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.06em' }}>{f.label}</label>
+              <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} style={inputStyle} onFocus={e => e.target.style.borderColor=C.indigo} onBlur={e => e.target.style.borderColor=C.border}/>
+            </div>
+          ))}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Titre du quiz</label>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Cours sur l'hémostase" className={inputCls}/>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">UE / Catégorie</label>
-            <input type="text" value={category} onChange={e => setCategory(e.target.value)} placeholder="Ex: UE 2.2" className={inputCls}/>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Chapitre</label>
-            <input type="text" value={chapter} onChange={e => setChapter(e.target.value)} placeholder="Ex: Hémostase primaire" className={inputCls}/>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Nombre de questions</label>
-            <select value={questionCount} onChange={e => setQuestionCount(+e.target.value)} className={inputCls}>
-              {[3, 5, 7, 10].map(n => <option key={n} value={n}>{n} questions</option>)}
+            <label style={{ fontSize:11, fontWeight:700, color:C.muted, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.06em' }}>Nombre de questions</label>
+            <select value={questionCount} onChange={e => setQuestionCount(+e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor=C.indigo} onBlur={e => e.target.style.borderColor=C.border}>
+              {[3,5,7,10].map(n => <option key={n} value={n}>{n} questions</option>)}
             </select>
           </div>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Texte du cours *</label>
-            <span className={`text-xs font-medium ${charCount < 50 ? 'text-red-400' : 'text-emerald-600'}`}>{charCount} caractères</span>
+        <div style={{ marginBottom:16 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+            <label style={{ fontSize:11, fontWeight:700, color:C.muted, textTransform:'uppercase', letterSpacing:'0.06em' }}>Texte du cours *</label>
+            <span style={{ fontSize:11, fontWeight:700, color:charCount<50?C.red:C.green }}>{charCount} / 4500</span>
           </div>
           <textarea value={courseText} onChange={e => setCourseText(e.target.value)}
             placeholder="Collez ici votre cours, vos notes de TD, un extrait de polycopié... (minimum 50 caractères)"
-            rows={8} maxLength={4500}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:bg-white transition resize-none placeholder:text-slate-400"/>
-          <p className="text-xs text-slate-400 mt-1.5">Le texte est analysé par l'IA pour générer des questions pertinentes.</p>
+            rows={7} maxLength={4500}
+            style={{ ...inputStyle, resize:'none', lineHeight:1.65, background:'#f8faff', padding:'12px 14px' }}
+            onFocus={e => e.target.style.borderColor=C.indigo} onBlur={e => e.target.style.borderColor=C.border}/>
+          <p style={{ fontSize:11, color:C.muted, marginTop:4 }}>L'IA analyse votre texte et génère des QCM pertinents.</p>
         </div>
 
-        {error   && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-xs text-red-600">{error}</div>}
-        {success && <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-xs text-emerald-700 font-medium">{success}</div>}
+        {error && (
+          <div style={{ background:'#fef2f2', border:`1px solid #fecaca`, borderRadius:14, padding:'10px 14px', fontSize:12, color:C.red, marginBottom:12 }}>{error}</div>
+        )}
+        {success && (
+          <div style={{ background:'#f0fdf4', border:`1px solid #bbf7d0`, borderRadius:14, padding:'10px 14px', fontSize:12, color:C.green, fontWeight:600, marginBottom:12 }}>{success}</div>
+        )}
 
-        <motion.button type="submit" disabled={!isReady || generating} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-          className="w-full py-3 text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
-          style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+        <motion.button type="submit" disabled={!isReady || generating}
+          whileHover={{ scale: isReady ? 1.01 : 1 }} whileTap={{ scale: isReady ? 0.97 : 1 }}
+          style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:isReady ? `linear-gradient(135deg,#4338ca,${C.indigo})` : '#e0e7ff', color:isReady?'#fff':C.muted, fontSize:14, fontWeight:800, cursor:isReady?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:'Nunito,sans-serif', boxShadow:isReady?clay.btn(C.indigo,'#312e81'):'none', transition:'all 0.2s' }}>
           {generating
-            ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>Génération en cours...</>
-            : <>Générer le quiz</>
+            ? <><div style={{ width:16, height:16, border:'2px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.7s linear infinite' }}/> Génération en cours...</>
+            : 'Générer le quiz ✦'
           }
         </motion.button>
-      </form>
+      </motion.form>
     </div>
   );
 }
 
-/* ─── Personal quiz list ─────────────────────────────────────────────────────── */
+/* ─── Personal quiz list ─────────────────────────────────────────────────── */
 function PersonalQuizList({ quizzes, onDelete, onPlay }) {
   const [deletingId, setDeletingId] = useState(null);
 
@@ -161,41 +258,41 @@ function PersonalQuizList({ quizzes, onDelete, onPlay }) {
   };
 
   if (quizzes.length === 0) return (
-    <div className="text-center py-10 text-slate-400">
-      <div className="text-4xl mb-3"></div>
-      <p className="font-semibold text-slate-600 mb-1">Aucun quiz généré</p>
-      <p className="text-sm">Utilisez le générateur ci-dessus pour créer votre premier quiz.</p>
+    <div style={{ textAlign:'center', padding:'48px 24px', color:C.muted }}>
+      <div style={{ fontSize:40, marginBottom:12 }}>📝</div>
+      <p style={{ fontWeight:700, color:C.text, fontFamily:'Nunito,sans-serif', marginBottom:4 }}>Aucun quiz généré</p>
+      <p style={{ fontSize:13 }}>Utilisez le générateur ci-dessus pour créer votre premier quiz.</p>
     </div>
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:14 }}>
       <AnimatePresence>
         {quizzes.map((quiz, i) => (
           <motion.div key={quiz._id}
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ delay: i * 0.05 }}
-            className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, scale:0.95 }}
+            transition={{ delay: i*0.05 }}
+            style={{ background:C.card, borderRadius:20, boxShadow:clay.card, border:`1px solid ${C.border}`, overflow:'hidden' }}
           >
-            <div className="p-5">
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-slate-800 leading-snug">{quiz.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{quiz.chapter || quiz.category} · {quiz.questions?.length} questions</p>
+            <div style={{ height:4, background:`linear-gradient(90deg,${C.indigo},${C.violet})` }}/>
+            <div style={{ padding:'18px 20px' }}>
+              <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:8, marginBottom:10 }}>
+                <div style={{ minWidth:0 }}>
+                  <h3 style={{ fontSize:13, fontWeight:800, color:C.text, fontFamily:'Nunito,sans-serif', lineHeight:1.3 }}>{quiz.title}</h3>
+                  <p style={{ fontSize:11, color:C.muted, marginTop:2 }}>{quiz.chapter || quiz.category} · {quiz.questions?.length} questions</p>
                 </div>
-                <button onClick={() => confirmDelete(quiz._id)} disabled={deletingId === quiz._id}
-                  className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition flex-shrink-0">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                </button>
+                <motion.button onClick={() => confirmDelete(quiz._id)} disabled={deletingId===quiz._id}
+                  whileHover={{ scale:1.1 }} whileTap={{ scale:0.9 }}
+                  style={{ width:30, height:30, borderRadius:10, background:'#fef2f2', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.red} strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </motion.button>
               </div>
-              <p className="text-xs text-slate-400 mb-4">
-                {new Date(quiz.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+              <p style={{ fontSize:11, color:C.muted, marginBottom:14 }}>
+                {new Date(quiz.createdAt).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' })}
               </p>
-              <motion.button onClick={() => onPlay(quiz._id)}
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                className="w-full py-2.5 text-white rounded-xl text-xs font-bold transition"
-                style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                Commencer ce quiz →
+              <motion.button onClick={() => onPlay(quiz._id)} whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+                style={{ width:'100%', padding:'10px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:12, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                Commencer →
               </motion.button>
             </div>
           </motion.div>
@@ -205,33 +302,43 @@ function PersonalQuizList({ quizzes, onDelete, onPlay }) {
   );
 }
 
-/* ─── Pro prompt ────────────────────────────────────────────────────────────── */
+/* ─── Pro prompt ─────────────────────────────────────────────────────────── */
 function ProFeaturePrompt() {
   const navigate = useNavigate();
   return (
-    <div className="max-w-md mx-auto text-center py-12">
-      <div className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-blue-200"
-        style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+    <div style={{ maxWidth:420, margin:'0 auto', textAlign:'center', padding:'48px 24px' }}>
+      <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} transition={sp}
+        style={{ width:72, height:72, borderRadius:24, margin:'0 auto 20px', display:'flex', alignItems:'center', justifyContent:'center', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, boxShadow:clay.btn(C.indigo,'#312e81') }}>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
           <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
         </svg>
-      </div>
-      <h3 className="text-lg font-bold text-slate-800 mb-2">Fonctionnalité Pro</h3>
-      <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-        La génération de quiz depuis vos cours est réservée aux abonnements <strong className="text-blue-700">Pro</strong> et <strong className="text-blue-700">Premium</strong>.
-        Créez jusqu'à 10 quiz personnalisés par jour.
+      </motion.div>
+      <h3 style={{ fontSize:18, fontWeight:900, color:C.text, fontFamily:'Nunito,sans-serif', marginBottom:8 }}>Fonctionnalité Pro</h3>
+      <p style={{ fontSize:13, color:C.muted, lineHeight:1.7, marginBottom:24 }}>
+        La génération de quiz depuis vos cours est réservée aux abonnements <strong style={{ color:C.indigo }}>Pro</strong> et <strong style={{ color:C.indigo }}>Premium</strong>. Créez jusqu'à 10 quiz personnalisés par jour.
       </p>
-      <motion.button onClick={() => navigate('/dashboard/subscription')}
-        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-        className="px-8 py-3 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-blue-200"
-        style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-        Voir les offres
+      <motion.button onClick={() => navigate('/dashboard/subscription')} whileHover={{ scale:1.03 }} whileTap={{ scale:0.96 }}
+        style={{ padding:'12px 32px', borderRadius:16, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+        Voir les offres →
       </motion.button>
     </div>
   );
 }
 
-/* ─── Main ──────────────────────────────────────────────────────────────────── */
+/* ─── Skeleton loader ────────────────────────────────────────────────────── */
+function Skeleton() {
+  return (
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:14 }}>
+      {[...Array(6)].map((_,i) => (
+        <div key={i} style={{ height:140, borderRadius:24, background:'linear-gradient(135deg,#e0e7ff,#c7d2fe)', opacity:0.6+(i*0.06), animation:'pulse 1.5s ease-in-out infinite' }}/>
+      ))}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MAIN
+   ════════════════════════════════════════════════════════════════════════════ */
 export default function Quiz() {
   const navigate = useNavigate();
   const { user }  = useAuth();
@@ -244,9 +351,9 @@ export default function Quiz() {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedUE, setSelectedUE]             = useState(null);
   const [selectedChapter, setSelectedChapter]   = useState(null);
+  const [quotaModal, setQuotaModal]   = useState(false);
 
   const isPro = ['pro', 'premium'].includes(user?.subscription);
-  const [quotaModal, setQuotaModal] = useState(false);
 
   const handlePlay = async (id) => {
     if (!isPro) {
@@ -259,11 +366,8 @@ export default function Quiz() {
   };
 
   useEffect(() => {
-    // Affiche immédiatement les données en cache si disponibles
     const cached = getCache('quizzes_list');
     if (cached) { setQuizzes(cached); setLoading(false); }
-
-    // Rafraîchit en arrière-plan (silencieux si cache présent)
     axios.get(`${API_URL}/quizzes`).then(r => {
       setQuizzes(r.data);
       setCache('quizzes_list', r.data);
@@ -275,7 +379,7 @@ export default function Quiz() {
       setPersonalLoading(true);
       axios.get(`${API_URL}/quizzes/personal`).then(r => setPersonalQuizzes(r.data)).finally(() => setPersonalLoading(false));
     }
-  }, [tab, isPro]);
+  }, [tab, isPro]); // eslint-disable-line
 
   const structure = {};
   quizzes.forEach(q => {
@@ -299,144 +403,93 @@ export default function Quiz() {
 
   const resetCatalogue = () => { setView('semesters'); setSelectedSemester(null); setSelectedUE(null); setSelectedChapter(null); };
 
-  if (loading) return (
-    <DashboardLayout>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"/>
-      </div>
-    </DashboardLayout>
-  );
-
   return (
     <DashboardLayout>
-      {/* ── Modal quota dépassé ── */}
-      <AnimatePresence>
-        {quotaModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={() => setQuotaModal(false)}>
-            <motion.div initial={{ scale: 0.9, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Quota mensuel atteint</h3>
-              <p className="text-slate-500 text-sm mb-1">Vous avez utilisé vos <span className="font-bold text-slate-700">10 quiz gratuits</span> ce mois-ci.</p>
-              <p className="text-slate-500 text-sm mb-6">Passez à l'abonnement <span className="font-bold text-blue-600">Étudiant</span> pour accéder à des quiz illimités, des flashcards illimitées, et bien plus encore.</p>
-              <div className="flex gap-3">
-                <button onClick={() => setQuotaModal(false)}
-                  className="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                  Plus tard
-                </button>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate('/dashboard/subscription')}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                  Voir les abonnements
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      <div className="flex-1 overflow-auto">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{ opacity:.6 } 50%{ opacity:.9 } }
+        * { font-family: 'DM Sans', system-ui, sans-serif; }
+        h1,h2,h3,.nunito { font-family: 'Nunito', sans-serif !important; }
+      `}</style>
 
-        {/* ── Hero ── */}
-        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #0c4a6e 100%)' }} className="px-6 pt-8 pb-0">
-          {/* Title + stats */}
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-white mb-1">Quiz</h1>
-              <p className="text-blue-200/70 text-sm">Testez vos connaissances par unité d'enseignement</p>
+      <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
+
+        {/* ── HERO ─────────────────────────────────────────────────────── */}
+        <div style={{ background:'linear-gradient(135deg, #4338ca 0%, #7C3AED 55%, #EC4899 100%)', position:'relative', overflow:'hidden' }}>
+          {/* Grid texture */}
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
+          {/* Shine */}
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.18), transparent 60%)', pointerEvents:'none' }} aria-hidden/>
+
+          <div style={{ position:'relative', maxWidth:1152, margin:'0 auto', padding:'28px 24px 0' }}>
+            <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:12, marginBottom:22 }}>
+              <div>
+                <p style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:4 }}>NursesPrep · IFSI</p>
+                <h1 className="nunito" style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:4 }}>Quiz</h1>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.65)' }}>Testez vos connaissances par unité d'enseignement</p>
+              </div>
+              {tab === 'catalogue' && (
+                <div style={{ display:'flex', gap:16, paddingBottom:4 }}>
+                  {[{ n:totalQuizzes, l:'Quiz' }, { n:semesters.length, l:'Semestres' }].map(s => (
+                    <div key={s.l} style={{ textAlign:'center' }}>
+                      <p className="nunito" style={{ fontSize:22, fontWeight:900, color:'#fff', lineHeight:1 }}>{s.n}</p>
+                      <p style={{ fontSize:11, color:'rgba(255,255,255,0.55)', marginTop:2 }}>{s.l}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {tab === 'catalogue' && (
-              <div className="flex gap-4 text-center pb-1">
-                <div>
-                  <p className="text-xl font-bold text-white">{totalQuizzes}</p>
-                  <p className="text-xs text-blue-300/70">Quiz</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-white">{semesters.length}</p>
-                  <p className="text-xs text-blue-300/70">Semestres</p>
-                </div>
-              </div>
-            )}
-          </div>
 
-          {/* Tab bar */}
-          <div className="flex gap-0">
-            {[
-              { id: 'catalogue', label: 'Catalogue' },
-              { id: 'personnalises', label: isPro ? 'Mes quiz' : 'Mes quiz' },
-            ].map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                className={`px-5 py-3 text-sm font-semibold border-b-2 transition-all ${
-                  tab === t.id
-                    ? 'border-white text-white'
-                    : 'border-transparent text-blue-300/70 hover:text-blue-200'
-                }`}>
-                {t.label}
-              </button>
-            ))}
+            {/* Tab bar */}
+            <div style={{ display:'flex', gap:2 }}>
+              {[{ id:'catalogue', label:'Catalogue' }, { id:'personnalises', label:'Mes quiz' }].map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  style={{ padding:'10px 20px', background:'transparent', border:'none', borderBottom:`2.5px solid ${tab===t.id?'#fff':'transparent'}`, color:tab===t.id?'#fff':'rgba(255,255,255,0.55)', fontSize:13, fontWeight:700, cursor:'pointer', transition:'all 0.2s', fontFamily:'Nunito,sans-serif' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* ── Content ── */}
-        <div className="p-6 bg-slate-50 min-h-full">
+        {/* ── CONTENT ──────────────────────────────────────────────────── */}
+        <div style={{ maxWidth:1152, margin:'0 auto', padding:'24px' }}>
 
-          {/* ── CATALOGUE TAB ── */}
+          {/* ── CATALOGUE ── */}
           {tab === 'catalogue' && (
             <AnimatePresence mode="wait">
 
               {/* SEMESTERS */}
               {view === 'semesters' && (
-                <motion.div key="sems"
-                  initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3 }}>
-                  {semesters.length === 0 ? (
-                    <div className="text-center py-20 text-slate-400">
-                      <div className="text-5xl mb-3"></div>
-                      <p className="font-semibold">Aucun quiz disponible</p>
+                <motion.div key="sems" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }} transition={{ duration:0.3 }}>
+                  {loading ? <Skeleton/> : semesters.length === 0 ? (
+                    <div style={{ textAlign:'center', padding:'60px 24px', color:C.muted }}>
+                      <div style={{ fontSize:48, marginBottom:12 }}>📚</div>
+                      <p style={{ fontWeight:700, color:C.text, fontFamily:'Nunito,sans-serif' }}>Aucun quiz disponible</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:14 }}>
                       {semesters.map((sem, idx) => {
                         const pal       = PALETTE[idx % PALETTE.length];
-                        const ueCount   = Object.keys(structure[sem]).length;
                         const allQ      = Object.values(structure[sem]).flatMap(ue => Object.values(ue)).flat();
                         const total     = allQ.length;
+                        const ueCount   = Object.keys(structure[sem]).length;
                         const doneCount = allQ.filter(q => q.attempt?.status === 'completed').length;
                         return (
-                          <motion.button key={sem}
-                            onClick={() => { setSelectedSemester(sem); setView('ues'); }}
-                            whileHover={{ y: -6, scale: 1.02 }}
-                            whileTap={{ scale: 0.97 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                            className="relative overflow-hidden rounded-2xl p-6 text-left shadow-md hover:shadow-xl transition-shadow"
-                            style={{ background: `linear-gradient(135deg, ${pal.from}, ${pal.to})` }}
-                          >
-                            <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10 blur-2xl"/>
-                            <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-black/10 blur-xl"/>
-                            <div className="text-4xl mb-4">{pal.emoji}</div>
-                            <h3 className="font-bold text-white text-base mb-1 leading-snug">{sem}</h3>
-                            <p className="text-white/75 text-xs mb-1">{ueCount} UE · {total} quiz</p>
-                            {doneCount > 0 && (
-                              <p className="text-white/90 text-xs mb-3 font-semibold">✓ {doneCount} quiz terminé{doneCount > 1 ? 's' : ''}</p>
-                            )}
-                            <div className={`flex items-center justify-between ${doneCount > 0 ? '' : 'mt-4'}`}>
-                              <div className="flex gap-1">
-                                {Array.from({ length: Math.min(ueCount, 5) }).map((_, i) => (
-                                  <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/60"/>
-                                ))}
-                              </div>
-                              <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-                                <ChevronRight className="text-white"/>
-                              </div>
-                            </div>
-                          </motion.button>
+                          <motion.div key={sem}
+                            initial={{ opacity:0, y:20, scale:0.94 }} whileInView={{ opacity:1, y:0, scale:1 }}
+                            viewport={{ once:true, margin:'-30px' }}
+                            transition={{ type:'spring', stiffness:280, damping:24, delay: idx*0.06 }}>
+                            <GradCard
+                              pal={pal} onClick={() => { setSelectedSemester(sem); setView('ues'); }}
+                              title={sem}
+                              sub={`${ueCount} UE · ${total} quiz`}
+                              sub2={doneCount > 0 ? `✓ ${doneCount} quiz terminé${doneCount>1?'s':''}` : null}
+                              progress={total>0 ? (doneCount/total)*100 : null}
+                            />
+                          </motion.div>
                         );
                       })}
                     </div>
@@ -446,18 +499,10 @@ export default function Quiz() {
 
               {/* UEs */}
               {view === 'ues' && selectedSemester && (
-                <motion.div key="ues"
-                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}>
-                  <Breadcrumb items={[
-                    { label: 'Quiz', onClick: resetCatalogue },
-                    { label: selectedSemester }
-                  ]}/>
-                  <div className="mb-6">
-                    <h2 className="text-xl font-black text-slate-900">{selectedSemester}</h2>
-                    <p className="text-sm text-slate-400 mt-0.5">{ues.length} unité{ues.length > 1 ? 's' : ''} d'enseignement</p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <motion.div key="ues" initial={{ opacity:0, x:24 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-24 }} transition={{ duration:0.28 }}>
+                  <Breadcrumb items={[{ label:'Quiz', onClick:resetCatalogue }, { label:selectedSemester }]}/>
+                  <SectionHeader title={selectedSemester} sub={`${ues.length} unité${ues.length>1?'s':''} d'enseignement`}/>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(210px,1fr))', gap:14 }}>
                     {ues.map((ue, idx) => {
                       const pal       = PALETTE[idx % PALETTE.length];
                       const allQ      = Object.values(structure[selectedSemester][ue]).flat();
@@ -465,27 +510,17 @@ export default function Quiz() {
                       const chCount   = Object.keys(structure[selectedSemester][ue]).length;
                       const doneCount = allQ.filter(q => q.attempt?.status === 'completed').length;
                       return (
-                        <motion.button key={ue}
-                          onClick={() => { setSelectedUE(ue); setView('chapters'); }}
-                          whileHover={{ y: -4, scale: 1.01 }}
-                          whileTap={{ scale: 0.98 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                          className="relative overflow-hidden rounded-2xl p-5 text-left shadow-md hover:shadow-xl transition-shadow"
-                          style={{ background: `linear-gradient(135deg, ${pal.from}, ${pal.to})` }}
-                        >
-                          <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"/>
-                          <div className="text-3xl mb-3">{pal.emoji}</div>
-                          <h3 className="font-bold text-white text-sm mb-1 leading-snug">{ue}</h3>
-                          <p className="text-white/75 text-xs mb-1">{chCount} chapitre{chCount > 1 ? 's' : ''} · {total} quiz</p>
-                          {doneCount > 0 && (
-                            <p className="text-white/90 text-xs mb-2 font-semibold">✓ {doneCount}/{total} terminé{doneCount > 1 ? 's' : ''}</p>
-                          )}
-                          <div className={`flex justify-end ${doneCount > 0 ? '' : 'mt-3'}`}>
-                            <div className="w-7 h-7 bg-white/20 rounded-xl flex items-center justify-center">
-                              <ChevronRight className="text-white"/>
-                            </div>
-                          </div>
-                        </motion.button>
+                        <motion.div key={ue}
+                          initial={{ opacity:0, y:18, scale:0.94 }} animate={{ opacity:1, y:0, scale:1 }}
+                          transition={{ type:'spring', stiffness:280, damping:24, delay: idx*0.055 }}>
+                          <GradCard
+                            pal={pal} onClick={() => { setSelectedUE(ue); setView('chapters'); }}
+                            title={ue}
+                            sub={`${chCount} chapitre${chCount>1?'s':''} · ${total} quiz`}
+                            sub2={doneCount > 0 ? `✓ ${doneCount}/${total} terminé${doneCount>1?'s':''}` : null}
+                            progress={total>0 ? (doneCount/total)*100 : null}
+                          />
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -494,63 +529,55 @@ export default function Quiz() {
 
               {/* CHAPTERS */}
               {view === 'chapters' && selectedSemester && selectedUE && (
-                <motion.div key="chaps"
-                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}>
+                <motion.div key="chaps" initial={{ opacity:0, x:24 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-24 }} transition={{ duration:0.28 }}>
                   <Breadcrumb items={[
-                    { label: 'Quiz', onClick: resetCatalogue },
-                    { label: selectedSemester, onClick: () => { setSelectedUE(null); setView('ues'); } },
-                    { label: selectedUE }
+                    { label:'Quiz', onClick:resetCatalogue },
+                    { label:selectedSemester, onClick:() => { setSelectedUE(null); setView('ues'); } },
+                    { label:selectedUE }
                   ]}/>
-                  <div className="mb-6">
-                    <h2 className="text-xl font-black text-slate-900">{selectedUE}</h2>
-                    <p className="text-sm text-slate-400 mt-0.5">{totalInUE} quiz disponible{totalInUE > 1 ? 's' : ''}</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SectionHeader title={selectedUE} sub={`${totalInUE} quiz disponible${totalInUE>1?'s':''}`}/>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:12 }}>
                     {chapters.map((chap, idx) => {
                       const pal       = PALETTE[idx % PALETTE.length];
                       const chapQ     = structure[selectedSemester][selectedUE][chap];
                       const count     = chapQ.length;
                       const doneCount = chapQ.filter(q => q.attempt?.status === 'completed').length;
                       const allDone   = doneCount === count && count > 0;
+                      const pct       = count > 0 ? (doneCount/count)*100 : 0;
                       return (
-                        <motion.button key={chap}
-                          onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
-                          whileHover={{ y: -3 }}
-                          whileTap={{ scale: 0.98 }}
-                          style={{ willChange: 'transform' }}
-                          className="bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-shadow transition-colors text-left group shadow-sm overflow-hidden"
-                        >
-                          <div className="flex items-center gap-4 p-5">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
-                              style={{ background: `linear-gradient(135deg,${pal.from},${pal.to})` }}>
-                              {pal.emoji}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="font-bold text-slate-800 text-sm truncate">{chap}</h3>
-                                {doneCount > 0 && (
-                                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-600'}`}>
-                                    ✓ {doneCount}/{count}
-                                  </span>
-                                )}
+                        <motion.div key={chap}
+                          initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
+                          transition={{ duration:0.3, ease:[0.16,1,0.3,1], delay: idx*0.05 }}>
+                          <motion.button
+                            onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
+                            whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(79,70,229,0.14)` }}
+                            whileTap={{ scale:0.98 }}
+                            style={{ width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s' }}
+                          >
+                            <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px' }}>
+                              <div style={{ width:44, height:44, borderRadius:14, background:`linear-gradient(135deg,${pal.from},${pal.to})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 4px 10px ${pal.from}44` }}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 3h6a1 1 0 0 1 0 2H9a1 1 0 0 1 0-2z"/></svg>
                               </div>
-                              <p className="text-xs text-slate-400 mt-0.5">{count} quiz disponible{count > 1 ? 's' : ''}</p>
+                              <div style={{ flex:1, minWidth:0 }}>
+                                <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:2 }}>
+                                  <span style={{ fontSize:13, fontWeight:800, color:C.text, fontFamily:'Nunito,sans-serif' }}>{chap}</span>
+                                  {doneCount > 0 && (
+                                    <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99, background:allDone?'#dcfce7':'#e0e7ff', color:allDone?'#15803d':C.indigo }}>
+                                      ✓ {doneCount}/{count}
+                                    </span>
+                                  )}
+                                </div>
+                                <p style={{ fontSize:11, color:C.muted }}>{count} quiz disponible{count>1?'s':''}</p>
+                              </div>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.muted} strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </div>
-                            <div className="text-slate-300 group-hover:text-blue-500 transition flex-shrink-0">
-                              <ChevronRight/>
-                            </div>
-                          </div>
-                          {/* Barre de progression verte */}
-                          {doneCount > 0 && (
-                            <div className="h-1 bg-slate-100">
-                              <div
-                                className={`h-1 transition-all ${allDone ? 'bg-green-400' : 'bg-blue-400'}`}
-                                style={{ width: `${(doneCount / count) * 100}%` }}
-                              />
-                            </div>
-                          )}
-                        </motion.button>
+                            {doneCount > 0 && (
+                              <div style={{ height:4, background:'#e0e7ff' }}>
+                                <div style={{ height:'100%', width:`${pct}%`, background:allDone?`linear-gradient(90deg,${C.green},#34d399)`:`linear-gradient(90deg,${C.indigo},${C.violet})`, transition:'width 0.8s ease' }}/>
+                              </div>
+                            )}
+                          </motion.button>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -559,83 +586,84 @@ export default function Quiz() {
 
               {/* QUIZZES */}
               {view === 'quizzes' && selectedSemester && selectedUE && selectedChapter && (
-                <motion.div key="quizs"
-                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}>
+                <motion.div key="quizs" initial={{ opacity:0, x:24 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-24 }} transition={{ duration:0.28 }}>
                   <Breadcrumb items={[
-                    { label: 'Quiz', onClick: resetCatalogue },
-                    { label: selectedSemester, onClick: () => { setSelectedUE(null); setSelectedChapter(null); setView('ues'); } },
-                    { label: selectedUE, onClick: () => { setSelectedChapter(null); setView('chapters'); } },
-                    { label: selectedChapter }
+                    { label:'Quiz', onClick:resetCatalogue },
+                    { label:selectedSemester, onClick:() => { setSelectedUE(null); setSelectedChapter(null); setView('ues'); } },
+                    { label:selectedUE, onClick:() => { setSelectedChapter(null); setView('chapters'); } },
+                    { label:selectedChapter }
                   ]}/>
-                  <div className="mb-6">
-                    <h2 className="text-xl font-black text-slate-900">{selectedChapter}</h2>
-                    <p className="text-sm text-slate-400 mt-0.5">{currentQuizzes.length} quiz disponible{currentQuizzes.length > 1 ? 's' : ''}</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <SectionHeader title={selectedChapter} sub={`${currentQuizzes.length} quiz disponible${currentQuizzes.length>1?'s':''}`}/>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:14 }}>
                     {currentQuizzes.map((quiz, i) => {
-                      const a = quiz.attempt;
+                      const a       = quiz.attempt;
                       const isDone  = a?.status === 'completed';
                       const isResume = a?.status === 'in_progress';
-                      const pct = isDone ? Math.round((a.score / a.totalQuestions) * 100) : null;
-                      const barColor = pct >= 60 ? '#22c55e' : '#ef4444';
+                      const pct     = isDone ? Math.round((a.score / a.totalQuestions) * 100) : null;
+                      const barColor = pct >= 60 ? C.green : C.red;
+                      const diff    = DIFF[quiz.difficulty] || DIFF.medium;
                       return (
                         <motion.div key={quiz._id}
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i < 6 ? i * 0.04 : 0, duration: 0.25 }}
-                          whileHover={{ y: -4 }}
-                          className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-100 transition-all cursor-pointer group"
-                          onClick={() => handlePlay(quiz._id)}
-                        >
-                          {/* Barre de statut colorée en haut */}
-                          <div className="h-1.5" style={{ background: isDone ? barColor : isResume ? '#f59e0b' : 'linear-gradient(90deg,#2563eb,#0891b2)' }}/>
-                          <div className="p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full">{quiz.category}</span>
-                              <div className="flex items-center gap-2">
-                                {isDone && (
-                                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${pct >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                                    {pct >= 60 ? '✓' : '✗'} {a.score}/{a.totalQuestions}
-                                  </span>
-                                )}
-                                {isResume && (
-                                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
-                                    ● Q{a.currentQuestion + 1}/{a.totalQuestions}
-                                  </span>
-                                )}
-                                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${diffColors[quiz.difficulty]}`}>{diffLabel[quiz.difficulty]}</span>
-                              </div>
-                            </div>
-                            <h3 className="text-sm font-bold text-slate-800 mb-2 leading-snug">{quiz.title}</h3>
-
-                            {/* Barre de score si terminé */}
-                            {isDone && (
-                              <div className="mb-3">
-                                <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                  <div className="h-1 rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }}/>
+                          initial={{ opacity:0, y:16, scale:0.95 }} animate={{ opacity:1, y:0, scale:1 }}
+                          transition={{ delay: i<6 ? i*0.05:0, duration:0.3, ease:[0.16,1,0.3,1] }}>
+                          <motion.div
+                            onClick={() => handlePlay(quiz._id)}
+                            whileHover={{ y:-5, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 24px 48px rgba(79,70,229,0.16)` }}
+                            whileTap={{ scale:0.98 }}
+                            style={{ background:C.card, borderRadius:20, boxShadow:clay.card, border:`1px solid ${C.border}`, overflow:'hidden', cursor:'pointer', transition:'box-shadow 0.2s' }}
+                          >
+                            {/* Status color bar */}
+                            <div style={{ height:4, background:isDone?barColor:isResume?C.amber:`linear-gradient(90deg,${C.indigo},${C.violet})` }}/>
+                            <div style={{ padding:'18px 20px' }}>
+                              {/* Top row chips */}
+                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:6, marginBottom:12 }}>
+                                <span style={{ fontSize:11, fontWeight:700, background:'#e0e7ff', color:C.indigo, borderRadius:99, padding:'4px 10px' }}>{quiz.category}</span>
+                                <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+                                  {isDone && <Chip label={`${pct>=60?'✓':'✗'} ${a.score}/${a.totalQuestions}`} bg={pct>=60?'#dcfce7':'#fee2e2'} color={pct>=60?'#15803d':'#991b1b'}/>}
+                                  {isResume && <Chip label={`● Q${a.currentQuestion+1}/${a.totalQuestions}`} bg='#fef9c3' color='#854d0e'/>}
+                                  <Chip label={diff.label} bg={diff.bg} color={diff.color}/>
                                 </div>
-                                {a.wrongAnswers > 0 && (
-                                  <p className="text-xs text-red-500 mt-1">{a.wrongAnswers} erreur{a.wrongAnswers > 1 ? 's' : ''} lors du dernier essai</p>
-                                )}
                               </div>
-                            )}
 
-                            {quiz.description && !isDone && <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2">{quiz.description}</p>}
-                            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                              <div className="flex items-center gap-3 text-xs text-slate-400">
-                                <span className="flex items-center gap-1.5">
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
-                                  {quiz.questions?.length || 0} questions
-                                </span>
-                                <span className="flex items-center gap-1.5">
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                  {quiz.duration} min
+                              {/* Title */}
+                              <h3 style={{ fontSize:14, fontWeight:800, color:C.text, fontFamily:'Nunito,sans-serif', lineHeight:1.35, marginBottom:isDone||quiz.description?10:14 }}>{quiz.title}</h3>
+
+                              {/* Score bar */}
+                              {isDone && (
+                                <div style={{ marginBottom:12 }}>
+                                  <div style={{ height:6, background:C.border, borderRadius:99, overflow:'hidden', boxShadow:'inset 0 2px 4px rgba(0,0,0,0.06)' }}>
+                                    <motion.div
+                                      initial={{ width:0 }} animate={{ width:`${pct}%` }}
+                                      transition={{ duration:1, ease:[0.16,1,0.3,1], delay:0.2 }}
+                                      style={{ height:'100%', borderRadius:99, background:barColor }}
+                                    />
+                                  </div>
+                                  {a.wrongAnswers > 0 && <p style={{ fontSize:11, color:C.red, marginTop:4 }}>{a.wrongAnswers} erreur{a.wrongAnswers>1?'s':''} lors du dernier essai</p>}
+                                </div>
+                              )}
+
+                              {quiz.description && !isDone && (
+                                <p style={{ fontSize:12, color:C.muted, lineHeight:1.65, marginBottom:12, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{quiz.description}</p>
+                              )}
+
+                              {/* Footer */}
+                              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${C.border}` }}>
+                                <div style={{ display:'flex', gap:14 }}>
+                                  <span style={{ fontSize:11, color:C.muted, display:'flex', alignItems:'center', gap:4 }}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+                                    {quiz.questions?.length||0} q.
+                                  </span>
+                                  <span style={{ fontSize:11, color:C.muted, display:'flex', alignItems:'center', gap:4 }}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    {quiz.duration} min
+                                  </span>
+                                </div>
+                                <span style={{ fontSize:12, fontWeight:800, color:C.indigo, fontFamily:'Nunito,sans-serif' }}>
+                                  {isDone ? 'Refaire →' : isResume ? 'Reprendre →' : 'Commencer →'}
                                 </span>
                               </div>
-                              <span className="text-xs font-bold text-blue-600 group-hover:text-blue-800 transition flex items-center gap-1">
-                                {isDone ? 'Refaire' : isResume ? 'Reprendre →' : 'Commencer →'}
-                              </span>
                             </div>
-                          </div>
+                          </motion.div>
                         </motion.div>
                       );
                     })}
@@ -645,31 +673,22 @@ export default function Quiz() {
             </AnimatePresence>
           )}
 
-          {/* ── PERSONNALISÉS TAB ── */}
+          {/* ── PERSONNALISÉS ── */}
           {tab === 'personnalises' && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {!isPro ? (
-                <ProFeaturePrompt/>
-              ) : (
+            <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.3 }}>
+              {!isPro ? <ProFeaturePrompt/> : (
                 <>
-                  <div className="mb-6">
-                    <h2 className="text-base font-bold text-slate-800 mb-1">Générer un quiz depuis votre cours</h2>
-                    <p className="text-sm text-slate-400">Collez n'importe quel texte de cours et l'IA génère des QCM adaptés.</p>
+                  <div style={{ marginBottom:20 }}>
+                    <h2 className="nunito" style={{ fontSize:18, fontWeight:900, color:C.text, marginBottom:4 }}>Générer un quiz depuis votre cours</h2>
+                    <p style={{ fontSize:13, color:C.muted }}>Collez n'importe quel texte de cours — l'IA génère des QCM adaptés.</p>
                   </div>
                   <QuizGenerator onGenerated={quiz => setPersonalQuizzes(prev => [quiz, ...prev])}/>
-                  <div className="mt-8">
-                    <h3 className="text-sm font-bold text-slate-700 mb-4">Mes quiz générés</h3>
-                    {personalLoading ? (
-                      <div className="flex justify-center py-8">
-                        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"/>
-                      </div>
-                    ) : (
-                      <PersonalQuizList
-                        quizzes={personalQuizzes}
-                        onDelete={id => setPersonalQuizzes(prev => prev.filter(q => q._id !== id))}
-                        onPlay={id => handlePlay(id)}
-                      />
-                    )}
+                  <div style={{ marginTop:32 }}>
+                    <h3 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text, marginBottom:16 }}>Mes quiz générés</h3>
+                    {personalLoading
+                      ? <div style={{ display:'flex', justifyContent:'center', padding:'32px 0' }}><div style={{ width:32, height:32, border:`3px solid ${C.indigo}`, borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.7s linear infinite' }}/></div>
+                      : <PersonalQuizList quizzes={personalQuizzes} onDelete={id => setPersonalQuizzes(prev => prev.filter(q => q._id !== id))} onPlay={id => handlePlay(id)}/>
+                    }
                   </div>
                 </>
               )}
@@ -677,6 +696,37 @@ export default function Quiz() {
           )}
         </div>
       </div>
+
+      {/* ── QUOTA MODAL ──────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {quotaModal && (
+          <motion.div key="backdrop" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+            onClick={() => setQuotaModal(false)}
+            style={{ position:'fixed', inset:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'center', padding:16, background:'rgba(30,27,75,0.45)', backdropFilter:'blur(8px)' }}>
+            <motion.div key="modal" initial={{ opacity:0, scale:0.9, y:20 }} animate={{ opacity:1, scale:1, y:0 }} exit={{ opacity:0, scale:0.9 }}
+              onClick={e => e.stopPropagation()}
+              style={{ background:C.card, borderRadius:28, padding:'28px 24px', width:'100%', maxWidth:380, boxShadow:clay.card, textAlign:'center' }}>
+              <div style={{ width:56, height:56, borderRadius:18, margin:'0 auto 16px', display:'flex', alignItems:'center', justifyContent:'center', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h3 className="nunito" style={{ fontSize:17, fontWeight:900, color:C.text, marginBottom:8 }}>Quota mensuel atteint</h3>
+              <p style={{ fontSize:13, color:C.muted, lineHeight:1.7, marginBottom:6 }}>Vous avez utilisé vos <strong style={{ color:C.text }}>10 quiz gratuits</strong> ce mois-ci.</p>
+              <p style={{ fontSize:13, color:C.muted, lineHeight:1.7, marginBottom:22 }}>Passez à l'abonnement <strong style={{ color:C.indigo }}>Étudiant</strong> pour un accès illimité.</p>
+              <div style={{ display:'flex', gap:10 }}>
+                <motion.button onClick={() => setQuotaModal(false)} whileTap={{ scale:0.96 }}
+                  style={{ flex:1, padding:'12px 0', borderRadius:14, background:C.bg, border:`1px solid ${C.border}`, fontSize:13, fontWeight:700, color:C.muted, cursor:'pointer', boxShadow:clay.sm }}>
+                  Plus tard
+                </motion.button>
+                <motion.button onClick={() => navigate('/dashboard/subscription')} whileTap={{ scale:0.96 }} whileHover={{ scale:1.02 }}
+                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, fontSize:13, fontWeight:800, color:'#fff', cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                  Voir les offres
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </DashboardLayout>
   );
 }
