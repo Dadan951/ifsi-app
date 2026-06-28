@@ -433,18 +433,18 @@ export default function QuizPlay() {
                   </div>
 
                   {/* Navigation révision */}
-                  <div style={{ display:'flex', gap:10 }}>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                     <motion.button onClick={() => setReviewIdx(i => Math.max(0, i - 1))} disabled={reviewIdx===0} whileTap={{ scale:0.96 }}
-                      style={{ flex:1, padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:reviewIdx===0?'not-allowed':'pointer', opacity:reviewIdx===0?0.4:1, boxShadow:clay.sm }}>
+                      style={{ width:'100%', padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:reviewIdx===0?'not-allowed':'pointer', opacity:reviewIdx===0?0.4:1, boxShadow:clay.sm }}>
                       ← Précédent
                     </motion.button>
                     {reviewIdx < total - 1
                       ? <motion.button onClick={() => setReviewIdx(i => i + 1)} whileTap={{ scale:0.96 }} whileHover={{ scale:1.01 }}
-                          style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                          style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
                           Suivant →
                         </motion.button>
                       : <motion.button onClick={() => setReviewMode(false)} whileTap={{ scale:0.96 }} whileHover={{ scale:1.01 }}
-                          style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                          style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
                           Terminer la révision
                         </motion.button>
                     }
@@ -518,14 +518,14 @@ export default function QuizPlay() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
                 Revoir toutes les questions
               </motion.button>
-              <div style={{ display:'flex', gap:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <motion.button onClick={() => navigate('/dashboard/quiz')} whileTap={{ scale:0.96 }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm }}>
                   ← Retour
                 </motion.button>
                 <motion.button whileTap={{ scale:0.96 }} whileHover={{ scale:1.01 }}
                   onClick={() => { setCurrent(0); setSelected(null); setAnswered(false); setScore(0); setDone(false); setAnswers([]); setReviewMode(false); setTimeLeft(quiz.duration*60); setShuffledQuestions(shuffleOptions(quiz.questions)); setReady(true); }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#1e293b,#334155)`, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn('#334155','#0f172a') }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#1e293b,#334155)`, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn('#334155','#0f172a') }}>
                   Recommencer
                 </motion.button>
               </div>
@@ -673,13 +673,13 @@ export default function QuizPlay() {
               <h3 style={{ fontSize:16, fontWeight:900, color:C.text, fontFamily:'Nunito,sans-serif', marginBottom:6 }}>Quitter le quiz ?</h3>
               <p style={{ fontSize:12, color:C.muted, lineHeight:1.65, marginBottom:4 }}>Ta progression est <strong style={{ color:C.text }}>automatiquement sauvegardée</strong>.</p>
               <p style={{ fontSize:12, color:C.muted, marginBottom:20 }}>Tu pourras reprendre à la question {current + 1} la prochaine fois.</p>
-              <div style={{ display:'flex', gap:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <motion.button onClick={() => setConfirmExit(false)} whileTap={{ scale:0.96 }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm }}>
                   Continuer
                 </motion.button>
                 <motion.button onClick={() => navigate('/dashboard/quiz')} whileTap={{ scale:0.96 }} whileHover={{ scale:1.01 }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
                   Quitter
                 </motion.button>
               </div>

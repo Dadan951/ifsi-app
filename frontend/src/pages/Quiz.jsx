@@ -104,27 +104,33 @@ function GradCard({ pal, title, sub, sub2, onClick, progress }) {
       transition={sp}
       onHoverStart={() => setState('hovered')} onHoverEnd={() => setState('idle')}
       onTapStart={() => setState('pressed')} onTap={() => setState('hovered')} onTapCancel={() => setState('idle')}
-      style={{ textAlign:'left', border:'none', cursor:'pointer', borderRadius:24, padding:'22px 20px', background:`linear-gradient(135deg, ${pal.from}, ${pal.to})`, position:'relative', overflow:'hidden', boxShadow:shadows[state], transition:'box-shadow 0.14s ease', width:'100%' }}
+      style={{ textAlign:'left', border:'none', cursor:'pointer', borderRadius:24, padding:'22px 20px', background:`linear-gradient(135deg, ${pal.from}, ${pal.to})`, position:'relative', overflow:'hidden', boxShadow:shadows[state], transition:'box-shadow 0.14s ease', width:'100%', minHeight:168, display:'flex', flexDirection:'column' }}
     >
       {/* shine */}
       <div style={{ position:'absolute', inset:0, background:'linear-gradient(148deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.06) 40%, transparent 65%)', borderRadius:24, pointerEvents:'none' }} aria-hidden/>
       {/* bottom vignette */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, height:40, background:'linear-gradient(to top, rgba(0,0,0,0.18), transparent)', borderRadius:'0 0 24px 24px', pointerEvents:'none' }} aria-hidden/>
 
-      <div style={{ position:'relative' }}>
-        <h3 style={{ fontSize:14, fontWeight:900, color:'#fff', fontFamily:'Nunito,sans-serif', lineHeight:1.3, marginBottom:4 }}>{title}</h3>
-        <p style={{ fontSize:11, color:'rgba(255,255,255,0.75)', marginBottom: sub2 ? 2 : 14 }}>{sub}</p>
-        {sub2 && <p style={{ fontSize:11, color:'rgba(255,255,255,0.9)', fontWeight:700, marginBottom:14 }}>{sub2}</p>}
+      {/* Contenu : flex colonne — texte en haut, chevron toujours en bas */}
+      <div style={{ position:'relative', flex:1, display:'flex', flexDirection:'column' }}>
+        {/* Zone texte */}
+        <div>
+          <h3 style={{ fontSize:14, fontWeight:900, color:'#fff', fontFamily:'Nunito,sans-serif', lineHeight:1.3, marginBottom:4, overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{title}</h3>
+          <p style={{ fontSize:11, color:'rgba(255,255,255,0.75)', marginBottom:sub2 ? 3 : 0 }}>{sub}</p>
+          {sub2 && <p style={{ fontSize:11, color:'rgba(255,255,255,0.9)', fontWeight:700 }}>{sub2}</p>}
+        </div>
 
-        {progress != null && (
-          <div style={{ height:4, background:'rgba(255,255,255,0.25)', borderRadius:99, overflow:'hidden', marginBottom:12 }}>
-            <div style={{ height:'100%', borderRadius:99, background:'rgba(255,255,255,0.9)', width:`${progress}%`, transition:'width 0.8s ease' }}/>
-          </div>
-        )}
-
-        <div style={{ display:'flex', justifyContent:'flex-end' }}>
-          <div style={{ width:30, height:30, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'1px solid rgba(255,255,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        {/* Zone basse : barre + chevron, toujours collée en bas */}
+        <div style={{ marginTop:'auto', paddingTop:12 }}>
+          {progress != null && (
+            <div style={{ height:4, background:'rgba(255,255,255,0.25)', borderRadius:99, overflow:'hidden', marginBottom:10 }}>
+              <div style={{ height:'100%', borderRadius:99, background:'rgba(255,255,255,0.9)', width:`${progress}%`, transition:'width 0.8s ease' }}/>
+            </div>
+          )}
+          <div style={{ display:'flex', justifyContent:'flex-end' }}>
+            <div style={{ width:30, height:30, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'1px solid rgba(255,255,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
           </div>
         </div>
       </div>
@@ -552,9 +558,9 @@ export default function Quiz() {
                             onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
                             whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(79,70,229,0.14)` }}
                             whileTap={{ scale:0.98 }}
-                            style={{ width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s' }}
+                            style={{ width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s', minHeight:80 }}
                           >
-                            <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px', minHeight:80, boxSizing:'border-box' }}>
                               <div style={{ width:44, height:44, borderRadius:14, background:`linear-gradient(135deg,${pal.from},${pal.to})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 4px 10px ${pal.from}44` }}>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 3h6a1 1 0 0 1 0 2H9a1 1 0 0 1 0-2z"/></svg>
                               </div>
@@ -712,13 +718,13 @@ export default function Quiz() {
               <h3 className="nunito" style={{ fontSize:17, fontWeight:900, color:C.text, marginBottom:8 }}>Quota mensuel atteint</h3>
               <p style={{ fontSize:13, color:C.muted, lineHeight:1.7, marginBottom:6 }}>Vous avez utilisé vos <strong style={{ color:C.text }}>10 quiz gratuits</strong> ce mois-ci.</p>
               <p style={{ fontSize:13, color:C.muted, lineHeight:1.7, marginBottom:22 }}>Passez à l'abonnement <strong style={{ color:C.indigo }}>Étudiant</strong> pour un accès illimité.</p>
-              <div style={{ display:'flex', gap:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <motion.button onClick={() => setQuotaModal(false)} whileTap={{ scale:0.96 }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, background:C.bg, border:`1px solid ${C.border}`, fontSize:13, fontWeight:700, color:C.muted, cursor:'pointer', boxShadow:clay.sm }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, background:C.bg, border:`1px solid ${C.border}`, fontSize:13, fontWeight:700, color:C.muted, cursor:'pointer', boxShadow:clay.sm }}>
                   Plus tard
                 </motion.button>
                 <motion.button onClick={() => navigate('/dashboard/subscription')} whileTap={{ scale:0.96 }} whileHover={{ scale:1.02 }}
-                  style={{ flex:1, padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, fontSize:13, fontWeight:800, color:'#fff', cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, fontSize:13, fontWeight:800, color:'#fff', cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
                   Voir les offres
                 </motion.button>
               </div>
