@@ -290,7 +290,7 @@ export default function QuizPlay() {
     const resumePct = Math.round((prevAttempt.currentQuestion / total) * 100);
     return (
       <DashboardLayout>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap'); @keyframes spin{to{transform:rotate(360deg)}}`}</style>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
         <main style={{ flex:1, overflowY:'auto', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
           <motion.div initial={{ opacity:0, scale:0.9, y:20 }} animate={{ opacity:1, scale:1, y:0 }} transition={{ type:'spring', stiffness:280, damping:24 }}
             style={{ background:C.card, borderRadius:28, padding:'28px 24px', width:'100%', maxWidth:380, boxShadow:clay.card, border:`1px solid ${C.border}`, textAlign:'center' }}>
@@ -347,7 +347,6 @@ export default function QuizPlay() {
 
       return (
         <DashboardLayout>
-          <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
           <main style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
             {/* Header révision */}
@@ -460,7 +459,6 @@ export default function QuizPlay() {
     /* Écran résultats */
     return (
       <DashboardLayout>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
         <main style={{ flex:1, overflowY:'auto', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
           <motion.div initial={{ opacity:0, y:20, scale:0.95 }} animate={{ opacity:1, y:0, scale:1 }} transition={{ type:'spring', stiffness:260, damping:22 }}
             style={{ background:C.card, borderRadius:32, padding:'28px 24px', width:'100%', maxWidth:420, boxShadow:clay.card, border:`1px solid ${C.border}`, textAlign:'center' }}>
@@ -540,7 +538,6 @@ export default function QuizPlay() {
   return (
     <DashboardLayout>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes urgent { 0%,100%{background:#fee2e2} 50%{background:#fecaca} }
       `}</style>

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+body { font-family: 'DM Sans', system-ui, sans-serif; }
+h1, h2, h3, .nunito { font-family: 'Nunito', sans-serif; }
+
 /* ── DARK MODE OVERRIDES ────────────────────────────────────────────────────── */
 
 .dark {

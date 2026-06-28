@@ -413,11 +413,8 @@ export default function Quiz() {
     <DashboardLayout>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100%{ opacity:.6 } 50%{ opacity:.9 } }
-        * { font-family: 'DM Sans', system-ui, sans-serif; }
-        h1,h2,h3,.nunito { font-family: 'Nunito', sans-serif !important; }
       `}</style>
 
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
@@ -552,15 +549,16 @@ export default function Quiz() {
                       const pct       = count > 0 ? (doneCount/count)*100 : 0;
                       return (
                         <motion.div key={chap}
+                          style={{ display:'flex' }}
                           initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
                           transition={{ duration:0.3, ease:[0.16,1,0.3,1], delay: idx*0.05 }}>
                           <motion.button
                             onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
                             whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(79,70,229,0.14)` }}
                             whileTap={{ scale:0.98 }}
-                            style={{ width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s', minHeight:80 }}
+                            style={{ flex:1, width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s' }}
                           >
-                            <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px', minHeight:80, boxSizing:'border-box' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px' }}>
                               <div style={{ width:44, height:44, borderRadius:14, background:`linear-gradient(135deg,${pal.from},${pal.to})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 4px 10px ${pal.from}44` }}>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 3h6a1 1 0 0 1 0 2H9a1 1 0 0 1 0-2z"/></svg>
                               </div>

@@ -348,14 +348,10 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
 
-      {/* Google Fonts */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
         @keyframes floatA { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(-20px,14px) scale(1.05)} 70%{transform:translate(14px,-18px) scale(0.97)} }
         @keyframes floatB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(18px,-12px)} }
         @keyframes floatC { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-10px,20px) scale(1.04)} 66%{transform:translate(16px,6px)} }
-        * { font-family: 'DM Sans', system-ui, sans-serif; }
-        h1,h2,h3,.nunito { font-family: 'Nunito', sans-serif !important; }
         @media(max-width:768px){ .blob { animation-play-state: paused !important; display: none; } }
       `}</style>
 
