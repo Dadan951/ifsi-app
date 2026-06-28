@@ -501,29 +501,29 @@ export default function QuizPlay() {
             </div>
 
             {/* Actions */}
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
               {wrongCount > 0 && (
                 <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
                   onClick={() => { setReviewIdx(answers.findIndex(a => !a.isCorrect)); setReviewMode(true); }}
-                  style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,#dc2626,#ea580c)`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.red,'#7f1d1d'), display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                  style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,#dc2626,#ea580c)`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.red,'#7f1d1d'), display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   Réviser mes {wrongCount} erreur{wrongCount>1?'s':''}
                 </motion.button>
               )}
               <motion.button whileTap={{ scale:0.96 }}
                 onClick={() => { setReviewIdx(0); setReviewMode(true); }}
-                style={{ width:'100%', padding:'12px 0', borderRadius:16, border:`1.5px solid ${C.border}`, background:C.bg, color:C.indigo, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                style={{ width:'100%', padding:'13px 0', borderRadius:16, border:`1.5px solid ${C.border}`, background:C.bg, color:C.indigo, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
                 Revoir toutes les questions
               </motion.button>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:4 }}>
                 <motion.button onClick={() => navigate('/dashboard/quiz')} whileTap={{ scale:0.96 }}
-                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm }}>
+                  style={{ display:'block', width:'100%', padding:'13px 0', borderRadius:14, border:`1.5px solid ${C.border}`, background:C.bg, color:C.muted, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.sm, minWidth:0 }}>
                   ← Retour
                 </motion.button>
                 <motion.button whileTap={{ scale:0.96 }} whileHover={{ scale:1.01 }}
                   onClick={() => { setCurrent(0); setSelected(null); setAnswered(false); setScore(0); setDone(false); setAnswers([]); setReviewMode(false); setTimeLeft(quiz.duration*60); setShuffledQuestions(shuffleOptions(quiz.questions)); setReady(true); }}
-                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#1e293b,#334155)`, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn('#334155','#0f172a') }}>
+                  style={{ display:'block', width:'100%', padding:'13px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#1e293b,#334155)`, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn('#334155','#0f172a'), minWidth:0 }}>
                   Recommencer
                 </motion.button>
               </div>
