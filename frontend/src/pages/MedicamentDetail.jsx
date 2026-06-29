@@ -218,7 +218,7 @@ function PartieBlock({ partieNum, title, content, id, color, partieIndex }) {
             </div>
           </div>
           {/* Contenu */}
-          <div style={{ paddingLeft:58, borderLeft:`2px solid ${color}30` }}>
+          <div style={{ paddingLeft:58 }}>
             <RichContent text={content} partieIndex={partieIndex}/>
           </div>
         </div>
@@ -482,7 +482,7 @@ export default function MedicamentDetail() {
                       </div>
                       <h2 style={{ fontSize:16, fontWeight:800, color:C.text }}>Introduction</h2>
                     </div>
-                    <div style={{ paddingLeft:52, borderLeft:`2px solid ${classColor}30` }}>
+                    <div style={{ paddingLeft:52 }}>
                       <RichContent text={drug.description} partieIndex={-1}/>
                     </div>
                   </div>
