@@ -96,7 +96,7 @@ function CoursBreadcrumb({ items }) {
           )}
           {item.onClick ? (
             <button onClick={item.onClick} style={{
-              fontSize:12, fontWeight:600, color:C.indigo, background:`${C.indigo}12`,
+              fontSize:12, fontWeight:600, color:C.indigo, background:'rgba(var(--theme-primary-rgb),0.07)',
               border:`1px solid ${C.border}`, padding:'3px 12px', borderRadius:20, cursor:'pointer',
             }}>
               {item.label}
@@ -233,7 +233,7 @@ function QuotaModal({ type, onClose }) {
           <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
             onClick={() => navigate('/dashboard/subscription')}
             style={{ width:'100%', padding:'12px', borderRadius:16, border:'none', cursor:'pointer', fontSize:13, fontWeight:800, color:'#fff',
-              background:'linear-gradient(135deg,#4F46E5,#7C3AED)', boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+              background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn() }}>
             Voir les abonnements
           </motion.button>
           <button onClick={onClose} style={{ width:'100%', padding:'10px', borderRadius:16, border:'none', cursor:'pointer', fontSize:13, fontWeight:600, color:C.sub, background:'transparent' }}>
@@ -323,7 +323,7 @@ function CoursTab() {
             {selected.tags?.length > 0 && (
               <div style={{ display:'flex', flexWrap:'wrap', gap:6, paddingTop:16, borderTop:`1px solid ${C.border}` }}>
                 {selected.tags.map(tag => (
-                  <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:20, background:`${C.indigo}12`, color:C.indigo }}>#{tag}</span>
+                  <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:20, background:'rgba(var(--theme-primary-rgb),0.07)', color:C.indigo }}>#{tag}</span>
                 ))}
               </div>
             )}
@@ -565,7 +565,7 @@ function FicheFileCard({ fiche, index }) {
                 <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
                   onClick={() => navigate('/dashboard/subscription')}
                   style={{ width:'100%', padding:12, borderRadius:16, border:'none', cursor:'pointer', fontSize:13, fontWeight:800, color:'#fff',
-                    background:'linear-gradient(135deg,#4F46E5,#7C3AED)', boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+                    background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn() }}>
                   Voir les abonnements
                 </motion.button>
                 <button onClick={() => setQuotaModal(false)} style={{ width:'100%', padding:10, borderRadius:16, border:'none', cursor:'pointer', fontSize:13, fontWeight:600, color:C.sub, background:'transparent' }}>
@@ -892,10 +892,10 @@ function FichesPersoUpgradeWall() {
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'48px 0' }}>
       <div style={{ maxWidth:420, width:'100%', textAlign:'center' }}>
         <div style={{ position:'relative', width:88, height:88, margin:'0 auto 24px' }}>
-          <div style={{ width:88, height:88, borderRadius:28, background:'linear-gradient(135deg,#EEF2FF,#ede9fe)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:clay.card }}>
+          <div style={{ width:88, height:88, borderRadius:28, background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:clay.card }}>
             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke={C.violet} strokeWidth="1.5" strokeLinecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </div>
-          <div style={{ position:'absolute', top:-4, right:-4, width:30, height:30, borderRadius:'50%', background:`linear-gradient(135deg,${C.indigo},${C.violet})`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+          <div style={{ position:'absolute', top:-4, right:-4, width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:clay.btn() }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
         </div>
@@ -916,7 +916,7 @@ function FichesPersoUpgradeWall() {
             </div>
           ))}
         </div>
-        <a href="/dashboard/subscription" style={{ display:'block', width:'100%', padding:'13px', color:'#fff', borderRadius:16, fontSize:13, fontWeight:800, textDecoration:'none', textAlign:'center', background:'linear-gradient(135deg,#4F46E5,#7C3AED)', boxShadow:clay.btn(C.indigo,'#3730a3'), marginBottom:10 }}>
+        <a href="/dashboard/subscription" style={{ display:'block', width:'100%', padding:'13px', color:'#fff', borderRadius:16, fontSize:13, fontWeight:800, textDecoration:'none', textAlign:'center', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn(), marginBottom:10 }}>
           Passer à Pro — Voir les offres
         </a>
         <p style={{ fontSize:11, color:C.sub }}>Sans engagement · Résiliable à tout moment</p>
@@ -1021,7 +1021,7 @@ function FichesPersoTab({ isPro }) {
             </div>
           ) : (
             <>
-              <div style={{ width:40, height:40, borderRadius:14, background:`${C.indigo}14`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 10px', boxShadow:clay.sm }}>
+              <div style={{ width:40, height:40, borderRadius:14, background:'rgba(var(--theme-primary-rgb),0.08)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 10px', boxShadow:clay.sm }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.indigo} strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
               <p style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:4 }}>Glissez ou cliquez pour déposer</p>
@@ -1069,7 +1069,7 @@ function FichesPersoTab({ isPro }) {
       <section>
         <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
           <h2 style={{ fontSize:14, fontWeight:800, color:C.text }}>Fiches générées par IA</h2>
-          <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:20, background:`linear-gradient(135deg,${C.indigo},${C.violet})`, color:'#fff' }}>Pro</span>
+          <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:20, background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', color:'#fff' }}>Pro</span>
         </div>
         <p style={{ fontSize:12, color:C.sub, marginBottom:16 }}>Importez votre cours (texte, image ou PDF) — l'IA génère une fiche colorée et structurée.</p>
 
@@ -1082,7 +1082,7 @@ function FichesPersoTab({ isPro }) {
               </div>
               <div style={{ height:6, background:C.bg, borderRadius:6, overflow:'hidden' }}>
                 <div style={{ height:6, borderRadius:6, transition:'width 0.3s', width:`${Math.min((status.used/status.limit)*100,100)}%`,
-                  background: status.remaining===0 ? '#f87171' : `linear-gradient(90deg,${C.indigo},${C.violet})` }}/>
+                  background: status.remaining===0 ? '#f87171' : 'linear-gradient(90deg,var(--theme-primary),var(--theme-secondary))' }}/>
               </div>
             </div>
             <p style={{ fontSize:12, color:C.sub, flexShrink:0 }}>{status.remaining} restante{status.remaining!==1?'s':''}</p>
@@ -1107,9 +1107,9 @@ function FichesPersoTab({ isPro }) {
               {SOURCE_MODES.map(m => (
                 <button key={m.id} type="button" onClick={() => { setSourceMode(m.id); setAiFile(null); }}
                   style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', borderRadius:12, fontSize:12, fontWeight:700, cursor:'pointer', border:`1.5px solid ${sourceMode===m.id ? 'transparent' : C.border}`, transition:'all 0.18s',
-                    background: sourceMode===m.id ? `linear-gradient(135deg,${C.indigo},${C.violet})` : C.card,
+                    background: sourceMode===m.id ? 'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))' : C.card,
                     color: sourceMode===m.id ? '#fff' : C.sub,
-                    boxShadow: sourceMode===m.id ? clay.btn(C.indigo,'#3730a3') : clay.sm }}>
+                    boxShadow: sourceMode===m.id ? clay.btn() : clay.sm }}>
                   {m.icon(sourceMode===m.id ? '#fff' : C.sub)} {m.label}
                 </button>
               ))}
@@ -1131,7 +1131,7 @@ function FichesPersoTab({ isPro }) {
               <div>
                 <input ref={aiFileRef} type="file" accept={sourceMode==='pdf'?'.pdf':'.jpg,.jpeg,.png,.webp'} style={{ display:'none' }} onChange={e => { if(e.target.files[0]) setAiFile(e.target.files[0]); e.target.value=''; }}/>
                 {aiFile ? (
-                  <div style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:`${C.indigo}08`, borderRadius:12, border:`1.5px solid ${C.border}` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:'rgba(var(--theme-primary-rgb),0.03)', borderRadius:12, border:`1.5px solid ${C.border}` }}>
                     <div style={{ width:34, height:34, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, background:sourceMode==='pdf'?'#fee2e2':'#dcfce7' }}>
                       {sourceMode==='pdf' ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                         : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1167,7 +1167,7 @@ function FichesPersoTab({ isPro }) {
           <motion.button type="submit" disabled={!canGenerate() || generating || status?.remaining===0}
             whileHover={{ opacity:0.92 }} whileTap={{ scale:0.98 }}
             style={{ width:'100%', padding:'13px', border:'none', borderRadius:14, cursor:'pointer', fontSize:13, fontWeight:800, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-              background:`linear-gradient(135deg,${C.indigo},${C.violet})`, boxShadow:clay.btn(C.indigo,'#3730a3'), opacity:(!canGenerate()||generating||status?.remaining===0)?0.5:1 }}>
+              background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn(), opacity:(!canGenerate()||generating||status?.remaining===0)?0.5:1 }}>
             {generating ? <><div style={{ width:16, height:16, border:'2px solid white', borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.7s linear infinite' }}/>Génération en cours...</> : 'Générer la fiche'}
           </motion.button>
         </form>

@@ -120,7 +120,7 @@ function FlashCard({ card, palette, flipped, onFlip }) {
         <div style={{
           position:'absolute', inset:0, borderRadius:28,
           background:C.card, border:`1px solid ${C.border}`,
-          boxShadow:`inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 0 #d4d8f0, 0 14px 36px rgba(79,70,229,0.12)`,
+          boxShadow:`inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 0 var(--theme-shadow), 0 14px 36px rgba(var(--theme-primary-rgb),0.12)`,
           backfaceVisibility:'hidden',
           display:'flex', flexDirection:'column', padding:'24px 24px',
         }}>
@@ -215,7 +215,7 @@ function OverviewGrid({ cards, currentIndex, unknownCards, onJumpTo, onClose }) 
                     <span style={{ fontSize:11, fontWeight:700, color:C.muted }}>#{i+1}</span>
                     {isDone && !isWrong && <span style={{ fontSize:11, color:C.green, fontWeight:700 }}>✓</span>}
                     {isDone &&  isWrong && <span style={{ fontSize:11, color:C.red, fontWeight:700 }}>✗</span>}
-                    {isCurrent && <span style={{ fontSize:10, fontWeight:700, color:C.indigo, background:'#e0e7ff', padding:'2px 7px', borderRadius:99 }}>En cours</span>}
+                    {isCurrent && <span style={{ fontSize:10, fontWeight:700, color:C.indigo, background:'var(--theme-border)', padding:'2px 7px', borderRadius:99 }}>En cours</span>}
                   </div>
                   <p style={{ fontSize:11, fontWeight:600, color:C.text, lineHeight:1.4,
                     display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{card.front}</p>
@@ -441,7 +441,7 @@ function SwipeGame({ cards, onExit, semester, ue, chapter, prevAttempt }) {
           </div>
           {/* Progress bar */}
           <div style={{ height:6, borderRadius:99, background:C.border, overflow:'hidden' }}>
-            <motion.div style={{ height:'100%', borderRadius:99, background:`linear-gradient(90deg,${C.indigo},${C.violet})` }}
+            <motion.div style={{ height:'100%', borderRadius:99, background:'linear-gradient(90deg,var(--theme-primary),var(--theme-secondary))' }}
               animate={{ width:`${progress}%` }} transition={{ duration:0.4 }}/>
           </div>
         </div>
@@ -748,7 +748,7 @@ export default function Flashcards() {
                 <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
                   <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
                     onClick={() => navigate('/dashboard/subscription')}
-                    style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,${C.indigo},${C.violet})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                    style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', boxShadow:clay.btn() }}>
                     Voir les abonnements
                   </motion.button>
                   <button onClick={() => setQuotaModal(false)}
@@ -762,7 +762,7 @@ export default function Flashcards() {
         </AnimatePresence>
 
         {/* Hero */}
-        <div style={{ background:'linear-gradient(135deg,#4338ca,#7C3AED,#EC4899)', padding:'32px 24px 28px', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', padding:'32px 24px 28px', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)', backgroundSize:'20px 20px', pointerEvents:'none' }}/>
           <div style={{ position:'absolute', top:-40, right:-40, width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,0.06)', pointerEvents:'none' }}/>
           <div style={{ position:'relative' }}>
@@ -895,7 +895,7 @@ export default function Flashcards() {
                         initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
                         transition={{ duration:0.3, ease:[0.16,1,0.3,1], delay: idx*0.05 }}>
                         <motion.button onClick={() => handleChapterClick(chap)}
-                          whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(79,70,229,0.14)` }}
+                          whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(var(--theme-primary-rgb),0.14)` }}
                           whileTap={{ scale:0.98 }}
                           style={{ flex:1, width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s' }}>
                           <div style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px' }}>
@@ -925,12 +925,12 @@ export default function Flashcards() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.muted} strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
                           </div>
                           {isDone && pct != null && (
-                            <div style={{ height:4, background:'#e0e7ff' }}>
+                            <div style={{ height:4, background:'var(--theme-border)' }}>
                               <div style={{ height:'100%', width:`${pct}%`, background: pct >= 60 ? `linear-gradient(90deg,${C.green},#34d399)` : `linear-gradient(90deg,${C.amber},#f97316)`, transition:'width 0.8s ease' }}/>
                             </div>
                           )}
                           {isProgress && progressPct != null && (
-                            <div style={{ height:4, background:'#e0e7ff' }}>
+                            <div style={{ height:4, background:'var(--theme-border)' }}>
                               <div style={{ height:'100%', width:`${progressPct}%`, background:`linear-gradient(90deg,${C.amber},#f97316)`, transition:'width 0.8s ease' }}/>
                             </div>
                           )}

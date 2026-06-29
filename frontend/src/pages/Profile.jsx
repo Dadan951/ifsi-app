@@ -348,9 +348,9 @@ export default function Profile() {
 
   const sub   = subConfig[user?.subscription] || subConfig.free;
   const stats = [
-    { label:'Quiz',       value:user?.progress?.quizCompleted      || 0, color:'#4F46E5', icon:'🧠' },
-    { label:'Flashcards', value:user?.progress?.flashcardsReviewed || 0, color:'#0891b2', icon:'🃏' },
-    { label:'Exercices',  value:user?.progress?.exercisesCompleted || 0, color:'#7C3AED', icon:'📋' },
+    { label:'Quiz',       value:user?.progress?.quizCompleted      || 0, color:'var(--theme-primary)',   icon:'🧠' },
+    { label:'Flashcards', value:user?.progress?.flashcardsReviewed || 0, color:'#0891b2',                icon:'🃏' },
+    { label:'Exercices',  value:user?.progress?.exercisesCompleted || 0, color:'var(--theme-secondary)', icon:'📋' },
     { label:'Score',      value:user?.progress?.totalScore         || 0, color:'#ea580c', icon:'⭐' },
   ];
   const maxStat = Math.max(...stats.map(s => s.value), 1);
@@ -527,7 +527,7 @@ export default function Profile() {
                 <SCard>
                   <SCardHeader
                     icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
-                    title="Activité" sub="Progression détaillée" gradFrom="#0891b2" gradTo="#4F46E5"/>
+                    title="Activité" sub="Progression détaillée" gradFrom="#0891b2" gradTo="var(--theme-primary)"/>
                   <div style={{ padding:'16px 20px', display:'flex', flexDirection:'column', gap:14 }}>
                     {stats.map(s => (
                       <div key={s.label}>
@@ -707,11 +707,11 @@ export default function Profile() {
                           preview:(
                             <div style={{ width:'100%', height:64, borderRadius:12, background:'#fff', border:'1px solid #e2e8f0', marginBottom:12, overflow:'hidden', display:'flex', flexDirection:'column', padding:8, gap:6 }}>
                               <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                                <div style={{ width:12, height:12, borderRadius:4, background:'#4F46E5', flexShrink:0 }}/>
-                                <div style={{ width:48, height:6, borderRadius:4, background:'#e0e7ff' }}/>
+                                <div style={{ width:12, height:12, borderRadius:4, background:'var(--theme-primary)', flexShrink:0 }}/>
+                                <div style={{ width:48, height:6, borderRadius:4, background:'var(--theme-border)' }}/>
                               </div>
                               <div style={{ display:'flex', gap:6 }}>
-                                <div style={{ width:24, height:24, borderRadius:8, background:'#EEF2FF', border:'1px solid #e0e7ff', flexShrink:0 }}/>
+                                <div style={{ width:24, height:24, borderRadius:8, background:'var(--theme-bg)', border:'1px solid var(--theme-border)', flexShrink:0 }}/>
                                 <div style={{ flex:1, display:'flex', flexDirection:'column', gap:4, justifyContent:'center' }}>
                                   <div style={{ height:5, borderRadius:4, background:'#e2e8f0', width:'75%' }}/>
                                   <div style={{ height:5, borderRadius:4, background:'#f1f5f9', width:'50%' }}/>
@@ -726,7 +726,7 @@ export default function Profile() {
                           preview:(
                             <div style={{ width:'100%', height:64, borderRadius:12, background:'#0f172a', border:'1px solid #1e293b', marginBottom:12, overflow:'hidden', display:'flex', flexDirection:'column', padding:8, gap:6 }}>
                               <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                                <div style={{ width:12, height:12, borderRadius:4, background:'#4F46E5', flexShrink:0 }}/>
+                                <div style={{ width:12, height:12, borderRadius:4, background:'var(--theme-primary)', flexShrink:0 }}/>
                                 <div style={{ width:48, height:6, borderRadius:4, background:'#1e293b' }}/>
                               </div>
                               <div style={{ display:'flex', gap:6 }}>

@@ -7,28 +7,30 @@ import { API_URL, useAuth } from '../context/AuthContext';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const C = {
-  bg:     '#EEF2FF',
+  bg:     'var(--theme-bg)',
   card:   '#FFFFFF',
-  text:   '#1e1b4b',
-  muted:  '#6366f1',
-  border: '#e0e7ff',
-  indigo: '#4F46E5',
-  violet: '#7C3AED',
+  text:   'var(--theme-text)',
+  muted:  'var(--theme-primary)',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
   pink:   '#EC4899',
   sub:    '#64748b',
 };
 
 const clay = {
-  card: '0 2px 0 #c7d2fe, 0 4px 24px rgba(99,102,241,0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
-  sm:   '0 2px 0 #c7d2fe, 0 2px 8px rgba(99,102,241,0.10)',
-  btn:  (hex, dark) => `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`,
-  open: '0 2px 0 #818cf8, 0 8px 32px rgba(79,70,229,0.15), 0 1px 0 rgba(255,255,255,0.9) inset',
+  card: '0 2px 0 var(--theme-shadow), 0 4px 24px rgba(var(--theme-primary-rgb),0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
+  sm:   '0 2px 0 var(--theme-shadow), 0 2px 8px rgba(var(--theme-primary-rgb),0.10)',
+  btn:  (hex, dark) => hex
+    ? `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`
+    : `0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.25), 0 1px 0 rgba(255,255,255,0.4) inset`,
+  open: '0 2px 0 var(--theme-shadow), 0 8px 32px rgba(var(--theme-primary-rgb),0.15), 0 1px 0 rgba(255,255,255,0.9) inset',
 };
 
 /* ─── Type config ────────────────────────────────────────────────────────────── */
 const TYPE_CFG = {
-  quiz:      { label:'Quiz',       color: C.indigo,  dot:'#4F46E5', icon:'🎯' },
-  flashcard: { label:'Flashcards', color: C.violet,  dot:'#7C3AED', icon:'🃏' },
+  quiz:      { label:'Quiz',       color: C.indigo,  dot:'var(--theme-primary)',   icon:'🎯' },
+  flashcard: { label:'Flashcards', color: C.violet,  dot:'var(--theme-secondary)', icon:'🃏' },
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -156,7 +158,7 @@ function ProgressChart({ data, chartTypes, setChartTypes }) {
                       {isHov && (
                         <motion.div initial={{ opacity:0, y:4, scale:0.9 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, scale:0.9 }}
                           style={{ position:'absolute', bottom:'100%', marginBottom:8, left:'50%', transform:'translateX(-50%)',
-                            background:'#1e1b4b', color:'#fff', borderRadius:12, padding:'6px 10px', textAlign:'center',
+                            background:'var(--theme-text)', color:'#fff', borderRadius:12, padding:'6px 10px', textAlign:'center',
                             boxShadow:'0 4px 16px rgba(30,27,75,0.3)', pointerEvents:'none', whiteSpace:'nowrap', zIndex:20 }}>
                           <p style={{ fontSize:15, fontWeight:900, color:cfg.from, lineHeight:1 }}>{d.pct}%</p>
                           <p style={{ fontSize:9, color:'rgba(255,255,255,0.45)', marginTop:2 }}>{fmtDateShort(d.completedAt)}</p>
@@ -164,7 +166,7 @@ function ProgressChart({ data, chartTypes, setChartTypes }) {
                             <p style={{ fontSize:9, color:typeCfg.dot, marginTop:2, fontWeight:700 }}>{typeCfg.icon} {typeCfg.label}</p>
                           )}
                           <div style={{ position:'absolute', left:'50%', bottom:-5, transform:'translateX(-50%)', width:10, height:5, overflow:'hidden' }}>
-                            <div style={{ width:8, height:8, background:'#1e1b4b', transform:'rotate(45deg)', margin:'0 auto', marginTop:-4 }}/>
+                            <div style={{ width:8, height:8, background:'var(--theme-text)', transform:'rotate(45deg)', margin:'0 auto', marginTop:-4 }}/>
                           </div>
                         </motion.div>
                       )}
@@ -220,7 +222,7 @@ function ScoreRing({ pct, size = 52 }) {
   return (
     <div style={{ position:'relative', flexShrink:0, width:size, height:size }}>
       <svg width={size} height={size} style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e0e7ff" strokeWidth="4"/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--theme-border)" strokeWidth="4"/>
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={sc.ring} strokeWidth="4"
           strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"/>
       </svg>
@@ -340,7 +342,7 @@ function QuizAccordion({ item, token, navigate }) {
             style={{ marginTop:16, width:'100%', padding:'12px 0', borderRadius:14, border:'none', cursor:'pointer',
               background:`linear-gradient(135deg,${C.indigo},${C.violet})`,
               color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-              boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+              boxShadow:clay.btn() }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
               <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
             </svg>
@@ -500,7 +502,7 @@ export default function History() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
-        <div style={{ background:'linear-gradient(135deg,#4338ca 0%,#7C3AED 55%,#EC4899 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 20% 20%,rgba(255,255,255,0.18),transparent 60%)', pointerEvents:'none' }} aria-hidden/>
 
@@ -561,7 +563,7 @@ export default function History() {
                       borderRadius:12, padding:'1px 7px', fontSize:11, fontWeight:700, minWidth:18, textAlign:'center' }}>{t.count}</span>
                   )}
                   {t.disabled && (
-                    <span style={{ fontSize:9, background:'#e0e7ff', color:'#94a3b8', borderRadius:8, padding:'1px 7px', fontWeight:700 }}>bientôt</span>
+                    <span style={{ fontSize:9, background:'var(--theme-border)', color:'#94a3b8', borderRadius:8, padding:'1px 7px', fontWeight:700 }}>bientôt</span>
                   )}
                 </motion.button>
               );
@@ -630,7 +632,7 @@ export default function History() {
                   onClick={() => navigate('/dashboard/quiz')}
                   style={{ marginTop:16, padding:'12px 24px', borderRadius:14, border:'none', cursor:'pointer',
                     background:`linear-gradient(135deg,${C.indigo},${C.violet})`,
-                    color:'#fff', fontSize:13, fontWeight:700, boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+                    color:'#fff', fontSize:13, fontWeight:700, boxShadow:clay.btn() }}>
                   Faire mon premier quiz
                 </motion.button>
               )}

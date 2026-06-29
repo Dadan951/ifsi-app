@@ -446,7 +446,7 @@ export default function Exercises() {
         <div style={{ padding:'24px 16px' }}>
           {loading ? (
             <div style={{ display:'flex', justifyContent:'center', alignItems:'center', padding:'80px 0' }}>
-              <div style={{ width:36, height:36, border:'4px solid #c7d2fe', borderTopColor:C.indigo, borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>
+              <div style={{ width:36, height:36, border:'4px solid var(--theme-shadow)', borderTopColor:'var(--theme-primary)', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>
             </div>
           ) : (
             <AnimatePresence mode="wait">

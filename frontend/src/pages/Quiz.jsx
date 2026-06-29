@@ -14,13 +14,13 @@ import { getCache, setCache } from '../utils/cache';
 
 /* ─── Design tokens (identiques au Dashboard) ────────────────────────────── */
 const C = {
-  bg:     '#EEF2FF',
+  bg:     'var(--theme-bg)',
   card:   '#FFFFFF',
-  text:   '#1e1b4b',
+  text:   'var(--theme-text)',
   muted:  '#6b7280',
-  border: '#e0e7ff',
-  indigo: '#4F46E5',
-  violet: '#7C3AED',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
   teal:   '#0891b2',
   pink:   '#EC4899',
   amber:  '#F59E0B',
@@ -29,9 +29,11 @@ const C = {
 };
 
 const clay = {
-  card: `inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.03), 0 4px 0 rgba(0,0,0,0.06), 0 12px 28px rgba(79,70,229,0.08), 0 24px 48px rgba(0,0,0,0.04)`,
+  card: `inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.03), 0 4px 0 rgba(0,0,0,0.06), 0 12px 28px rgba(var(--theme-primary-rgb),0.08), 0 24px 48px rgba(0,0,0,0.04)`,
   sm:   `inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 0 rgba(0,0,0,0.07), 0 8px 16px rgba(0,0,0,0.07)`,
-  btn:  (hex, dark) => `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${dark}, 0 14px 28px ${hex}55`,
+  btn:  (hex, dark) => hex
+    ? `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${dark}, 0 14px 28px ${hex}55`
+    : `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 var(--theme-dark), 0 14px 28px rgba(var(--theme-primary-rgb),0.33)`,
 };
 
 const PALETTE = [
@@ -242,7 +244,7 @@ function QuizGenerator({ onGenerated }) {
 
         <motion.button type="submit" disabled={!isReady || generating}
           whileHover={{ scale: isReady ? 1.01 : 1 }} whileTap={{ scale: isReady ? 0.97 : 1 }}
-          style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:isReady ? `linear-gradient(135deg,#4338ca,${C.indigo})` : '#e0e7ff', color:isReady?'#fff':C.muted, fontSize:14, fontWeight:800, cursor:isReady?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:'Nunito,sans-serif', boxShadow:isReady?clay.btn(C.indigo,'#312e81'):'none', transition:'all 0.2s' }}>
+          style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:isReady ? 'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))' : 'var(--theme-border)', color:isReady?'#fff':C.muted, fontSize:14, fontWeight:800, cursor:isReady?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:'Nunito,sans-serif', boxShadow:isReady?clay.btn():'none', transition:'all 0.2s' }}>
           {generating
             ? <><div style={{ width:16, height:16, border:'2px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.7s linear infinite' }}/> Génération en cours...</>
             : 'Générer le quiz ✦'
@@ -280,7 +282,7 @@ function PersonalQuizList({ quizzes, onDelete, onPlay }) {
             transition={{ delay: i*0.05 }}
             style={{ background:C.card, borderRadius:20, boxShadow:clay.card, border:`1px solid ${C.border}`, overflow:'hidden' }}
           >
-            <div style={{ height:4, background:`linear-gradient(90deg,${C.indigo},${C.violet})` }}/>
+            <div style={{ height:4, background:'linear-gradient(90deg,var(--theme-primary),var(--theme-secondary))' }}/>
             <div style={{ padding:'18px 20px' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:8, marginBottom:10 }}>
                 <div style={{ minWidth:0 }}>
@@ -297,7 +299,7 @@ function PersonalQuizList({ quizzes, onDelete, onPlay }) {
                 {new Date(quiz.createdAt).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' })}
               </p>
               <motion.button onClick={() => onPlay(quiz._id)} whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                style={{ width:'100%', padding:'13px 0', borderRadius:16, border:'none', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn() }}>
                 Commencer →
               </motion.button>
             </div>
@@ -314,7 +316,7 @@ function ProFeaturePrompt() {
   return (
     <div style={{ maxWidth:420, margin:'0 auto', textAlign:'center', padding:'48px 24px' }}>
       <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} transition={sp}
-        style={{ width:72, height:72, borderRadius:24, margin:'0 auto 20px', display:'flex', alignItems:'center', justifyContent:'center', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, boxShadow:clay.btn(C.indigo,'#312e81') }}>
+        style={{ width:72, height:72, borderRadius:24, margin:'0 auto 20px', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', boxShadow:clay.btn() }}>
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
           <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
         </svg>
@@ -324,7 +326,7 @@ function ProFeaturePrompt() {
         La génération de quiz depuis vos cours est réservée aux abonnements <strong style={{ color:C.indigo }}>Pro</strong> et <strong style={{ color:C.indigo }}>Premium</strong>. Créez jusqu'à 10 quiz personnalisés par jour.
       </p>
       <motion.button onClick={() => navigate('/dashboard/subscription')} whileHover={{ scale:1.03 }} whileTap={{ scale:0.96 }}
-        style={{ padding:'12px 32px', borderRadius:16, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+        style={{ padding:'12px 32px', borderRadius:16, border:'none', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn() }}>
         Voir les offres →
       </motion.button>
     </div>
@@ -336,7 +338,7 @@ function Skeleton() {
   return (
     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:14 }}>
       {[...Array(6)].map((_,i) => (
-        <div key={i} style={{ height:140, borderRadius:24, background:'linear-gradient(135deg,#e0e7ff,#c7d2fe)', opacity:0.6+(i*0.06), animation:'pulse 1.5s ease-in-out infinite' }}/>
+        <div key={i} style={{ height:140, borderRadius:24, background:'linear-gradient(135deg,var(--theme-border),var(--theme-shadow))', opacity:0.6+(i*0.06), animation:'pulse 1.5s ease-in-out infinite' }}/>
       ))}
     </div>
   );
@@ -420,7 +422,7 @@ export default function Quiz() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
-        <div style={{ background:'linear-gradient(135deg, #4338ca 0%, #7C3AED 55%, #EC4899 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           {/* Grid texture */}
           <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
           {/* Shine */}
@@ -551,7 +553,7 @@ export default function Quiz() {
                           transition={{ duration:0.3, ease:[0.16,1,0.3,1], delay: idx*0.05 }}>
                           <motion.button
                             onClick={() => { setSelectedChapter(chap); setView('quizzes'); }}
-                            whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(79,70,229,0.14)` }}
+                            whileHover={{ y:-3, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 20px 40px rgba(var(--theme-primary-rgb),0.14)` }}
                             whileTap={{ scale:0.98 }}
                             style={{ flex:1, width:'100%', textAlign:'left', border:`1px solid ${C.border}`, cursor:'pointer', borderRadius:18, overflow:'hidden', background:C.card, boxShadow:clay.card, padding:0, transition:'box-shadow 0.2s' }}
                           >
@@ -563,7 +565,7 @@ export default function Quiz() {
                                 <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:2 }}>
                                   <span style={{ fontSize:13, fontWeight:800, color:C.text, fontFamily:'Nunito,sans-serif' }}>{chap}</span>
                                   {doneCount > 0 && (
-                                    <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99, background:allDone?'#dcfce7':'#e0e7ff', color:allDone?'#15803d':C.indigo }}>
+                                    <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99, background:allDone?'#dcfce7':'var(--theme-border)', color:allDone?'#15803d':C.indigo }}>
                                       ✓ {doneCount}/{count}
                                     </span>
                                   )}
@@ -573,7 +575,7 @@ export default function Quiz() {
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.muted} strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </div>
                             {doneCount > 0 && (
-                              <div style={{ height:4, background:'#e0e7ff' }}>
+                              <div style={{ height:4, background:'var(--theme-border)' }}>
                                 <div style={{ height:'100%', width:`${pct}%`, background:allDone?`linear-gradient(90deg,${C.green},#34d399)`:`linear-gradient(90deg,${C.indigo},${C.violet})`, transition:'width 0.8s ease' }}/>
                               </div>
                             )}
@@ -609,7 +611,7 @@ export default function Quiz() {
                           transition={{ delay: i<6 ? i*0.05:0, duration:0.3, ease:[0.16,1,0.3,1] }}>
                           <motion.div
                             onClick={() => handlePlay(quiz._id)}
-                            whileHover={{ y:-5, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 24px 48px rgba(79,70,229,0.16)` }}
+                            whileHover={{ y:-5, boxShadow:`inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 0 rgba(0,0,0,0.06), 0 24px 48px rgba(var(--theme-primary-rgb),0.16)` }}
                             whileTap={{ scale:0.98 }}
                             style={{ background:C.card, borderRadius:20, boxShadow:clay.card, border:`1px solid ${C.border}`, overflow:'hidden', cursor:'pointer', transition:'box-shadow 0.2s' }}
                           >
@@ -618,7 +620,7 @@ export default function Quiz() {
                             <div style={{ padding:'18px 20px' }}>
                               {/* Top row chips */}
                               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:6, marginBottom:12 }}>
-                                <span style={{ fontSize:11, fontWeight:700, background:'#e0e7ff', color:C.indigo, borderRadius:99, padding:'4px 10px' }}>{quiz.category}</span>
+                                <span style={{ fontSize:11, fontWeight:700, background:'var(--theme-border)', color:C.indigo, borderRadius:99, padding:'4px 10px' }}>{quiz.category}</span>
                                 <div style={{ display:'flex', gap:6, alignItems:'center' }}>
                                   {isDone && <Chip label={`${pct>=60?'✓':'✗'} ${a.score}/${a.totalQuestions}`} bg={pct>=60?'#dcfce7':'#fee2e2'} color={pct>=60?'#15803d':'#991b1b'}/>}
                                   {isResume && <Chip label={`● Q${a.currentQuestion+1}/${a.totalQuestions}`} bg='#fef9c3' color='#854d0e'/>}
@@ -707,7 +709,7 @@ export default function Quiz() {
             <motion.div key="modal" initial={{ opacity:0, scale:0.9, y:20 }} animate={{ opacity:1, scale:1, y:0 }} exit={{ opacity:0, scale:0.9 }}
               onClick={e => e.stopPropagation()}
               style={{ background:C.card, borderRadius:28, padding:'28px 24px', width:'100%', maxWidth:380, boxShadow:clay.card, textAlign:'center' }}>
-              <div style={{ width:56, height:56, borderRadius:18, margin:'0 auto 16px', display:'flex', alignItems:'center', justifyContent:'center', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, boxShadow:clay.btn(C.indigo,'#312e81') }}>
+              <div style={{ width:56, height:56, borderRadius:18, margin:'0 auto 16px', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', boxShadow:clay.btn() }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
               <h3 className="nunito" style={{ fontSize:17, fontWeight:900, color:C.text, marginBottom:8 }}>Quota mensuel atteint</h3>
@@ -719,7 +721,7 @@ export default function Quiz() {
                   Plus tard
                 </motion.button>
                 <motion.button onClick={() => navigate('/dashboard/subscription')} whileTap={{ scale:0.96 }} whileHover={{ scale:1.02 }}
-                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, fontSize:13, fontWeight:800, color:'#fff', cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                  style={{ width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', fontSize:13, fontWeight:800, color:'#fff', cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn() }}>
                   Voir les offres
                 </motion.button>
               </div>

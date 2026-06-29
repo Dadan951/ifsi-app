@@ -213,7 +213,7 @@ function ProgressBar({ value, max, color, label, sublabel }) {
           {done ? '✓' : `${value}/${max}`}
         </span>
       </div>
-      <div style={{ height: 10, borderRadius: 99, background: '#e0e7ff', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+      <div style={{ height: 10, borderRadius: 99, background: 'var(--theme-border)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -327,7 +327,7 @@ export default function Dashboard() {
   ];
 
   const ACTIONS = [
-    { to: '/dashboard/quiz',         label: 'Quiz',        desc: 'QCM & questions',       icon: Icon.quiz,   grad: `135deg, #4338ca, ${C.indigo}`, color: C.indigo,  darkColor: '#312e81' },
+    { to: '/dashboard/quiz',         label: 'Quiz',        desc: 'QCM & questions',       icon: Icon.quiz,   grad: `135deg, var(--theme-dark), var(--theme-primary)`, color: C.indigo,  darkColor: 'var(--theme-dark)' },
     { to: '/dashboard/flashcards',   label: 'Flashcards',  desc: 'Mémorisation rapide',   icon: Icon.flash,  grad: `135deg, #6d28d9, ${C.violet}`, color: C.violet,  darkColor: '#4c1d95' },
     { to: '/dashboard/exercises',    label: 'Exercices',   desc: 'Cas cliniques',         icon: Icon.exo,    grad: `135deg, #0e7490, ${C.teal}`,   color: C.teal,    darkColor: '#164e63' },
     { to: '/dashboard/cours',        label: 'Cours',       desc: 'Leçons & fiches',       icon: Icon.book,   grad: `135deg, #15803d, #10b981`,     color: '#10b981', darkColor: '#064e3b' },
@@ -361,7 +361,7 @@ export default function Dashboard() {
 
         {/* ── Ambient blobs (desktop only — blur retiré pour perf mobile) ──── */}
         <div className="blob" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }} aria-hidden>
-          <div style={{ position:'absolute', width:700, height:700, top:-200, right:-150, borderRadius:'50%', background:'radial-gradient(circle,rgba(79,70,229,0.09) 0%,transparent 65%)', animation:'floatA 20s ease-in-out infinite', willChange:'transform' }}/>
+          <div style={{ position:'absolute', width:700, height:700, top:-200, right:-150, borderRadius:'50%', background:'radial-gradient(circle,rgba(var(--theme-primary-rgb),0.09) 0%,transparent 65%)', animation:'floatA 20s ease-in-out infinite', willChange:'transform' }}/>
           <div style={{ position:'absolute', width:500, height:500, bottom:0, left:-100, borderRadius:'50%', background:'radial-gradient(circle,rgba(236,72,153,0.07) 0%,transparent 65%)', animation:'floatB 24s ease-in-out infinite', willChange:'transform' }}/>
           <div style={{ position:'absolute', width:400, height:400, top:'40%', left:'35%', borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.05) 0%,transparent 65%)', animation:'floatC 28s ease-in-out infinite', willChange:'transform' }}/>
         </div>
@@ -599,7 +599,7 @@ export default function Dashboard() {
                       key={i}
                       initial={{ scaleY:0 }} animate={{ scaleY:1 }}
                       transition={{ delay:0.55 + i*0.06, ...spring }}
-                      style={{ flex:1, height:6, borderRadius:99, transformOrigin:'bottom', background:i < streak ? `linear-gradient(135deg,${C.orange},${C.amber})` : '#e0e7ff', boxShadow:i < streak ? `0 2px 6px rgba(234,88,12,0.4)` : 'none' }}
+                      style={{ flex:1, height:6, borderRadius:99, transformOrigin:'bottom', background:i < streak ? `linear-gradient(135deg,${C.orange},${C.amber})` : 'var(--theme-border)', boxShadow:i < streak ? `0 2px 6px rgba(234,88,12,0.4)` : 'none' }}
                     />
                   ))}
                 </div>
@@ -630,7 +630,7 @@ export default function Dashboard() {
                 <div style={{ display:'flex', gap:5, marginTop:14 }}>
                   {TIPS.map((_, i) => (
                     <button key={i} onClick={() => setTipIdx(i)} aria-label={`Conseil ${i+1}`}
-                      style={{ height:4, borderRadius:99, border:'none', cursor:'pointer', transition:'all 0.2s', background:i===tipIdx?C.amber:'#e0e7ff', width:i===tipIdx?20:6, boxShadow:i===tipIdx?`0 2px 6px ${C.amber}66`:'none' }}
+                      style={{ height:4, borderRadius:99, border:'none', cursor:'pointer', transition:'all 0.2s', background:i===tipIdx?C.amber:'var(--theme-border)', width:i===tipIdx?20:6, boxShadow:i===tipIdx?`0 2px 6px ${C.amber}66`:'none' }}
                     />
                   ))}
                 </div>
@@ -640,7 +640,7 @@ export default function Dashboard() {
               {/* Upgrade card — free only */}
               {user?.subscription === 'free' && (
                 <ScrollReveal delay={0.20} x={24} y={0}>
-                  <Card style={{ padding:'24px', background:`linear-gradient(135deg,#4338ca,${C.indigo})`, border:'none', boxShadow:clay.btn(C.indigo), position:'relative', overflow:'hidden' }}>
+                  <Card style={{ padding:'24px', background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', border:'none', boxShadow:clay.btn(), position:'relative', overflow:'hidden' }}>
                     <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.15),transparent 60%)', pointerEvents:'none' }} aria-hidden/>
                     <div style={{ position:'relative' }}>
                       <div style={{ width:40, height:40, borderRadius:14, background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14, color:'#fff', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)' }}>
@@ -729,7 +729,7 @@ export default function Dashboard() {
                   Annuler
                 </motion.button>
                 <motion.button whileTap={{ scale:0.96 }} onClick={saveGoals} disabled={saving}
-                  style={{ flex:1, padding:'13px 0', borderRadius:16, background:`linear-gradient(135deg,#4338ca,${C.indigo})`, border:'none', color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', opacity:saving?0.6:1, boxShadow:clay.btn(C.indigo), fontFamily:'Nunito,sans-serif' }}>
+                  style={{ flex:1, padding:'13px 0', borderRadius:16, background:'linear-gradient(135deg,var(--theme-dark),var(--theme-primary))', border:'none', color:'#fff', fontSize:13, fontWeight:800, cursor:'pointer', opacity:saving?0.6:1, boxShadow:clay.btn(), fontFamily:'Nunito,sans-serif' }}>
                   {saving ? 'Enregistrement...' : 'Enregistrer'}
                 </motion.button>
               </div>
