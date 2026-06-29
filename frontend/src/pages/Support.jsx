@@ -5,11 +5,29 @@ import DashboardLayout from '../components/DashboardLayout';
 import { API_URL } from '../context/AuthContext';
 import { getCache, setCache } from '../utils/cache';
 
-/* ─── Config ────────────────────────────────────────────────────────────────── */
+/* ─── Design tokens ──────────────────────────────────────────────────────────── */
+const C = {
+  bg:     'var(--theme-bg)',
+  card:   '#FFFFFF',
+  text:   'var(--theme-text)',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
+  sub:    '#64748b',
+};
+const clay = {
+  card: '0 2px 0 var(--theme-shadow), 0 4px 24px rgba(var(--theme-primary-rgb),0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
+  sm:   '0 2px 0 var(--theme-shadow), 0 2px 8px rgba(var(--theme-primary-rgb),0.10)',
+  btn:  (hex, dark) => hex
+    ? `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`
+    : `0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.25), 0 1px 0 rgba(255,255,255,0.4) inset`,
+};
+
+/* ─── Config ─────────────────────────────────────────────────────────────────── */
 const STATUS_CFG = {
-  open:        { label: 'Ouvert',   color: '#10b981', bg: 'rgba(16,185,129,0.15)'  },
-  in_progress: { label: 'En cours', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)'  },
-  closed:      { label: 'Fermé',    color: '#64748b', bg: 'rgba(100,116,139,0.15)' },
+  open:        { label: 'Ouvert',   color: '#10b981', bg: 'rgba(16,185,129,0.12)'  },
+  in_progress: { label: 'En cours', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)'  },
+  closed:      { label: 'Fermé',    color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
 };
 const CAT_CFG = {
   question:   { label: 'Question',    color: '#3b82f6' },
@@ -26,13 +44,17 @@ const CAT_LABELS = {
   other:      'Autre',
 };
 
-/* ─── Mini components ────────────────────────────────────────────────────────── */
+/* ─── Badges ─────────────────────────────────────────────────────────────────── */
 function StatusBadge({ status }) {
   const c = STATUS_CFG[status] || STATUS_CFG.open;
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold flex-shrink-0"
-      style={{ background: c.bg, color: c.color }}>
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.color }}/>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '3px 10px', borderRadius: 999,
+      fontSize: 11, fontWeight: 700, flexShrink: 0,
+      background: c.bg, color: c.color,
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, flexShrink: 0 }}/>
       {c.label}
     </span>
   );
@@ -41,68 +63,105 @@ function StatusBadge({ status }) {
 function CatBadge({ cat }) {
   const c = CAT_CFG[cat] || CAT_CFG.other;
   return (
-    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold"
-      style={{ background: c.color + '22', color: c.color }}>
+    <span style={{
+      display: 'inline-flex', padding: '2px 8px', borderRadius: 6,
+      fontSize: 11, fontWeight: 700,
+      background: c.color + '22', color: c.color,
+    }}>
       {c.label}
     </span>
   );
 }
 
+/* ─── Bubble ─────────────────────────────────────────────────────────────────── */
 function Bubble({ msg }) {
   const isAdmin = msg.sender === 'admin';
+
   if (isAdmin) {
     return (
-      <div className="flex gap-3 items-start">
-        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5"
-          style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-          <svg width="12" height="12" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        <div style={{
+          width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'var(--theme-hero)', marginTop: 2,
+          boxShadow: '0 2px 8px rgba(var(--theme-primary-rgb),0.25)',
+        }}>
+          <svg width="13" height="13" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-slate-400 mb-1 font-semibold">{msg.senderName || 'Support NursesPrep'}</p>
-          <div className="inline-block max-w-[85%] bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-sm">
-            <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 11, color: C.sub, marginBottom: 4, fontWeight: 600 }}>
+            {msg.senderName || 'Support NursesPrep'}
+          </p>
+          <div style={{
+            display: 'inline-block', maxWidth: '85%',
+            background: C.card, border: `1px solid ${C.border}`,
+            borderRadius: '16px 16px 16px 4px',
+            padding: '10px 14px', boxShadow: clay.sm,
+          }}>
+            <p style={{ fontSize: 13, color: C.text, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+              {msg.content}
+            </p>
           </div>
-          <p className="text-[10px] text-slate-400 mt-1">{new Date(msg.createdAt).toLocaleString('fr-FR')}</p>
+          <p style={{ fontSize: 10, color: C.sub, marginTop: 4 }}>
+            {new Date(msg.createdAt).toLocaleString('fr-FR')}
+          </p>
         </div>
       </div>
     );
   }
+
   return (
-    <div className="flex gap-3 items-start flex-row-reverse">
-      <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5 bg-slate-100 dark:bg-slate-600">
-        <svg width="12" height="12" fill="none" stroke="#64748b" strokeWidth="2" viewBox="0 0 24 24">
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexDirection: 'row-reverse' }}>
+      <div style={{
+        width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: C.bg, border: `1px solid ${C.border}`,
+        boxShadow: clay.sm, marginTop: 2,
+      }}>
+        <svg width="13" height="13" fill="none" stroke={C.sub} strokeWidth="2" viewBox="0 0 24 24">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
         </svg>
       </div>
-      <div className="flex-1 min-w-0 flex flex-col items-end">
-        <p className="text-[11px] text-slate-400 mb-1 font-semibold">{msg.senderName || 'Vous'}</p>
-        <div className="inline-block max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 shadow-sm"
-          style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-          <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <p style={{ fontSize: 11, color: C.sub, marginBottom: 4, fontWeight: 600 }}>
+          {msg.senderName || 'Vous'}
+        </p>
+        <div style={{
+          display: 'inline-block', maxWidth: '85%',
+          background: 'var(--theme-primary)',
+          borderRadius: '16px 16px 4px 16px',
+          padding: '10px 14px',
+          boxShadow: clay.btn(),
+        }}>
+          <p style={{ fontSize: 13, color: '#fff', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+            {msg.content}
+          </p>
         </div>
-        <p className="text-[10px] text-slate-400 mt-1">{new Date(msg.createdAt).toLocaleString('fr-FR')}</p>
+        <p style={{ fontSize: 10, color: C.sub, marginTop: 4 }}>
+          {new Date(msg.createdAt).toLocaleString('fr-FR')}
+        </p>
       </div>
     </div>
   );
 }
 
-/* ─── Main page ──────────────────────────────────────────────────────────────── */
+/* ─── Main ───────────────────────────────────────────────────────────────────── */
 export default function Support() {
-  const headers  = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+  const headers   = { Authorization: `Bearer ${localStorage.getItem('token')}` };
   const bottomRef = useRef(null);
 
-  const [view,     setView]     = useState('list');
-  const [tickets,  setTickets]  = useState([]);
-  const [ticket,   setTicket]   = useState(null);
-  const [loading,  setLoading]  = useState(true);
-  const [showModal,setShowModal]= useState(false);
-  const [form,     setForm]     = useState({ subject: '', category: 'question', message: '' });
-  const [submitting,setSubmitting] = useState(false);
-  const [formErr,  setFormErr]  = useState('');
-  const [replyText,setReplyText]= useState('');
-  const [replying, setReplying] = useState(false);
+  const [view,       setView]       = useState('list');
+  const [tickets,    setTickets]    = useState([]);
+  const [ticket,     setTicket]     = useState(null);
+  const [loading,    setLoading]    = useState(true);
+  const [showModal,  setShowModal]  = useState(false);
+  const [form,       setForm]       = useState({ subject: '', category: 'question', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [formErr,    setFormErr]    = useState('');
+  const [replyText,  setReplyText]  = useState('');
+  const [replying,   setReplying]   = useState(false);
 
   /* ── Data ── */
   const loadTickets = async () => {
@@ -152,56 +211,82 @@ export default function Support() {
   };
 
   /* ── Stats ── */
-  const openCount  = tickets.filter(t => t.status === 'open').length;
-  const ipCount    = tickets.filter(t => t.status === 'in_progress').length;
-  const closedCount= tickets.filter(t => t.status === 'closed').length;
-  const unread     = tickets.filter(t => t.isReadByUser === false).length;
+  const openCount   = tickets.filter(t => t.status === 'open').length;
+  const ipCount     = tickets.filter(t => t.status === 'in_progress').length;
+  const closedCount = tickets.filter(t => t.status === 'closed').length;
+  const unread      = tickets.filter(t => t.isReadByUser === false).length;
 
-  /* ════════════════════════════════════════════════════════════════════ */
+  /* ════════════════════════════════════════════════════════════════════════════ */
   return (
     <DashboardLayout>
-      <main className="flex-1 overflow-auto bg-slate-50/60 dark:bg-slate-950">
+      <main style={{ flex: 1, overflowY: 'auto', background: C.bg }}>
 
-        {/* ── Hero ──────────────────────────────────────────────────── */}
-        <div className="relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e3a5f 45%,#0c4a6e 100%)', minHeight: 200 }}>
-          <div className="absolute -top-10 right-0 w-64 h-64 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle,#38bdf8,transparent)', opacity: 0.08, filter: 'blur(40px)' }}/>
-          <div className="absolute bottom-0 -left-10 w-48 h-48 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle,#6366f1,transparent)', opacity: 0.08, filter: 'blur(32px)' }}/>
+        {/* ── Hero ─────────────────────────────────────────────────────── */}
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--theme-hero)', minHeight: 200 }}>
+          {/* Orbs décoratifs */}
+          <div style={{
+            position: 'absolute', top: -40, right: -20, width: 240, height: 240,
+            borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.12),transparent)',
+            filter: 'blur(40px)', pointerEvents: 'none',
+          }}/>
+          <div style={{
+            position: 'absolute', bottom: -30, left: -20, width: 180, height: 180,
+            borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.08),transparent)',
+            filter: 'blur(32px)', pointerEvents: 'none',
+          }}/>
 
-          <div className="relative z-10 px-6 py-10 max-w-5xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)' }}>
-                    <svg width="22" height="22" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" viewBox="0 0 24 24">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-white">Contact Support</h1>
-                    <p className="text-blue-300 text-xs mt-0.5">Notre équipe vous répond dans les plus brefs délais</p>
-                  </div>
+          <div style={{ position: 'relative', zIndex: 10, padding: '40px 24px 36px', maxWidth: 900, margin: '0 auto' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+
+              {/* Titre */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  style={{
+                    width: 52, height: 52, borderRadius: 16, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)',
+                    boxShadow: '0 2px 0 rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.3) inset',
+                  }}>
+                  <svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </motion.div>
+                <div>
+                  <motion.h1
+                    initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    style={{ fontSize: 26, fontWeight: 800, color: '#fff', margin: 0 }}>
+                    Support
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.18 }}
+                    style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
+                    Notre équipe répond dans les plus brefs délais
+                  </motion.p>
                 </div>
               </div>
 
               {/* Stats */}
-              <div className="flex gap-2 flex-wrap">
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {[
-                  { label: 'Total',     val: tickets.length, col: '#60a5fa' },
-                  { label: 'Ouverts',   val: openCount,      col: '#34d399' },
-                  { label: 'En cours',  val: ipCount,        col: '#fbbf24' },
-                  { label: 'Résolus',   val: closedCount,    col: '#94a3b8' },
+                  { label: 'Total',    val: tickets.length, col: 'rgba(255,255,255,0.9)' },
+                  { label: 'Ouverts',  val: openCount,      col: '#6ee7b7' },
+                  { label: 'En cours', val: ipCount,        col: '#fcd34d' },
+                  { label: 'Résolus',  val: closedCount,    col: 'rgba(255,255,255,0.5)' },
                 ].map((s, i) => (
                   <motion.div key={i}
                     initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.07 }}
-                    className="rounded-xl px-3.5 py-2 text-center min-w-[68px]"
-                    style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
-                    <p className="text-xl font-bold" style={{ color: s.col }}>{s.val}</p>
-                    <p className="text-[11px] text-blue-300">{s.label}</p>
+                    transition={{ delay: 0.1 + i * 0.07 }}
+                    style={{
+                      borderRadius: 14, padding: '8px 14px', textAlign: 'center', minWidth: 70,
+                      background: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                    }}>
+                    <p style={{ fontSize: 22, fontWeight: 800, color: s.col, margin: 0 }}>{s.val}</p>
+                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 1 }}>{s.label}</p>
                   </motion.div>
                 ))}
               </div>
@@ -209,8 +294,8 @@ export default function Support() {
           </div>
         </div>
 
-        {/* ── Body ──────────────────────────────────────────────────── */}
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* ── Body ─────────────────────────────────────────────────────── */}
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
           <AnimatePresence mode="wait">
 
             {/* ══ LIST VIEW ══ */}
@@ -219,11 +304,17 @@ export default function Support() {
                 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.28 }}>
 
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Mes tickets</h2>
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <h2 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>Mes tickets</h2>
                     {unread > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500 text-white">
+                      <span style={{
+                        padding: '2px 10px', borderRadius: 999,
+                        fontSize: 11, fontWeight: 800,
+                        background: C.indigo, color: '#fff',
+                        boxShadow: clay.btn(),
+                      }}>
                         {unread} nouveau{unread > 1 ? 'x' : ''}
                       </span>
                     )}
@@ -231,64 +322,96 @@ export default function Support() {
                   <motion.button
                     whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}
                     onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-blue-500/30"
-                    style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 20px', borderRadius: 14,
+                      fontSize: 13, fontWeight: 800, color: '#fff', border: 'none', cursor: 'pointer',
+                      background: C.indigo, boxShadow: clay.btn(),
+                    }}>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                     Nouveau ticket
                   </motion.button>
                 </div>
 
+                {/* Contenu */}
                 {loading ? (
-                  <div className="text-center py-20 text-slate-400">Chargement…</div>
+                  <div style={{ textAlign: 'center', padding: '80px 0', color: C.sub }}>Chargement…</div>
                 ) : tickets.length === 0 ? (
-                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-14 text-center">
-                    <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg,#1e3a5f,#0c4a6e)' }}>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+                    style={{
+                      background: C.card, borderRadius: 24, border: `1.5px solid ${C.border}`,
+                      boxShadow: clay.card, padding: '56px 32px', textAlign: 'center',
+                    }}>
+                    <div style={{
+                      width: 64, height: 64, borderRadius: 20, margin: '0 auto 18px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'var(--theme-hero)',
+                      boxShadow: '0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.3)',
+                    }}>
                       <svg width="28" height="28" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" viewBox="0 0 24 24">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                       </svg>
                     </div>
-                    <p className="text-slate-700 dark:text-slate-200 font-bold text-lg mb-1">Aucun ticket</p>
-                    <p className="text-slate-400 text-sm mb-5">Créez votre premier ticket pour contacter le support.</p>
-                    <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    <p style={{ fontSize: 17, fontWeight: 800, color: C.text, margin: '0 0 8px' }}>Aucun ticket</p>
+                    <p style={{ fontSize: 13, color: C.sub, marginBottom: 24 }}>
+                      Créez votre premier ticket pour contacter le support.
+                    </p>
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}
                       onClick={() => setShowModal(true)}
-                      className="px-5 py-2.5 rounded-xl text-sm font-bold text-white"
-                      style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
+                      style={{
+                        padding: '10px 24px', borderRadius: 14,
+                        fontSize: 13, fontWeight: 800, color: '#fff', border: 'none', cursor: 'pointer',
+                        background: C.indigo, boxShadow: clay.btn(),
+                      }}>
                       Créer un ticket
                     </motion.button>
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className="space-y-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {tickets.map((t, i) => (
                       <motion.div key={t._id}
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04 }}
+                        whileHover={{ y: -2, boxShadow: `0 2px 0 var(--theme-shadow), 0 8px 32px rgba(var(--theme-primary-rgb),0.14), 0 1px 0 rgba(255,255,255,0.9) inset` }}
                         onClick={() => openTicket(t)}
-                        className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 cursor-pointer hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all group">
-                        <div className="flex items-center gap-4">
-                          {/* Unread indicator */}
-                          <div className="w-2 h-2 rounded-full flex-shrink-0"
-                            style={{ background: t.isReadByUser === false ? '#3b82f6' : 'transparent' }}/>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                              <span className="text-[11px] font-mono text-slate-400 flex-shrink-0">
+                        style={{
+                          background: C.card, borderRadius: 18,
+                          border: `1.5px solid ${C.border}`,
+                          boxShadow: clay.card, padding: '14px 16px',
+                          cursor: 'pointer', transition: 'box-shadow 0.18s',
+                        }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          {/* Unread dot */}
+                          <div style={{
+                            width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                            background: t.isReadByUser === false ? C.indigo : 'transparent',
+                            boxShadow: t.isReadByUser === false ? `0 0 6px rgba(var(--theme-primary-rgb),0.5)` : 'none',
+                          }}/>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: 11, fontFamily: 'monospace', color: C.sub, flexShrink: 0 }}>
                                 #{t._id.slice(-6).toUpperCase()}
                               </span>
                               <CatBadge cat={t.category}/>
                             </div>
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            <p style={{
+                              fontSize: 14, fontWeight: 700, color: C.text,
+                              margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            }}>
                               {t.subject}
                             </p>
-                            <p className="text-xs text-slate-400 mt-0.5">
+                            <p style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>
                               {t.messages?.length || 0} message{(t.messages?.length || 0) !== 1 ? 's' : ''}
                               {' · '}
                               {new Date(t.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </p>
                           </div>
                           <StatusBadge status={t.status}/>
-                          <svg width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0">
+                          <svg width="14" height="14" fill="none" stroke={C.sub} strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
                             <polyline points="9 18 15 12 9 6"/>
                           </svg>
                         </div>
@@ -306,60 +429,105 @@ export default function Support() {
                 exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.28 }}>
 
                 {/* Back + header */}
-                <div className="flex items-start gap-4 mb-6">
-                  <motion.button whileHover={{ x: -2 }} whileTap={{ scale: 0.95 }}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 24 }}>
+                  <motion.button
+                    whileHover={{ x: -2 }} whileTap={{ scale: 0.95 }}
                     onClick={() => { setView('list'); setTicket(null); loadTickets(); }}
-                    className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition pt-0.5 flex-shrink-0">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      fontSize: 13, fontWeight: 600, color: C.sub,
+                      background: 'none', border: 'none', cursor: 'pointer', paddingTop: 2, flexShrink: 0,
+                    }}>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <polyline points="15 18 9 12 15 6"/>
                     </svg>
                     Retour
                   </motion.button>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 truncate">{ticket.subject}</h2>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 style={{
+                      fontSize: 17, fontWeight: 800, color: C.text,
+                      margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {ticket.subject}
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
                       <CatBadge cat={ticket.category}/>
                       <StatusBadge status={ticket.status}/>
-                      <span className="text-[11px] font-mono text-slate-400">#{ticket._id.slice(-6).toUpperCase()}</span>
-                      <span className="text-xs text-slate-400">
+                      <span style={{ fontSize: 11, fontFamily: 'monospace', color: C.sub }}>
+                        #{ticket._id.slice(-6).toUpperCase()}
+                      </span>
+                      <span style={{ fontSize: 11, color: C.sub }}>
                         {new Date(ticket.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Conversation thread */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 mb-4 space-y-5 min-h-[300px] max-h-[480px] overflow-y-auto">
+                {/* Thread */}
+                <div style={{
+                  background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`,
+                  boxShadow: clay.card, padding: '20px', marginBottom: 12,
+                  minHeight: 300, maxHeight: 480, overflowY: 'auto',
+                  display: 'flex', flexDirection: 'column', gap: 18,
+                }}>
                   {(ticket.messages || []).length === 0 ? (
-                    <p className="text-center text-slate-400 py-8 text-sm">Aucun message</p>
+                    <p style={{ textAlign: 'center', color: C.sub, padding: '32px 0', fontSize: 13 }}>Aucun message</p>
                   ) : (
                     (ticket.messages || []).map((msg, i) => <Bubble key={i} msg={msg}/>)
                   )}
                   <div ref={bottomRef}/>
                 </div>
 
-                {/* Reply box or closed banner */}
+                {/* Reply / closed */}
                 {ticket.status !== 'closed' ? (
-                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4">
-                    <textarea rows={3} value={replyText} onChange={e => setReplyText(e.target.value)}
+                  <div style={{
+                    background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`,
+                    boxShadow: clay.card, padding: '16px',
+                  }}>
+                    <textarea rows={3} value={replyText}
+                      onChange={e => setReplyText(e.target.value)}
                       placeholder="Écrire un message…"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 resize-none focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition"/>
-                    <div className="flex justify-end mt-3">
+                      style={{
+                        width: '100%', boxSizing: 'border-box',
+                        padding: '12px 16px', borderRadius: 12,
+                        border: `1.5px solid ${C.border}`, background: C.bg,
+                        fontSize: 13, color: C.text, resize: 'none',
+                        outline: 'none', fontFamily: 'inherit', lineHeight: 1.5,
+                      }}
+                      onFocus={e => { e.target.style.borderColor = C.indigo; e.target.style.boxShadow = `0 0 0 3px rgba(var(--theme-primary-rgb),0.12)`; }}
+                      onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = 'none'; }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
                       <motion.button
                         whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.97 }}
                         onClick={handleReply} disabled={replying || !replyText.trim()}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50 shadow-md shadow-blue-500/25"
-                        style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                        {replying && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"/>}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '10px 20px', borderRadius: 12,
+                          fontSize: 13, fontWeight: 800, color: '#fff',
+                          border: 'none', cursor: replying || !replyText.trim() ? 'not-allowed' : 'pointer',
+                          background: C.indigo, boxShadow: clay.btn(),
+                          opacity: replying || !replyText.trim() ? 0.55 : 1,
+                        }}>
+                        {replying && (
+                          <div style={{
+                            width: 14, height: 14, border: '2px solid rgba(255,255,255,0.4)',
+                            borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.7s linear infinite',
+                          }}/>
+                        )}
                         Envoyer
-                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                         </svg>
                       </motion.button>
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 text-center text-sm text-slate-400">
+                  <div style={{
+                    borderRadius: 16, border: `1.5px solid ${C.border}`,
+                    background: C.bg, padding: '16px 24px',
+                    textAlign: 'center', fontSize: 13, color: C.sub,
+                  }}>
                     Ce ticket est fermé. Créez un nouveau ticket pour toute nouvelle demande.
                   </div>
                 )}
@@ -369,78 +537,155 @@ export default function Support() {
         </div>
       </main>
 
-      {/* ── New Ticket Modal ─────────────────────────────────────────── */}
+      {/* ── Modale nouveau ticket ─────────────────────────────────────── */}
       <AnimatePresence>
         {showModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 50,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)',
+            }}>
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: 'spring', stiffness: 360, damping: 26 }}
-              className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+              style={{
+                background: C.card, borderRadius: 28,
+                boxShadow: '0 4px 0 rgba(0,0,0,0.15), 0 24px 64px rgba(0,0,0,0.3)',
+                width: '100%', maxWidth: 500, overflow: 'hidden',
+              }}>
 
-              {/* Modal header */}
-              <div className="px-6 py-5 flex items-center justify-between"
-                style={{ background: 'linear-gradient(135deg,#0f172a,#1e3a5f)' }}>
+              {/* Header modale */}
+              <div style={{
+                padding: '20px 24px',
+                background: 'var(--theme-hero)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Nouveau ticket</h2>
-                  <p className="text-blue-300 text-xs mt-0.5">Nous vous répondrons dès que possible</p>
+                  <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: 0 }}>Nouveau ticket</h2>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
+                    Nous vous répondrons dès que possible
+                  </p>
                 </div>
-                <button onClick={() => setShowModal(false)}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center transition text-white"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
-                  onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,0.2)'}
-                  onMouseOut={e => e.currentTarget.style.background='rgba(255,255,255,0.1)'}>
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <motion.button
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    width: 34, height: 34, borderRadius: 10,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer',
+                    boxShadow: '0 1px 0 rgba(0,0,0,0.15)',
+                  }}>
+                  <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
-                </button>
+                </motion.button>
               </div>
 
-              <form onSubmit={handleCreate} className="p-6 space-y-4">
+              {/* Formulaire */}
+              <form onSubmit={handleCreate} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {formErr && (
-                  <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl px-4 py-2.5 border border-red-100 dark:border-red-800">
+                  <div style={{
+                    padding: '10px 14px', borderRadius: 10,
+                    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
+                    fontSize: 13, color: '#ef4444',
+                  }}>
                     {formErr}
-                  </p>
+                  </div>
                 )}
 
+                {/* Catégorie */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">Catégorie</label>
-                  <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-400 transition">
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                    Catégorie
+                  </label>
+                  <select
+                    value={form.category}
+                    onChange={e => setForm({ ...form, category: e.target.value })}
+                    style={{
+                      width: '100%', padding: '10px 14px', borderRadius: 12,
+                      border: `1.5px solid ${C.border}`, background: C.bg,
+                      fontSize: 13, color: C.text, outline: 'none', fontFamily: 'inherit',
+                      boxShadow: clay.sm,
+                    }}>
                     {Object.entries(CAT_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
 
+                {/* Objet */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">Objet</label>
-                  <input type="text" required value={form.subject}
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                    Objet
+                  </label>
+                  <input
+                    type="text" required value={form.subject}
                     onChange={e => setForm({ ...form, subject: e.target.value })}
                     placeholder="Décrivez brièvement votre demande"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-400 transition"/>
+                    style={{
+                      width: '100%', boxSizing: 'border-box', padding: '10px 14px', borderRadius: 12,
+                      border: `1.5px solid ${C.border}`, background: C.bg,
+                      fontSize: 13, color: C.text, outline: 'none', fontFamily: 'inherit',
+                      boxShadow: clay.sm,
+                    }}
+                    onFocus={e => { e.target.style.borderColor = C.indigo; e.target.style.boxShadow = `0 0 0 3px rgba(var(--theme-primary-rgb),0.12)`; }}
+                    onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = clay.sm; }}
+                  />
                 </div>
 
+                {/* Message */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">Message</label>
-                  <textarea required rows={5} value={form.message}
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                    Message
+                  </label>
+                  <textarea
+                    required rows={5} value={form.message}
                     onChange={e => setForm({ ...form, message: e.target.value })}
-                    placeholder="Expliquez votre problème ou votre question en détail…"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 resize-none focus:outline-none focus:border-blue-400 transition"/>
+                    placeholder="Expliquez votre problème en détail…"
+                    style={{
+                      width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 12,
+                      border: `1.5px solid ${C.border}`, background: C.bg,
+                      fontSize: 13, color: C.text, resize: 'none', outline: 'none', fontFamily: 'inherit',
+                      lineHeight: 1.5, boxShadow: clay.sm,
+                    }}
+                    onFocus={e => { e.target.style.borderColor = C.indigo; e.target.style.boxShadow = `0 0 0 3px rgba(var(--theme-primary-rgb),0.12)`; }}
+                    onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = clay.sm; }}
+                  />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-1">
-                  <button type="button" onClick={() => setShowModal(false)}
-                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                {/* Actions */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 4 }}>
+                  <motion.button
+                    type="button" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => setShowModal(false)}
+                    style={{
+                      padding: '10px 18px', borderRadius: 12,
+                      fontSize: 13, fontWeight: 700, color: C.sub, cursor: 'pointer',
+                      background: C.bg, border: `1.5px solid ${C.border}`,
+                      boxShadow: clay.sm,
+                    }}>
                     Annuler
-                  </button>
-                  <motion.button type="submit" disabled={submitting}
+                  </motion.button>
+                  <motion.button
+                    type="submit" disabled={submitting}
                     whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-60 shadow-md shadow-blue-500/25"
-                    style={{ background: 'linear-gradient(135deg,#2563eb,#0891b2)' }}>
-                    {submitting && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"/>}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 22px', borderRadius: 12,
+                      fontSize: 13, fontWeight: 800, color: '#fff',
+                      border: 'none', cursor: submitting ? 'not-allowed' : 'pointer',
+                      background: C.indigo, boxShadow: clay.btn(),
+                      opacity: submitting ? 0.6 : 1,
+                    }}>
+                    {submitting && (
+                      <div style={{
+                        width: 14, height: 14, border: '2px solid rgba(255,255,255,0.4)',
+                        borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.7s linear infinite',
+                      }}/>
+                    )}
                     {submitting ? 'Envoi…' : 'Envoyer le ticket'}
                   </motion.button>
                 </div>
@@ -449,6 +694,8 @@ export default function Support() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </DashboardLayout>
   );
 }
