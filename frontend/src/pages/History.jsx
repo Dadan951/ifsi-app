@@ -25,6 +25,12 @@ const clay = {
   open: '0 2px 0 #818cf8, 0 8px 32px rgba(79,70,229,0.15), 0 1px 0 rgba(255,255,255,0.9) inset',
 };
 
+/* ─── Type config ────────────────────────────────────────────────────────────── */
+const TYPE_CFG = {
+  quiz:      { label:'Quiz',       color: C.indigo,  dot:'#4F46E5', icon:'🎯' },
+  flashcard: { label:'Flashcards', color: C.violet,  dot:'#7C3AED', icon:'🃏' },
+};
+
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 const DIFF = {
   easy:   { bg:'#d1fae5', text:'#065f46', label:'Facile' },
@@ -47,7 +53,7 @@ function fmtDateShort(d) {
   return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
 }
 
-/* ─── Bar chart config ────────────────────────────────────────────────────── */
+/* ─── Bar chart ───────────────────────────────────────────────────────────── */
 const BAR_COLORS = {
   good:   { from:'#10b981', to:'#34d399', glow:'#10b98140', dot:'#10b981', label:'Réussi' },
   medium: { from:'#f59e0b', to:'#fbbf24', glow:'#f59e0b40', dot:'#f59e0b', label:'Passable' },
@@ -59,109 +65,148 @@ function barCfg(pct) {
   return BAR_COLORS.bad;
 }
 
-/* ─── ProgressChart ───────────────────────────────────────────────────────── */
-function ProgressChart({ data }) {
+function ProgressChart({ data, chartTypes, setChartTypes }) {
   const [hovered, setHovered] = useState(null);
-  if (data.length < 2) return null;
 
-  const items   = data.slice(-12);
-  const avg     = Math.round(items.reduce((s, d) => s + d.pct, 0) / items.length);
-  const best    = Math.max(...items.map(d => d.pct));
+  const items   = data.slice(-14);
+  const avg     = items.length ? Math.round(items.reduce((s, d) => s + d.pct, 0) / items.length) : 0;
+  const best    = items.length ? Math.max(...items.map(d => d.pct)) : 0;
   const bestIdx = items.findIndex(d => d.pct === best);
-
   const half     = Math.floor(items.length / 2);
   const avgFirst  = items.slice(0, half).reduce((s, d) => s + d.pct, 0) / (half || 1);
   const avgSecond = items.slice(half).reduce((s, d) => s + d.pct, 0) / ((items.length - half) || 1);
   const trend     = avgSecond - avgFirst;
   const avgCfg    = barCfg(avg);
 
+  const toggleType = (id) => {
+    setChartTypes(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { if (next.size > 1) next.delete(id); }
+      else next.add(id);
+      return next;
+    });
+  };
+
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
-      {/* KPIs */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr auto auto', gap:12 }}>
-        <div style={{ borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:16,
-          background:`linear-gradient(135deg,${avgCfg.from}18,${avgCfg.to}08)`,
-          border:`1.5px solid ${avgCfg.from}30`, boxShadow:clay.sm }}>
-          <div>
-            <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Moyenne</p>
-            <p className="nunito" style={{ fontSize:28, fontWeight:900, color:avgCfg.from, lineHeight:1 }}>{avg}%</p>
-          </div>
-          <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:4, padding:'4px 10px', borderRadius:20, fontSize:12, fontWeight:700,
-            background: trend > 2 ? '#d1fae5' : trend < -2 ? '#fee2e2' : '#f1f5f9',
-            color:      trend > 2 ? '#065f46' : trend < -2 ? '#991b1b' : '#64748b' }}>
-            {trend > 2 ? '↑' : trend < -2 ? '↓' : '→'} {Math.abs(Math.round(trend))}%
-          </div>
-        </div>
-        <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
-          background:'linear-gradient(135deg,#ecfdf5,#d1fae5)', border:'1.5px solid #a7f3d0', boxShadow:clay.sm }}>
-          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'#059669', marginBottom:2 }}>Meilleur</p>
-          <p className="nunito" style={{ fontSize:24, fontWeight:900, color:'#065f46', lineHeight:1 }}>{best}%</p>
-        </div>
-        <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
-          background:'linear-gradient(135deg,#f8fafc,#f1f5f9)', border:`1.5px solid ${C.border}`, boxShadow:clay.sm }}>
-          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Analysés</p>
-          <p className="nunito" style={{ fontSize:24, fontWeight:900, color:C.text, lineHeight:1 }}>{items.length}</p>
-        </div>
+      {/* Type toggles du chart */}
+      <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+        {Object.entries(TYPE_CFG).map(([id, cfg]) => {
+          const active = chartTypes.has(id);
+          return (
+            <button key={id} onClick={() => toggleType(id)}
+              style={{ padding:'5px 12px', borderRadius:20, border:`1.5px solid ${active ? cfg.color : C.border}`,
+                background: active ? `${cfg.color}14` : C.bg,
+                color: active ? cfg.color : C.sub,
+                fontSize:11, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:5,
+                transition:'all 0.18s' }}>
+              <span style={{ width:7, height:7, borderRadius:'50%', background: active ? cfg.color : '#cbd5e1', display:'inline-block', transition:'background 0.18s' }}/>
+              {cfg.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Barres */}
-      <div>
-        <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:112, position:'relative' }}>
-          <div style={{ position:'absolute', inset:0, height:'20%', background:'linear-gradient(180deg,#10b98108,transparent)', borderRadius:12, pointerEvents:'none' }}/>
-          {items.map((d, i) => {
-            const cfg    = barCfg(d.pct);
-            const isHov  = hovered === i;
-            const isBest = i === bestIdx;
-            const h      = Math.max(d.pct, 6);
-            return (
-              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end', position:'relative' }}
-                onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}>
-                <AnimatePresence>
-                  {isHov && (
-                    <motion.div initial={{ opacity:0, y:4, scale:0.9 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, scale:0.9 }}
-                      style={{ position:'absolute', bottom:'100%', marginBottom:8, left:'50%', transform:'translateX(-50%)',
-                        background:'#1e1b4b', color:'#fff', borderRadius:12, padding:'6px 10px', textAlign:'center',
-                        boxShadow:'0 4px 16px rgba(30,27,75,0.3)', pointerEvents:'none', whiteSpace:'nowrap', zIndex:20 }}>
-                      <p style={{ fontSize:15, fontWeight:900, color:cfg.from, lineHeight:1 }}>{d.pct}%</p>
-                      <p style={{ fontSize:9, color:'rgba(255,255,255,0.45)', marginTop:2 }}>{fmtDateShort(d.completedAt)}</p>
-                      <p style={{ fontSize:10, fontWeight:600, color:cfg.dot, marginTop:2 }}>{cfg.label}</p>
-                      <div style={{ position:'absolute', left:'50%', bottom:-5, transform:'translateX(-50%)', width:10, height:5, overflow:'hidden' }}>
-                        <div style={{ width:8, height:8, background:'#1e1b4b', transform:'rotate(45deg)', margin:'0 auto', marginTop:-4 }}/>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <motion.div
-                  initial={{ scaleY:0, opacity:0 }} animate={{ scaleY:1, opacity:1 }}
-                  transition={{ delay:i*0.04, duration:0.5, ease:[0.16,1,0.3,1] }}
-                  style={{ width:'100%', height:`${h}%`, originY:1, cursor:'pointer',
-                    background: isHov||isBest ? `linear-gradient(180deg,${cfg.from},${cfg.to}cc)` : `linear-gradient(180deg,${cfg.from}cc,${cfg.to}88)`,
-                    boxShadow: isHov||isBest ? `0 0 12px ${cfg.glow}` : 'none',
-                    borderRadius:'8px 8px 4px 4px',
-                    outline: isBest ? `2px solid ${cfg.from}` : 'none' }}/>
+      {items.length < 2 ? (
+        <p style={{ textAlign:'center', color:C.sub, fontSize:13, padding:'24px 0' }}>Pas encore assez de données pour afficher le graphique</p>
+      ) : (
+        <>
+          {/* KPIs */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr auto auto', gap:12 }}>
+            <div style={{ borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:16,
+              background:`linear-gradient(135deg,${avgCfg.from}18,${avgCfg.to}08)`,
+              border:`1.5px solid ${avgCfg.from}30`, boxShadow:clay.sm }}>
+              <div>
+                <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Moyenne</p>
+                <p className="nunito" style={{ fontSize:28, fontWeight:900, color:avgCfg.from, lineHeight:1 }}>{avg}%</p>
               </div>
-            );
-          })}
-        </div>
-        <div style={{ display:'flex', gap:6, marginTop:8 }}>
-          {items.map((d, i) => (
-            <div key={i} style={{ flex:1, textAlign:'center' }}>
-              <span style={{ fontSize:9, color:'#94a3b8' }}>{fmtDateShort(d.completedAt)}</span>
+              <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:4, padding:'4px 10px', borderRadius:20, fontSize:12, fontWeight:700,
+                background: trend > 2 ? '#d1fae5' : trend < -2 ? '#fee2e2' : '#f1f5f9',
+                color:      trend > 2 ? '#065f46' : trend < -2 ? '#991b1b' : '#64748b' }}>
+                {trend > 2 ? '↑' : trend < -2 ? '↓' : '→'} {Math.abs(Math.round(trend))}%
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+            <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
+              background:'linear-gradient(135deg,#ecfdf5,#d1fae5)', border:'1.5px solid #a7f3d0', boxShadow:clay.sm }}>
+              <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'#059669', marginBottom:2 }}>Meilleur</p>
+              <p className="nunito" style={{ fontSize:24, fontWeight:900, color:'#065f46', lineHeight:1 }}>{best}%</p>
+            </div>
+            <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
+              background:`linear-gradient(135deg,#f8fafc,#f1f5f9)`, border:`1.5px solid ${C.border}`, boxShadow:clay.sm }}>
+              <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Analysés</p>
+              <p className="nunito" style={{ fontSize:24, fontWeight:900, color:C.text, lineHeight:1 }}>{items.length}</p>
+            </div>
+          </div>
 
-      {/* Légende */}
-      <div style={{ display:'flex', gap:16, justifyContent:'center' }}>
-        {[BAR_COLORS.good, BAR_COLORS.medium, BAR_COLORS.bad].map(bc => (
-          <span key={bc.label} style={{ display:'flex', alignItems:'center', gap:6, fontSize:10, color:C.sub }}>
-            <span style={{ width:10, height:10, borderRadius:'50%', background:bc.dot, display:'inline-block', flexShrink:0 }}/>
-            {bc.label}
-          </span>
-        ))}
-      </div>
+          {/* Barres */}
+          <div>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:5, height:112, position:'relative' }}>
+              <div style={{ position:'absolute', inset:0, height:'20%', background:'linear-gradient(180deg,#10b98108,transparent)', borderRadius:12, pointerEvents:'none' }}/>
+              {items.map((d, i) => {
+                const cfg    = barCfg(d.pct);
+                const isHov  = hovered === i;
+                const isBest = i === bestIdx;
+                const h      = Math.max(d.pct, 6);
+                const typeCfg = TYPE_CFG[d.type];
+                return (
+                  <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end', position:'relative' }}
+                    onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}>
+                    <AnimatePresence>
+                      {isHov && (
+                        <motion.div initial={{ opacity:0, y:4, scale:0.9 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, scale:0.9 }}
+                          style={{ position:'absolute', bottom:'100%', marginBottom:8, left:'50%', transform:'translateX(-50%)',
+                            background:'#1e1b4b', color:'#fff', borderRadius:12, padding:'6px 10px', textAlign:'center',
+                            boxShadow:'0 4px 16px rgba(30,27,75,0.3)', pointerEvents:'none', whiteSpace:'nowrap', zIndex:20 }}>
+                          <p style={{ fontSize:15, fontWeight:900, color:cfg.from, lineHeight:1 }}>{d.pct}%</p>
+                          <p style={{ fontSize:9, color:'rgba(255,255,255,0.45)', marginTop:2 }}>{fmtDateShort(d.completedAt)}</p>
+                          {typeCfg && (
+                            <p style={{ fontSize:9, color:typeCfg.dot, marginTop:2, fontWeight:700 }}>{typeCfg.icon} {typeCfg.label}</p>
+                          )}
+                          <div style={{ position:'absolute', left:'50%', bottom:-5, transform:'translateX(-50%)', width:10, height:5, overflow:'hidden' }}>
+                            <div style={{ width:8, height:8, background:'#1e1b4b', transform:'rotate(45deg)', margin:'0 auto', marginTop:-4 }}/>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Dot type indicator */}
+                    {typeCfg && (
+                      <div style={{ width:5, height:5, borderRadius:'50%', background:typeCfg.dot, marginBottom:3, flexShrink:0 }}/>
+                    )}
+
+                    <motion.div
+                      initial={{ scaleY:0, opacity:0 }} animate={{ scaleY:1, opacity:1 }}
+                      transition={{ delay:i*0.04, duration:0.5, ease:[0.16,1,0.3,1] }}
+                      style={{ width:'100%', height:`${h}%`, originY:1, cursor:'pointer',
+                        background: isHov||isBest ? `linear-gradient(180deg,${cfg.from},${cfg.to}cc)` : `linear-gradient(180deg,${cfg.from}cc,${cfg.to}88)`,
+                        boxShadow: isHov||isBest ? `0 0 12px ${cfg.glow}` : 'none',
+                        borderRadius:'8px 8px 4px 4px',
+                        outline: isBest ? `2px solid ${cfg.from}` : 'none' }}/>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display:'flex', gap:5, marginTop:8 }}>
+              {items.map((d, i) => (
+                <div key={i} style={{ flex:1, textAlign:'center' }}>
+                  <span style={{ fontSize:9, color:'#94a3b8' }}>{fmtDateShort(d.completedAt)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Légende */}
+          <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            {[BAR_COLORS.good, BAR_COLORS.medium, BAR_COLORS.bad].map(bc => (
+              <span key={bc.label} style={{ display:'flex', alignItems:'center', gap:6, fontSize:10, color:C.sub }}>
+                <span style={{ width:10, height:10, borderRadius:'50%', background:bc.dot, display:'inline-block', flexShrink:0 }}/>
+                {bc.label}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -187,13 +232,13 @@ function ScoreRing({ pct, size = 52 }) {
 }
 
 /* ─── QuizAccordion ───────────────────────────────────────────────────────── */
-function QuizAccordion({ item, token, navigate, isOpen }) {
+function QuizAccordion({ item, token, navigate }) {
   const [answers, setAnswers] = useState(null);
   const [loading, setLoading] = useState(false);
   const fetched = useState(false);
 
   useEffect(() => {
-    if (!isOpen || fetched[0] || !item.quizId) return;
+    if (fetched[0] || !item.quizId) return;
     fetched[1](true);
     setLoading(true);
     axios.get(`${API_URL}/quizzes/${item.quizId}/progress`, {
@@ -202,7 +247,7 @@ function QuizAccordion({ item, token, navigate, isOpen }) {
       .then(r => setAnswers(r.data?.answers || []))
       .catch(() => setAnswers([]))
       .finally(() => setLoading(false));
-  }, [isOpen]); // eslint-disable-line
+  }, []); // eslint-disable-line
 
   const sc      = scoreColor(item.pct);
   const correct = answers?.filter(a => a.isCorrect).length ?? item.score;
@@ -215,9 +260,7 @@ function QuizAccordion({ item, token, navigate, isOpen }) {
       <div style={{ padding:'0 18px 18px', paddingTop:4 }}>
         <div style={{ height:1, background:C.border, marginBottom:16 }}/>
 
-        {/* Score résumé */}
-        <div style={{ display:'flex', alignItems:'center', gap:16, padding:'14px 16px', borderRadius:16,
-          background:sc.bg, marginBottom:14 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:16, padding:'14px 16px', borderRadius:16, background:sc.bg, marginBottom:14 }}>
           <ScoreRing pct={item.pct} size={56}/>
           <div style={{ flex:1 }}>
             <p className="nunito" style={{ fontSize:20, fontWeight:900, color:sc.text, lineHeight:1 }}>{item.score}/{item.total}</p>
@@ -236,14 +279,12 @@ function QuizAccordion({ item, token, navigate, isOpen }) {
           </div>
         </div>
 
-        {/* Barre de score */}
         <div style={{ height:6, background:C.border, borderRadius:8, overflow:'hidden', marginBottom:18 }}>
           <motion.div initial={{ width:0 }} animate={{ width:`${item.pct}%` }}
             transition={{ duration:0.6, ease:[0.16,1,0.3,1], delay:0.1 }}
             style={{ height:'100%', borderRadius:8, background:sc.ring }}/>
         </div>
 
-        {/* Questions */}
         {loading ? (
           <div style={{ display:'flex', justifyContent:'center', padding:'24px 0' }}>
             <div style={{ width:28, height:28, border:`3px solid ${C.indigo}`, borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.7s linear infinite' }}/>
@@ -293,7 +334,6 @@ function QuizAccordion({ item, token, navigate, isOpen }) {
           <p style={{ fontSize:12, color:C.sub, textAlign:'center', padding:'16px 0' }}>Détail des questions non disponible</p>
         )}
 
-        {/* Refaire */}
         {item.quizId && (
           <motion.button whileHover={{ scale:1.01 }} whileTap={{ scale:0.97 }}
             onClick={e => { e.stopPropagation(); navigate(`/dashboard/quiz/${item.quizId}`); }}
@@ -312,50 +352,139 @@ function QuizAccordion({ item, token, navigate, isOpen }) {
   );
 }
 
+/* ─── FlashcardAccordion ──────────────────────────────────────────────────── */
+function FlashcardAccordion({ item, navigate }) {
+  const sc = scoreColor(item.pct);
+  return (
+    <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }}
+      exit={{ height:0, opacity:0 }} transition={{ duration:0.32, ease:[0.16,1,0.3,1] }}
+      style={{ overflow:'hidden' }}>
+      <div style={{ padding:'0 18px 18px', paddingTop:4 }}>
+        <div style={{ height:1, background:C.border, marginBottom:16 }}/>
+
+        {/* Résumé */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+          <div style={{ borderRadius:14, padding:'12px 14px', background:'#ecfdf5', border:'1.5px solid #a7f3d0', textAlign:'center' }}>
+            <p className="nunito" style={{ fontSize:28, fontWeight:900, color:'#059669', lineHeight:1 }}>{item.known}</p>
+            <p style={{ fontSize:11, fontWeight:700, color:'#059669', marginTop:3 }}>✓ Je savais</p>
+          </div>
+          <div style={{ borderRadius:14, padding:'12px 14px', background:'#fef2f2', border:'1.5px solid #fecaca', textAlign:'center' }}>
+            <p className="nunito" style={{ fontSize:28, fontWeight:900, color:'#ef4444', lineHeight:1 }}>{item.unknown}</p>
+            <p style={{ fontSize:11, fontWeight:700, color:'#ef4444', marginTop:3 }}>✗ À retravailler</p>
+          </div>
+        </div>
+
+        <div style={{ height:6, background:C.border, borderRadius:8, overflow:'hidden', marginBottom:16 }}>
+          <motion.div initial={{ width:0 }} animate={{ width:`${item.pct}%` }}
+            transition={{ duration:0.6, ease:[0.16,1,0.3,1], delay:0.1 }}
+            style={{ height:'100%', borderRadius:8, background:sc.ring }}/>
+        </div>
+
+        {/* Cartes à retravailler */}
+        {item.unknownCards && item.unknownCards.length > 0 ? (
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:4 }}>
+              Cartes à retravailler ({item.unknownCards.length})
+            </p>
+            {item.unknownCards.map((card, i) => (
+              <motion.div key={i} initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }}
+                transition={{ delay:i*0.03 }}
+                style={{ borderRadius:12, border:'1.5px solid #fecaca', background:'#fef2f2', padding:'10px 12px' }}>
+                <p style={{ fontSize:12, fontWeight:700, color:C.text, marginBottom:4 }}>
+                  <span style={{ color:'#ef4444', marginRight:6 }}>Q</span>{card.front}
+                </p>
+                <p style={{ fontSize:11, color:C.sub, paddingLeft:16, borderLeft:'2px solid #fecaca' }}>{card.back}</p>
+              </motion.div>
+            ))}
+          </div>
+        ) : item.unknown === 0 ? (
+          <div style={{ textAlign:'center', padding:'16px 0' }}>
+            <p style={{ fontSize:28, marginBottom:4 }}>🎉</p>
+            <p style={{ fontSize:13, fontWeight:700, color:'#059669' }}>Toutes les cartes maîtrisées !</p>
+          </div>
+        ) : (
+          <p style={{ fontSize:12, color:C.sub, textAlign:'center', padding:'16px 0' }}>Détail non disponible</p>
+        )}
+
+        <motion.button whileHover={{ scale:1.01 }} whileTap={{ scale:0.97 }}
+          onClick={e => { e.stopPropagation(); navigate('/dashboard/flashcards'); }}
+          style={{ marginTop:16, width:'100%', padding:'12px 0', borderRadius:14, border:'none', cursor:'pointer',
+            background:`linear-gradient(135deg,${C.violet},${C.pink})`,
+            color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+            boxShadow:clay.btn(C.violet,'#6d28d9') }}>
+          <span>🃏</span> Revoir ce chapitre
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Main ────────────────────────────────────────────────────────────────── */
 export default function History() {
   const { token }  = useAuth();
   const navigate   = useNavigate();
-  const [history,   setHistory]   = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [search,    setSearch]    = useState('');
-  const [filterSem, setFilterSem] = useState('');
-  const [sort,      setSort]      = useState('date');
-  const [openId,    setOpenId]    = useState(null);
+
+  const [quizHistory, setQuizHistory] = useState([]);
+  const [fcHistory,   setFcHistory]   = useState([]);
+  const [loading,     setLoading]     = useState(true);
+
+  const [typeFilter,  setTypeFilter]  = useState('all');
+  const [chartTypes,  setChartTypes]  = useState(new Set(['quiz', 'flashcard']));
+  const [search,      setSearch]      = useState('');
+  const [filterSem,   setFilterSem]   = useState('');
+  const [sort,        setSort]        = useState('date');
+  const [openId,      setOpenId]      = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_URL}/quizzes/history`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => setHistory(r.data))
+    Promise.all([
+      axios.get(`${API_URL}/quizzes/history`,    { headers: { Authorization: `Bearer ${token}` } }),
+      axios.get(`${API_URL}/flashcards/history`, { headers: { Authorization: `Bearer ${token}` } }),
+    ])
+      .then(([qRes, fcRes]) => {
+        setQuizHistory(qRes.data.map(h => ({ ...h, type:'quiz' })));
+        setFcHistory(fcRes.data.map(h => ({ ...h, type:'flashcard' })));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
 
+  const history = useMemo(() =>
+    [...quizHistory, ...fcHistory].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)),
+  [quizHistory, fcHistory]);
+
+  const visibleHistory = useMemo(() =>
+    typeFilter === 'all' ? history : history.filter(h => h.type === typeFilter),
+  [history, typeFilter]);
+
   const stats = useMemo(() => {
-    if (!history.length) return null;
-    const scores  = history.map(h => h.pct);
+    if (!visibleHistory.length) return null;
+    const scores  = visibleHistory.map(h => h.pct);
     const avg     = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     const best    = Math.max(...scores);
-    const above80 = history.filter(h => h.pct >= 80).length;
-    return { total:history.length, avg, best, above80 };
-  }, [history]);
+    const above80 = visibleHistory.filter(h => h.pct >= 80).length;
+    return { total:visibleHistory.length, avg, best, above80 };
+  }, [visibleHistory]);
 
   const semesters = useMemo(() => [...new Set(history.map(h => h.semester).filter(Boolean))].sort(), [history]);
 
+  const chartData = useMemo(() =>
+    [...history]
+      .filter(h => chartTypes.has(h.type))
+      .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt))
+      .slice(-20),
+  [history, chartTypes]);
+
   const filtered = useMemo(() => {
-    let list = history.filter(h => {
+    let list = visibleHistory.filter(h => {
       const q           = search.toLowerCase();
-      const matchSearch = !q || h.title.toLowerCase().includes(q) || h.category.toLowerCase().includes(q) || h.chapter.toLowerCase().includes(q);
+      const matchSearch = !q || h.title.toLowerCase().includes(q) || h.category.toLowerCase().includes(q) || (h.chapter||'').toLowerCase().includes(q);
       const matchSem    = !filterSem || h.semester === filterSem;
       return matchSearch && matchSem;
     });
     if (sort === 'score_desc') list = [...list].sort((a, b) => b.pct - a.pct);
     if (sort === 'score_asc')  list = [...list].sort((a, b) => a.pct - b.pct);
     return list;
-  }, [history, search, filterSem, sort]);
-
-  const chartData = useMemo(() =>
-    [...history].sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt)).slice(-20),
-  [history]);
+  }, [visibleHistory, search, filterSem, sort]);
 
   if (loading) return (
     <DashboardLayout>
@@ -379,12 +508,12 @@ export default function History() {
             style={{ position:'relative', padding:'28px 24px 28px' }}>
             <p style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:4 }}>NursesPrep · IFSI</p>
             <h1 className="nunito" style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:4 }}>Mes résultats</h1>
-            <p style={{ fontSize:13, color:'rgba(255,255,255,0.65)', marginBottom:20 }}>Clique sur un quiz pour voir le détail question par question</p>
+            <p style={{ fontSize:13, color:'rgba(255,255,255,0.65)', marginBottom:20 }}>Quiz, flashcards et exercices — tout ton historique</p>
 
             {stats && (
               <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
                 {[
-                  { n:stats.total,     l:'Quiz terminés', c:'#fff' },
+                  { n:stats.total,     l: typeFilter==='all' ? 'Sessions' : typeFilter==='quiz' ? 'Quiz' : 'Sessions FC', c:'#fff' },
                   { n:`${stats.avg}%`, l:'Score moyen',   c:'#c4b5fd' },
                   { n:`${stats.best}%`,l:'Meilleur',      c:'#6ee7b7' },
                   { n:stats.above80,   l:'Score ≥ 80%',   c:'#fcd34d' },
@@ -403,32 +532,65 @@ export default function History() {
         {/* ── CONTENT ──────────────────────────────────────────────────────── */}
         <div style={{ padding:'24px 16px' }}>
 
+          {/* Filtre type */}
+          <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
+            {[
+              { id:'all',       label:'Tout',       count: history.length,      icon:null,   disabled:false },
+              { id:'quiz',      label:'Quiz',       count: quizHistory.length,  icon:'🎯',   disabled:false },
+              { id:'flashcard', label:'Flashcards', count: fcHistory.length,    icon:'🃏',   disabled:false },
+              { id:'exercise',  label:'Exercices',  count: 0,                   icon:'✏️',   disabled:true  },
+            ].map(t => {
+              const active = typeFilter === t.id;
+              return (
+                <motion.button key={t.id}
+                  whileHover={!t.disabled ? { scale:1.02 } : {}}
+                  whileTap={!t.disabled ? { scale:0.97 } : {}}
+                  disabled={t.disabled}
+                  onClick={() => !t.disabled && setTypeFilter(t.id)}
+                  style={{ padding:'8px 16px', borderRadius:20, border:`1.5px solid ${active ? C.indigo : C.border}`,
+                    background: active ? `${C.indigo}14` : C.card,
+                    color: t.disabled ? '#94a3b8' : active ? C.indigo : C.text,
+                    fontSize:13, fontWeight:700, cursor: t.disabled ? 'default' : 'pointer',
+                    boxShadow: active ? clay.sm : 'none',
+                    opacity: t.disabled ? 0.55 : 1,
+                    display:'flex', alignItems:'center', gap:6, transition:'all 0.18s' }}>
+                  {t.icon && <span>{t.icon}</span>}
+                  {t.label}
+                  {!t.disabled && t.count > 0 && (
+                    <span style={{ background: active ? C.indigo : C.bg, color: active ? '#fff' : C.indigo,
+                      borderRadius:12, padding:'1px 7px', fontSize:11, fontWeight:700, minWidth:18, textAlign:'center' }}>{t.count}</span>
+                  )}
+                  {t.disabled && (
+                    <span style={{ fontSize:9, background:'#e0e7ff', color:'#94a3b8', borderRadius:8, padding:'1px 7px', fontWeight:700 }}>bientôt</span>
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+
           {/* Graphique de progression */}
-          {chartData.length >= 2 && (
-            <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
+          {(chartData.length > 0 || history.length >= 2) && (
+            <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.15 }}
               style={{ background:C.card, borderRadius:24, boxShadow:clay.card, border:`1.5px solid ${C.border}`,
                 padding:'20px 20px 18px', marginBottom:18 }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:18 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:18, gap:12, flexWrap:'wrap' }}>
                 <div>
                   <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text }}>Progression</h2>
-                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {Math.min(chartData.length,12)} derniers quiz</p>
+                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {Math.min(chartData.length,14)} dernières sessions</p>
                 </div>
-                <span style={{ fontSize:10, fontWeight:600, color:C.sub, background:C.bg, border:`1.5px solid ${C.border}`, padding:'6px 12px', borderRadius:20 }}>
-                  Survole une barre
-                </span>
               </div>
-              <ProgressChart data={chartData}/>
+              <ProgressChart data={chartData} chartTypes={chartTypes} setChartTypes={setChartTypes}/>
             </motion.div>
           )}
 
-          {/* Filtres */}
+          {/* Filtres texte / semestre / tri */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:10, marginBottom:16 }}>
             <div style={{ flex:1, minWidth:180, position:'relative' }}>
               <svg style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:C.sub }}
                 width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un quiz…"
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher…"
                 style={{ width:'100%', paddingLeft:36, paddingRight:14, paddingTop:10, paddingBottom:10,
                   borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card, boxShadow:clay.sm,
                   fontSize:13, color:C.text, outline:'none', boxSizing:'border-box' }}/>
@@ -450,7 +612,7 @@ export default function History() {
 
           {filtered.length > 0 && (
             <p style={{ fontSize:12, color:C.sub, marginBottom:14 }}>
-              {filtered.length} quiz affiché{filtered.length>1?'s':''}{(search||filterSem)?' (filtré)':''} ·{' '}
+              {filtered.length} session{filtered.length>1?'s':''} affichée{filtered.length>1?'s':''}{(search||filterSem)?' (filtré)':''} ·{' '}
               <span style={{ color:C.indigo }}>clique pour voir le détail</span>
             </p>
           )}
@@ -461,7 +623,7 @@ export default function History() {
               style={{ textAlign:'center', padding:'80px 24px' }}>
               <div style={{ fontSize:48, marginBottom:12 }}>📋</div>
               <p style={{ fontWeight:700, color:C.text, fontSize:15 }}>
-                {history.length === 0 ? "Aucun quiz terminé pour l'instant" : 'Aucun résultat pour cette recherche'}
+                {history.length === 0 ? "Aucune session terminée pour l'instant" : 'Aucun résultat pour cette recherche'}
               </p>
               {history.length === 0 && (
                 <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
@@ -479,6 +641,7 @@ export default function History() {
                 const diff   = DIFF[item.difficulty] || DIFF.medium;
                 const sc     = scoreColor(item.pct);
                 const isOpen = openId === item._id;
+                const tCfg   = TYPE_CFG[item.type];
                 return (
                   <motion.div key={item._id}
                     initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
@@ -496,22 +659,33 @@ export default function History() {
 
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', marginBottom:4 }}>
+                          {/* Type badge */}
+                          {tCfg && (
+                            <span style={{ fontSize:10, fontWeight:700, color:tCfg.color, background:`${tCfg.color}14`,
+                              padding:'2px 8px', borderRadius:20 }}>
+                              {tCfg.icon} {tCfg.label}
+                            </span>
+                          )}
                           {item.semester && (
                             <span style={{ fontSize:10, fontWeight:700, color:C.indigo, background:`${C.indigo}14`, padding:'2px 8px', borderRadius:20 }}>{item.semester}</span>
                           )}
-                          {item.difficulty && (
+                          {item.type === 'quiz' && item.difficulty && (
                             <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:20, background:diff.bg, color:diff.text }}>{diff.label}</span>
                           )}
                         </div>
                         <p style={{ fontSize:13, fontWeight:700, color:isOpen ? C.indigo : C.text,
                           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', transition:'color 0.2s' }}>{item.title}</p>
                         <p style={{ fontSize:11, color:C.sub, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginTop:2 }}>
-                          {item.category}{item.chapter ? ` · ${item.chapter}` : ''}
+                          {item.type === 'flashcard'
+                            ? `${item.category}${item.ue ? '' : ''}`
+                            : `${item.category}${item.chapter ? ` · ${item.chapter}` : ''}`}
                         </p>
                       </div>
 
                       <div style={{ textAlign:'right', flexShrink:0 }}>
-                        <div style={{ fontSize:13, fontWeight:800, color:sc.text }}>{item.score}/{item.total}</div>
+                        <div style={{ fontSize:13, fontWeight:800, color:sc.text }}>
+                          {item.type === 'flashcard' ? `${item.known}/${item.total}` : `${item.score}/${item.total}`}
+                        </div>
                         <div style={{ fontSize:11, color:C.sub, marginTop:2 }}>{fmtDate(item.completedAt)}</div>
                       </div>
 
@@ -527,7 +701,9 @@ export default function History() {
 
                     <AnimatePresence>
                       {isOpen && (
-                        <QuizAccordion item={item} token={token} navigate={navigate} isOpen={isOpen}/>
+                        item.type === 'quiz'
+                          ? <QuizAccordion item={item} token={token} navigate={navigate}/>
+                          : <FlashcardAccordion item={item} navigate={navigate}/>
                       )}
                     </AnimatePresence>
                   </motion.div>

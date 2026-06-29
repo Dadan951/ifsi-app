@@ -62,6 +62,37 @@ exports.markReviewed = async (req, res) => {
   }
 };
 
+// ── GET /api/flashcards/history ──────────────────────────────────────────
+// Historique des sessions de flashcards terminées
+exports.getHistory = async (req, res) => {
+  try {
+    const attempts = await FlashcardAttempt.find({
+      user: req.user._id,
+      status: 'completed',
+    })
+      .sort({ completedAt: -1 })
+      .limit(200);
+
+    const result = attempts.map(a => ({
+      _id:          a._id,
+      type:         'flashcard',
+      title:        a.chapter,
+      category:     a.ue,
+      chapter:      a.chapter,
+      semester:     a.semester,
+      ue:           a.ue,
+      known:        a.known || 0,
+      unknown:      a.unknown || 0,
+      total:        a.total || 0,
+      pct:          a.total > 0 ? Math.round(((a.known || 0) / a.total) * 100) : 0,
+      unknownCards: a.unknownCards || [],
+      completedAt:  a.completedAt,
+    }));
+
+    res.json(result);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
 // ── GET /api/flashcards/attempts ─────────────────────────────────────────
 // Tous les attempts de l'utilisateur (pour afficher les badges sur les chapitres)
 exports.getAttempts = async (req, res) => {
