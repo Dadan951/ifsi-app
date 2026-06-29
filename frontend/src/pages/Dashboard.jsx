@@ -15,13 +15,13 @@ import DashboardLayout from '../components/DashboardLayout';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
 const C = {
-  bg:       '#EEF2FF',
+  bg:       'var(--theme-bg)',
   card:     '#FFFFFF',
-  text:     '#1e1b4b',
+  text:     'var(--theme-text)',
   muted:    '#6b7280',
-  border:   '#e0e7ff',
-  indigo:   '#4F46E5',
-  violet:   '#7C3AED',
+  border:   'var(--theme-border)',
+  indigo:   'var(--theme-primary)',
+  violet:   'var(--theme-secondary)',
   teal:     '#0891b2',
   pink:     '#EC4899',
   amber:    '#F59E0B',
@@ -32,9 +32,11 @@ const C = {
 
 /* Clay shadows */
 const clay = {
-  card: `inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.03), 0 4px 0 rgba(0,0,0,0.06), 0 12px 28px rgba(79,70,229,0.08), 0 24px 48px rgba(0,0,0,0.04)`,
+  card: `inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.03), 0 4px 0 rgba(0,0,0,0.06), 0 12px 28px rgba(var(--theme-primary-rgb),0.08), 0 24px 48px rgba(0,0,0,0.04)`,
   sm:   `inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 0 rgba(0,0,0,0.07), 0 8px 16px rgba(0,0,0,0.07)`,
-  btn:  (hex) => `inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.18), 0 4px 0 ${hex}cc, 0 8px 20px ${hex}44`,
+  btn:  (hex) => hex
+    ? `inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.18), 0 4px 0 ${hex}cc, 0 8px 20px ${hex}44`
+    : `inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.18), 0 4px 0 var(--theme-dark), 0 8px 20px rgba(var(--theme-primary-rgb),0.27)`,
   pressed: `inset 0 2px 6px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.08)`,
 };
 
@@ -368,7 +370,7 @@ export default function Dashboard() {
 
           {/* ── HERO ──────────────────────────────────────────────────────── */}
           <motion.div {...fade(0)}>
-            <Card style={{ padding: '32px 36px', background: 'linear-gradient(135deg, #4338ca 0%, #7C3AED 50%, #EC4899 100%)', border: 'none', boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 0 rgba(67,56,202,0.4), 0 20px 40px rgba(79,70,229,0.35)`, position: 'relative', overflow: 'hidden' }}>
+            <Card style={{ padding: '32px 36px', background: 'var(--theme-hero)', border: 'none', boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 0 rgba(var(--theme-primary-rgb),0.4), 0 20px 40px rgba(var(--theme-primary-rgb),0.35)`, position: 'relative', overflow: 'hidden' }}>
               {/* Shine overlay */}
               <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.15), transparent 60%)', pointerEvents:'none' }} aria-hidden/>
               {/* Grid texture */}

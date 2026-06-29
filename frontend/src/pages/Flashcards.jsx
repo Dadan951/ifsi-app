@@ -8,14 +8,16 @@ import { getCache, setCache } from '../utils/cache';
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
 const C = {
-  bg:'#EEF2FF', card:'#FFFFFF', text:'#1e1b4b', muted:'#6b7280',
-  border:'#e0e7ff', indigo:'#4F46E5', violet:'#7C3AED',
+  bg:'var(--theme-bg)', card:'#FFFFFF', text:'var(--theme-text)', muted:'#6b7280',
+  border:'var(--theme-border)', indigo:'var(--theme-primary)', violet:'var(--theme-secondary)',
   green:'#10B981', red:'#DC2626', amber:'#F59E0B',
 };
 const clay = {
-  card:`inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 0 #d4d8f0, 0 8px 24px rgba(79,70,229,0.08)`,
-  sm:  `inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 0 #d4d8f0, 0 4px 12px rgba(79,70,229,0.06)`,
-  btn: (hex, dark) => `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${dark}, 0 14px 28px ${hex}55`,
+  card:`inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 0 var(--theme-shadow), 0 8px 24px rgba(var(--theme-primary-rgb),0.08)`,
+  sm:  `inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 0 var(--theme-shadow), 0 4px 12px rgba(var(--theme-primary-rgb),0.06)`,
+  btn: (hex, dark) => hex
+    ? `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 ${dark}, 0 14px 28px ${hex}55`
+    : `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.22), 0 8px 0 var(--theme-dark), 0 14px 28px rgba(var(--theme-primary-rgb),0.33)`,
 };
 const PALETTE = [
   { from:'#6366f1', to:'#8b5cf6', dark:'#3730a3' },
@@ -402,7 +404,7 @@ function SwipeGame({ cards, onExit, semester, ue, chapter, prevAttempt }) {
                   Continuer
                 </motion.button>
                 <motion.button onClick={onExit} whileTap={{ scale:0.96 }}
-                  style={{ display:'block', width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:`linear-gradient(135deg,${C.indigo},${C.violet})`, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn(C.indigo,'#312e81'), minWidth:0 }}>
+                  style={{ display:'block', width:'100%', padding:'12px 0', borderRadius:14, border:'none', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:clay.btn(), minWidth:0 }}>
                   Quitter
                 </motion.button>
               </div>
@@ -628,7 +630,7 @@ export default function Flashcards() {
             <p style={{ fontSize:11, color:C.muted, marginBottom:24 }}>{pct}% complété · {a.known} connu · {a.unknown} à revoir</p>
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               <motion.button onClick={handleResume} whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
-                style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,${C.indigo},${C.violet})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81'), display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(), display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 Reprendre où je me suis arrêté
               </motion.button>
@@ -700,7 +702,7 @@ export default function Flashcards() {
 
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               <motion.button onClick={handleStart} whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
-                style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:`linear-gradient(135deg,${C.indigo},${C.violet})`, color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn(C.indigo,'#312e81') }}>
+                style={{ width:'100%', padding:'14px 0', borderRadius:16, border:'none', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', color:'#fff', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:'Nunito,sans-serif', boxShadow:clay.btn() }}>
                 Refaire ce chapitre
               </motion.button>
               <motion.button onClick={() => { setErrorsModal(false); setSelectedChapter(null); }} whileTap={{ scale:0.96 }}

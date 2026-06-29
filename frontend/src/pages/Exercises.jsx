@@ -8,18 +8,20 @@ import { API_URL, useAuth } from '../context/AuthContext';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const C = {
-  bg:     '#EEF2FF',
+  bg:     'var(--theme-bg)',
   card:   '#FFFFFF',
-  text:   '#1e1b4b',
-  border: '#e0e7ff',
-  indigo: '#4F46E5',
-  violet: '#7C3AED',
+  text:   'var(--theme-text)',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
   sub:    '#64748b',
 };
 const clay = {
-  card: '0 2px 0 #c7d2fe, 0 4px 24px rgba(99,102,241,0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
-  sm:   '0 2px 0 #c7d2fe, 0 2px 8px rgba(99,102,241,0.10)',
-  btn:  (hex, dark) => `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`,
+  card: '0 2px 0 var(--theme-shadow), 0 4px 24px rgba(var(--theme-primary-rgb),0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
+  sm:   '0 2px 0 var(--theme-shadow), 0 2px 8px rgba(var(--theme-primary-rgb),0.10)',
+  btn:  (hex, dark) => hex
+    ? `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`
+    : `0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.25), 0 1px 0 rgba(255,255,255,0.4) inset`,
 };
 
 /* ─── Palettes ───────────────────────────────────────────────────────────────── */
@@ -386,7 +388,7 @@ export default function Exercises() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ── */}
-        <div style={{ background:'linear-gradient(135deg,#0c4a6e 0%,#1d4ed8 45%,#4338ca 75%,#7C3AED 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           {/* Orbs */}
           <div style={{ position:'absolute', top:-40, right:-40, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,#38bdf8,transparent)', opacity:0.18, filter:'blur(50px)', animation:'drift1 18s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', bottom:-20, left:60, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,#a5b4fc,transparent)', opacity:0.15, filter:'blur(40px)', animation:'drift2 22s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>

@@ -7,18 +7,20 @@ import { getCache, setCache } from '../utils/cache';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const C = {
-  bg:     '#EEF2FF',
+  bg:     'var(--theme-bg)',
   card:   '#FFFFFF',
-  text:   '#1e1b4b',
-  border: '#e0e7ff',
-  indigo: '#4F46E5',
-  violet: '#7C3AED',
+  text:   'var(--theme-text)',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
   sub:    '#64748b',
 };
 const clay = {
-  card: '0 2px 0 #c7d2fe, 0 4px 24px rgba(99,102,241,0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
-  sm:   '0 2px 0 #c7d2fe, 0 2px 8px rgba(99,102,241,0.10)',
-  btn:  (hex, dark) => `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`,
+  card: '0 2px 0 var(--theme-shadow), 0 4px 24px rgba(var(--theme-primary-rgb),0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
+  sm:   '0 2px 0 var(--theme-shadow), 0 2px 8px rgba(var(--theme-primary-rgb),0.10)',
+  btn:  (hex, dark) => hex
+    ? `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`
+    : `0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.25), 0 1px 0 rgba(255,255,255,0.4) inset`,
 };
 
 /* ─── Palette ────────────────────────────────────────────────────────────────── */
@@ -293,7 +295,7 @@ export default function Annales() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ── */}
-        <div style={{ background:'linear-gradient(135deg,#1e1b4b 0%,#312e81 35%,#4338ca 70%,#7C3AED 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           {/* Orbs */}
           <div style={{ position:'absolute', top:-40, right:-30, width:200, height:200, borderRadius:'50%', background:'radial-gradient(circle,#a5b4fc,transparent)', opacity:0.2, filter:'blur(48px)', animation:'drift1 20s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', bottom:-16, left:80, width:150, height:150, borderRadius:'50%', background:'radial-gradient(circle,#fbbf24,transparent)', opacity:0.12, filter:'blur(38px)', animation:'drift2 24s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>

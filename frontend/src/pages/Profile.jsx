@@ -11,18 +11,20 @@ import { API_URL } from '../context/AuthContext';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const C = {
-  bg:     '#EEF2FF',
+  bg:     'var(--theme-bg)',
   card:   '#FFFFFF',
-  text:   '#1e1b4b',
-  border: '#e0e7ff',
-  indigo: '#4F46E5',
-  violet: '#7C3AED',
+  text:   'var(--theme-text)',
+  border: 'var(--theme-border)',
+  indigo: 'var(--theme-primary)',
+  violet: 'var(--theme-secondary)',
   sub:    '#64748b',
 };
 const clay = {
-  card: '0 2px 0 #c7d2fe, 0 4px 24px rgba(99,102,241,0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
-  sm:   '0 2px 0 #c7d2fe, 0 2px 8px rgba(99,102,241,0.10)',
-  btn:  (hex, dark) => `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`,
+  card: '0 2px 0 var(--theme-shadow), 0 4px 24px rgba(var(--theme-primary-rgb),0.10), 0 1px 0 rgba(255,255,255,0.9) inset',
+  sm:   '0 2px 0 var(--theme-shadow), 0 2px 8px rgba(var(--theme-primary-rgb),0.10)',
+  btn:  (hex, dark) => hex
+    ? `0 4px 0 ${dark}, 0 8px 24px ${hex}40, 0 1px 0 rgba(255,255,255,0.4) inset`
+    : `0 4px 0 var(--theme-dark), 0 8px 24px rgba(var(--theme-primary-rgb),0.25), 0 1px 0 rgba(255,255,255,0.4) inset`,
 };
 
 const subConfig = {
@@ -258,10 +260,10 @@ function AvatarCropModal({ src, onConfirm, onCancel, loading }) {
             Annuler
           </motion.button>
           <motion.button onClick={handleConfirm} disabled={loading}
-            whileHover={{ y:-2, boxShadow:clay.btn(C.indigo,'#3730a3') }} whileTap={{ scale:0.97 }}
-            style={{ flex:1, padding:'10px', borderRadius:14, border:'none', background:`linear-gradient(135deg,${C.indigo},${C.violet})`,
+            whileHover={{ y:-2, boxShadow:clay.btn() }} whileTap={{ scale:0.97 }}
+            style={{ flex:1, padding:'10px', borderRadius:14, border:'none', background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))',
               fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-              boxShadow:clay.btn(C.indigo,'#3730a3'), opacity:loading?0.8:1 }}>
+              boxShadow:clay.btn(), opacity:loading?0.8:1 }}>
             {loading
               ? <><div style={{ width:14, height:14, border:'2px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>Envoi...</>
               : '✓ Confirmer'}
@@ -275,7 +277,7 @@ function AvatarCropModal({ src, onConfirm, onCancel, loading }) {
 /* ─── Main ───────────────────────────────────────────────────────────────────── */
 export default function Profile() {
   const { user, refreshUser } = useAuth();
-  const { toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark, colorTheme, setColorTheme, THEMES } = useTheme();
   const isAdmin = user?.role === 'admin';
 
   const [infoForm, setInfoForm] = useState({ name:user?.name||'', email:user?.email||'' });
@@ -369,7 +371,7 @@ export default function Profile() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ── */}
-        <div style={{ background:'linear-gradient(135deg,#1e1b4b 0%,#312e81 30%,#4338ca 65%,#7C3AED 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           {/* Orbs */}
           <div style={{ position:'absolute', top:-48, right:-32, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,#a5b4fc,transparent)', opacity:0.2, filter:'blur(50px)', animation:'drift1 18s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', bottom:-20, left:100, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,#EC4899,transparent)', opacity:0.12, filter:'blur(40px)', animation:'drift2 22s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
@@ -391,8 +393,8 @@ export default function Profile() {
                   <input type="file" accept="image/*" style={{ display:'none' }} onChange={handleAvatarChange}/>
                   <motion.div whileHover={{ scale:1.1 }} whileTap={{ scale:0.9 }}
                     style={{ width:32, height:32, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
-                      background: avatarLoading ? '#64748b' : `linear-gradient(135deg,${C.indigo},${C.violet})`,
-                      boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+                      background: avatarLoading ? '#64748b' : 'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))',
+                      boxShadow:clay.btn() }}>
                     {avatarLoading
                       ? <div style={{ width:13, height:13, border:'2px solid rgba(255,255,255,0.5)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>
                       : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
@@ -471,9 +473,9 @@ export default function Profile() {
                           Passez à Pro pour accéder aux exercices, à la génération IA et bien plus.
                         </p>
                         <Link to="/dashboard/subscription" style={{ textDecoration:'none' }}>
-                          <motion.div whileHover={{ y:-2, boxShadow:clay.btn(C.indigo,'#3730a3') }} whileTap={{ scale:0.97 }}
+                          <motion.div whileHover={{ y:-2, boxShadow:clay.btn() }} whileTap={{ scale:0.97 }}
                             style={{ textAlign:'center', padding:'9px', borderRadius:14, fontSize:12, fontWeight:700, color:'#fff', cursor:'pointer',
-                              background:`linear-gradient(135deg,${C.indigo},${C.violet})`, boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+                              background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn() }}>
                             Passer au Pro →
                           </motion.div>
                         </Link>
@@ -604,10 +606,10 @@ export default function Profile() {
                     </div>
                     <div style={{ display:'flex', justifyContent:'flex-end' }}>
                       <motion.button type="submit" disabled={infoLoading}
-                        whileHover={{ y:-3, boxShadow:clay.btn(C.indigo,'#3730a3') }} whileTap={{ scale:0.97 }}
+                        whileHover={{ y:-3, boxShadow:clay.btn() }} whileTap={{ scale:0.97 }}
                         style={{ padding:'10px 22px', borderRadius:14, border:'none', cursor:'pointer', fontSize:13, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', gap:8,
-                          background:`linear-gradient(135deg,${C.indigo},${C.violet})`,
-                          boxShadow:clay.btn(C.indigo,'#3730a3'), opacity:infoLoading?0.7:1 }}>
+                          background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))',
+                          boxShadow:clay.btn(), opacity:infoLoading?0.7:1 }}>
                         {infoLoading && <div style={{ width:14, height:14, border:'2px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>}
                         {infoLoading ? 'Enregistrement…' : 'Enregistrer'}
                       </motion.button>
@@ -743,19 +745,56 @@ export default function Profile() {
                           whileHover={{ y:-3, boxShadow:theme.active?clay.card:clay.sm }} whileTap={{ scale:0.97 }}
                           style={{ position:'relative', padding:14, borderRadius:18, cursor:'pointer', textAlign:'left',
                             border:`2px solid ${theme.active?C.indigo:C.border}`,
-                            background: theme.active ? `${C.indigo}08` : C.card,
+                            background: theme.active ? 'rgba(var(--theme-primary-rgb),0.03)' : C.card,
                             boxShadow: theme.active ? clay.card : clay.sm, transition:'all 0.2s' }}>
                           {theme.preview}
                           <p style={{ fontSize:12, fontWeight:700, color:C.text }}>{theme.label}</p>
                           <p style={{ fontSize:11, color:C.sub, marginTop:2 }}>{theme.sub}</p>
                           {theme.active && (
                             <div style={{ position:'absolute', top:12, right:12, width:20, height:20, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
-                              background:`linear-gradient(135deg,${C.indigo},${C.violet})`, boxShadow:clay.btn(C.indigo,'#3730a3') }}>
+                              background:'linear-gradient(135deg,var(--theme-primary),var(--theme-secondary))', boxShadow:clay.btn() }}>
                               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
                           )}
                         </motion.button>
                       ))}
+                    </div>
+
+                    {/* ── Couleur de l'application ── */}
+                    <div style={{ marginTop:20, paddingTop:20, borderTop:`1px solid ${C.border}` }}>
+                      <p style={{ fontSize:11, fontWeight:700, color:C.sub, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:14 }}>
+                        Couleur de l'application
+                      </p>
+                      <div style={{ display:'flex', gap:12, flexWrap:'wrap', alignItems:'center' }}>
+                        {Object.entries(THEMES).map(([key, t]) => {
+                          const active = colorTheme === key;
+                          return (
+                            <motion.button key={key}
+                              onClick={() => setColorTheme(key)}
+                              whileHover={{ scale:1.15, y:-3 }}
+                              whileTap={{ scale:0.92 }}
+                              title={t.label}
+                              style={{
+                                width:38, height:38, borderRadius:'50%', border:'none', cursor:'pointer', flexShrink:0,
+                                background:`linear-gradient(135deg,${t.primary},${t.secondary})`,
+                                boxShadow: active
+                                  ? `0 0 0 3px #fff, 0 0 0 5px ${t.primary}, 0 6px 16px ${t.primary}60`
+                                  : `0 3px 10px ${t.primary}50`,
+                                display:'flex', alignItems:'center', justifyContent:'center',
+                                transition:'box-shadow 0.2s',
+                              }}>
+                              {active && (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                              )}
+                            </motion.button>
+                          );
+                        })}
+                      </div>
+                      <p style={{ fontSize:11, color:C.sub, marginTop:10 }}>
+                        <span style={{ fontWeight:700, color:'var(--theme-primary)' }}>{THEMES[colorTheme]?.label}</span> — thème actif
+                      </p>
                     </div>
                   </div>
                 </SCard>
