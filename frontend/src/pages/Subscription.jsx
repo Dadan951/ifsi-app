@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -218,22 +218,19 @@ function CmpVal({ v, col }) {
 export default function Subscription() {
   const { user, token, refreshUser } = useAuth();
   const [params]     = useSearchParams();
-  const [loading,    setLoading]    = useState(null);
-  const [portalLoad, setPortalLoad] = useState(false);
-  const [banner,     setBanner]     = useState(null);
-  const [tableScrollable, setTableScrollable] = useState(false);
-  const tableRef = useRef(null);
+  const [loading,      setLoading]      = useState(null);
+  const [portalLoad,   setPortalLoad]   = useState(false);
+  const [banner,       setBanner]       = useState(null);
+  const [isMobile,     setIsMobile]     = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(1); // Étudiant par défaut
 
   const currentSub  = user?.subscription || 'free';
   const isPaid      = currentSub !== 'free';
   const headers     = { Authorization: `Bearer ${token}` };
   const currentPlan = PLANS.find(p => p.id === currentSub);
 
-  /* Détecte si le tableau est scrollable (pour afficher l'indicateur) */
   useEffect(() => {
-    const el = tableRef.current;
-    if (!el) return;
-    const check = () => setTableScrollable(el.scrollWidth > el.clientWidth + 4);
+    const check = () => setIsMobile(window.innerWidth < 660);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
@@ -523,78 +520,127 @@ export default function Subscription() {
             transition={{ delay: 0.35 }}
             style={{ marginBottom: 40 }}>
 
-            {/* Titre section */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: 0 }}>
-                Comparaison détaillée
-              </h2>
-              {tableScrollable && (
-                <span style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  fontSize: 11, color: C.sub, fontWeight: 600,
-                  padding: '4px 10px', borderRadius: 8, background: C.card, border: `1px solid ${C.border}`,
-                }}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.sub} strokeWidth="2.5">
-                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="15 8 19 12 15 16"/>
-                  </svg>
-                  Glisser pour voir plus
-                </span>
-              )}
-            </div>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: '0 0 16px' }}>
+              Comparaison détaillée
+            </h2>
 
-            {/* Wrapper clay + scroll */}
-            <div style={{
-              background: C.card, borderRadius: 24, border: `1.5px solid ${C.border}`,
-              boxShadow: clay.card, overflow: 'hidden', position: 'relative',
-            }}>
-              {/* Dégradé indicateur de scroll à droite */}
-              {tableScrollable && (
-                <div style={{
-                  position: 'absolute', top: 0, right: 0, bottom: 0, width: 48, zIndex: 10,
-                  background: 'linear-gradient(to left, rgba(255,255,255,0.95), transparent)',
-                  pointerEvents: 'none',
-                }}/>
-              )}
+            {/* ── VUE MOBILE : onglets plan + table 2 colonnes ── */}
+            {isMobile && (
+              <div>
+                {/* Onglets sélection plan */}
+                <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                  {PLANS.map((p, pi) => (
+                    <motion.button key={p.id}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => setSelectedPlan(pi)}
+                      style={{
+                        flex: 1, padding: '9px 4px', borderRadius: 14, border: 'none', cursor: 'pointer',
+                        fontSize: 12, fontWeight: 800, lineHeight: 1.2,
+                        background: selectedPlan === pi ? p.gradient : C.card,
+                        color: selectedPlan === pi ? '#fff' : C.sub,
+                        boxShadow: selectedPlan === pi
+                          ? `0 3px 0 ${p.dark}, 0 6px 16px ${p.glow}`
+                          : clay.sm,
+                        transition: 'all 0.18s',
+                      }}>
+                      {p.icon}<br/>{p.name}
+                    </motion.button>
+                  ))}
+                </div>
 
-              <div ref={tableRef} style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                <table style={{ width: '100%', minWidth: 500, borderCollapse: 'collapse' }}>
+                {/* Table 2 colonnes animée */}
+                <AnimatePresence mode="wait">
+                  <motion.div key={selectedPlan}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}
+                    style={{
+                      background: C.card, borderRadius: 20,
+                      border: `1.5px solid ${PLANS[selectedPlan].accent}44`,
+                      boxShadow: `0 2px 0 var(--theme-shadow), 0 4px 20px ${PLANS[selectedPlan].glow}, 0 1px 0 rgba(255,255,255,0.9) inset`,
+                      overflow: 'hidden',
+                    }}>
+
+                    {/* En-tête plan sélectionné */}
+                    <div style={{
+                      padding: '12px 16px', background: PLANS[selectedPlan].gradient,
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>
+                        {PLANS[selectedPlan].icon} {PLANS[selectedPlan].name}
+                      </span>
+                      <span style={{ fontSize: 16, fontWeight: 900, color: 'rgba(255,255,255,0.9)' }}>
+                        {PLANS[selectedPlan].price}€<span style={{ fontSize: 11, fontWeight: 500, opacity: 0.7 }}>/mois</span>
+                      </span>
+                    </div>
+
+                    {/* Lignes fonctionnalités */}
+                    {COMPARE.map((section, si) => (
+                      <div key={si}>
+                        <div style={{
+                          padding: '8px 16px',
+                          background: C.bg,
+                          borderTop: si === 0 ? 'none' : `1.5px solid ${C.border}`,
+                        }}>
+                          <span style={{ fontSize: 10, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+                            {section.category}
+                          </span>
+                        </div>
+                        {section.rows.map((row, ri) => (
+                          <div key={ri} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '11px 16px', gap: 12,
+                            borderTop: `1px solid ${C.border}`,
+                            background: ri % 2 === 1 ? C.bg : C.card,
+                          }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: C.text, flex: 1 }}>
+                              {row.label}
+                            </span>
+                            <CmpVal v={row.vals[selectedPlan]} col={selectedPlan}/>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* ── VUE DESKTOP : table 4 colonnes ── */}
+            {!isMobile && (
+              <div style={{
+                background: C.card, borderRadius: 24,
+                border: `1.5px solid ${C.border}`, boxShadow: clay.card,
+                overflow: 'hidden',
+              }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: `2px solid ${C.border}`, background: C.bg }}>
-                      {/* Colonne feature (sticky) */}
-                      <th style={{
-                        padding: '14px 16px', textAlign: 'left', width: '38%',
-                        position: 'sticky', left: 0, zIndex: 3,
-                        background: C.bg,
-                        boxShadow: '2px 0 6px rgba(0,0,0,0.04)',
-                      }}>
+                      <th style={{ padding: '14px 20px', textAlign: 'left', width: '38%' }}>
                         <span style={{ fontSize: 10, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                           Fonctionnalité
                         </span>
                       </th>
-                      {PLANS.map((p, pi) => (
+                      {PLANS.map((p) => (
                         <th key={p.id} style={{
-                          padding: '14px 10px', textAlign: 'center',
-                          background: p.popular ? `rgba(var(--theme-primary-rgb),0.04)` : C.bg,
-                          minWidth: 90,
+                          padding: '14px 12px', textAlign: 'center',
+                          background: p.popular ? `rgba(var(--theme-primary-rgb),0.04)` : 'transparent',
                         }}>
                           <div style={{
                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            width: 28, height: 28, borderRadius: 8, marginBottom: 4,
+                            width: 30, height: 30, borderRadius: 9, marginBottom: 5,
                             background: p.gradient,
                             boxShadow: `0 2px 0 ${p.dark}, 0 4px 10px ${p.glow}`,
                           }}>
-                            <span style={{ fontSize: 13 }}>{p.icon}</span>
+                            <span style={{ fontSize: 14 }}>{p.icon}</span>
                           </div>
-                          <div style={{ fontSize: 12, fontWeight: 800, color: p.accent }}>{p.name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: p.accent }}>{p.name}</div>
                           <div style={{ fontSize: 11, fontWeight: 600, color: C.sub }}>{p.price}€/mois</div>
                           {p.id === currentSub && (
                             <div style={{
-                              fontSize: 9, fontWeight: 800, marginTop: 3,
-                              padding: '2px 6px', borderRadius: 999, display: 'inline-block',
+                              fontSize: 9, fontWeight: 800, marginTop: 4,
+                              padding: '2px 7px', borderRadius: 999, display: 'inline-block',
                               background: p.accent + '18', color: p.accent,
-                            }}>
-                              ▲ actuel
-                            </div>
+                            }}>▲ actuel</div>
                           )}
                         </th>
                       ))}
@@ -603,32 +649,24 @@ export default function Subscription() {
                   <tbody>
                     {COMPARE.map((section, si) => (
                       <>
-                        {/* Ligne catégorie */}
                         <tr key={`cat-${si}`} style={{ background: C.bg, borderTop: si === 0 ? 'none' : `1.5px solid ${C.border}` }}>
-                          <td colSpan={4} style={{ padding: '10px 16px' }}>
+                          <td colSpan={4} style={{ padding: '10px 20px' }}>
                             <span style={{ fontSize: 10, fontWeight: 800, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.09em' }}>
                               {section.category}
                             </span>
                           </td>
                         </tr>
-                        {/* Lignes features */}
                         {section.rows.map((row, ri) => (
                           <tr key={`${si}-${ri}`} style={{
                             borderTop: `1px solid ${C.border}`,
-                            background: ri % 2 === 1 ? 'rgba(var(--theme-primary-rgb),0.015)' : C.card,
+                            background: ri % 2 === 1 ? C.bg : C.card,
                           }}>
-                            {/* Label (sticky) */}
-                            <td style={{
-                              padding: '11px 16px', fontSize: 13, fontWeight: 600, color: C.text,
-                              position: 'sticky', left: 0, zIndex: 2,
-                              background: ri % 2 === 1 ? C.bg : C.card,
-                              boxShadow: '2px 0 6px rgba(0,0,0,0.03)',
-                            }}>
+                            <td style={{ padding: '12px 20px', fontSize: 13, fontWeight: 600, color: C.text }}>
                               {row.label}
                             </td>
                             {row.vals.map((v, vi) => (
                               <td key={vi} style={{
-                                padding: '11px 10px', textAlign: 'center',
+                                padding: '12px 12px', textAlign: 'center',
                                 background: PLANS[vi].popular ? `rgba(var(--theme-primary-rgb),0.04)` : 'transparent',
                               }}>
                                 <CmpVal v={v} col={vi}/>
@@ -641,7 +679,7 @@ export default function Subscription() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            )}
           </motion.div>
 
           {/* ── CTA upgrade pour plan gratuit ─────────────────────────── */}
