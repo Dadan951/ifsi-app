@@ -652,7 +652,6 @@ export default function Flashcards() {
     const a      = chapterAttempt;
     const tot    = a.total || currentCards.length;
     const pct    = tot ? Math.round((a.known / tot) * 100) : 0;
-    const passed = pct >= 60;
     const ringColor = pct >= 80 ? C.green : pct >= 60 ? C.amber : C.red;
     return (
       <DashboardLayout>
