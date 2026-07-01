@@ -67,10 +67,21 @@ function barCfg(pct) {
   return BAR_COLORS.bad;
 }
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 640);
+    window.addEventListener('resize', fn, { passive: true });
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return mobile;
+}
+
 function ProgressChart({ data, chartTypes, setChartTypes }) {
   const [hovered, setHovered] = useState(null);
+  const isMobile = useIsMobile();
 
-  const items   = data.slice(-14);
+  const items   = data.slice(-7);
   const avg     = items.length ? Math.round(items.reduce((s, d) => s + d.pct, 0) / items.length) : 0;
   const best    = items.length ? Math.max(...items.map(d => d.pct)) : 0;
   const bestIdx = items.findIndex(d => d.pct === best);
@@ -115,35 +126,39 @@ function ProgressChart({ data, chartTypes, setChartTypes }) {
       ) : (
         <>
           {/* KPIs */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr auto auto', gap:12 }}>
-            <div style={{ borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:16,
+          <div style={{ display:'grid', gap:10, gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr auto auto' }}>
+            {/* Moyenne — pleine largeur sur mobile */}
+            <div style={{ borderRadius:16, padding:'12px 16px', display:'flex', alignItems:'center', gap:12,
+              gridColumn: isMobile ? '1 / -1' : undefined,
               background:`linear-gradient(135deg,${avgCfg.from}18,${avgCfg.to}08)`,
               border:`1.5px solid ${avgCfg.from}30`, boxShadow:clay.sm }}>
               <div>
                 <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Moyenne</p>
-                <p className="nunito" style={{ fontSize:28, fontWeight:900, color:avgCfg.from, lineHeight:1 }}>{avg}%</p>
+                <p className="nunito" style={{ fontSize:isMobile?24:28, fontWeight:900, color:avgCfg.from, lineHeight:1 }}>{avg}%</p>
               </div>
-              <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:4, padding:'4px 10px', borderRadius:20, fontSize:12, fontWeight:700,
+              <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:4, padding:'4px 10px', borderRadius:20, fontSize:11, fontWeight:700,
                 background: trend > 2 ? '#d1fae5' : trend < -2 ? '#fee2e2' : '#f1f5f9',
                 color:      trend > 2 ? '#065f46' : trend < -2 ? '#991b1b' : '#64748b' }}>
                 {trend > 2 ? '↑' : trend < -2 ? '↓' : '→'} {Math.abs(Math.round(trend))}%
               </div>
             </div>
-            <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
+            {/* Meilleur */}
+            <div style={{ borderRadius:16, padding:'12px 14px', textAlign:'center',
               background:'linear-gradient(135deg,#ecfdf5,#d1fae5)', border:'1.5px solid #a7f3d0', boxShadow:clay.sm }}>
               <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'#059669', marginBottom:2 }}>Meilleur</p>
-              <p className="nunito" style={{ fontSize:24, fontWeight:900, color:'#065f46', lineHeight:1 }}>{best}%</p>
+              <p className="nunito" style={{ fontSize:isMobile?20:24, fontWeight:900, color:'#065f46', lineHeight:1 }}>{best}%</p>
             </div>
-            <div style={{ borderRadius:16, padding:'14px 18px', textAlign:'center',
+            {/* Analysés */}
+            <div style={{ borderRadius:16, padding:'12px 14px', textAlign:'center',
               background:`linear-gradient(135deg,#f8fafc,#f1f5f9)`, border:`1.5px solid ${C.border}`, boxShadow:clay.sm }}>
               <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:C.sub, marginBottom:2 }}>Analysés</p>
-              <p className="nunito" style={{ fontSize:24, fontWeight:900, color:C.text, lineHeight:1 }}>{items.length}</p>
+              <p className="nunito" style={{ fontSize:isMobile?20:24, fontWeight:900, color:C.text, lineHeight:1 }}>{items.length}</p>
             </div>
           </div>
 
           {/* Barres */}
           <div>
-            <div style={{ display:'flex', alignItems:'flex-end', gap:5, height:112, position:'relative' }}>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:isMobile?4:5, height:isMobile?90:112, position:'relative' }}>
               <div style={{ position:'absolute', inset:0, height:'20%', background:'linear-gradient(180deg,#10b98108,transparent)', borderRadius:12, pointerEvents:'none' }}/>
               {items.map((d, i) => {
                 const cfg    = barCfg(d.pct);
@@ -189,10 +204,10 @@ function ProgressChart({ data, chartTypes, setChartTypes }) {
                 );
               })}
             </div>
-            <div style={{ display:'flex', gap:5, marginTop:8 }}>
+            <div style={{ display:'flex', gap:isMobile?4:5, marginTop:6 }}>
               {items.map((d, i) => (
                 <div key={i} style={{ flex:1, textAlign:'center' }}>
-                  <span style={{ fontSize:9, color:'#94a3b8' }}>{fmtDateShort(d.completedAt)}</span>
+                  <span style={{ fontSize:isMobile?8:9, color:'#94a3b8' }}>{fmtDateShort(d.completedAt)}</span>
                 </div>
               ))}
             </div>
@@ -473,7 +488,7 @@ export default function History() {
     [...history]
       .filter(h => chartTypes.has(h.type))
       .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt))
-      .slice(-20),
+      .slice(-7),
   [history, chartTypes]);
 
   const filtered = useMemo(() => {
@@ -578,7 +593,7 @@ export default function History() {
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:18, gap:12, flexWrap:'wrap' }}>
                 <div>
                   <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text }}>Progression</h2>
-                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {Math.min(chartData.length,14)} dernières sessions</p>
+                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {Math.min(chartData.length,7)} dernières sessions</p>
                 </div>
               </div>
               <ProgressChart data={chartData} chartTypes={chartTypes} setChartTypes={setChartTypes}/>
@@ -587,7 +602,8 @@ export default function History() {
 
           {/* Filtres texte / semestre / tri */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:10, marginBottom:16 }}>
-            <div style={{ flex:1, minWidth:180, position:'relative' }}>
+            {/* Barre de recherche — pleine largeur sur mobile */}
+            <div style={{ flex:1, minWidth:0, width:'100%', position:'relative' }}>
               <svg style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:C.sub }}
                 width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -597,14 +613,15 @@ export default function History() {
                   borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card, boxShadow:clay.sm,
                   fontSize:13, color:C.text, outline:'none', boxSizing:'border-box' }}/>
             </div>
+            {/* Selects — côte à côte (chacun flex:1) pour remplir la ligne sur mobile */}
             <select value={filterSem} onChange={e => setFilterSem(e.target.value)}
-              style={{ padding:'10px 14px', borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card,
+              style={{ flex:1, minWidth:0, padding:'10px 12px', borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card,
                 boxShadow:clay.sm, fontSize:13, color:C.text, outline:'none', cursor:'pointer' }}>
-              <option value="">Tous les semestres</option>
+              <option value="">Tous semestres</option>
               {semesters.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
             <select value={sort} onChange={e => setSort(e.target.value)}
-              style={{ padding:'10px 14px', borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card,
+              style={{ flex:1, minWidth:0, padding:'10px 12px', borderRadius:12, border:`1.5px solid ${C.border}`, background:C.card,
                 boxShadow:clay.sm, fontSize:13, color:C.text, outline:'none', cursor:'pointer' }}>
               <option value="date">Plus récent</option>
               <option value="score_desc">Meilleur score</option>
