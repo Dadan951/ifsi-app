@@ -377,7 +377,7 @@ export default function Profile() {
       <div style={{ flex:1, overflowY:'auto', background:C.bg }}>
 
         {/* ── HERO ── */}
-        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden', minHeight:'200px' }}>
           {/* Orbs */}
           <div style={{ position:'absolute', top:-48, right:-32, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,#a5b4fc,transparent)', opacity:0.2, filter:'blur(50px)', animation:'drift1 18s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', bottom:-20, left:100, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,#EC4899,transparent)', opacity:0.12, filter:'blur(40px)', animation:'drift2 22s ease-in-out infinite', pointerEvents:'none' }} aria-hidden/>
@@ -439,21 +439,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Stats grid */}
-            <div className="profile-stats-grid" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
-              {stats.map((s, i) => (
-                <motion.div key={s.label}
-                  initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
-                  transition={{ delay:0.1+i*0.07, duration:0.4 }}
-                  style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:16, padding:'12px 8px', textAlign:'center', backdropFilter:'blur(8px)' }}>
-                  <div style={{ fontSize:18, marginBottom:2 }}>{s.icon}</div>
-                  <div style={{ fontSize:20, fontWeight:900, color:'#fff', lineHeight:1 }}>
-                    <Counter value={s.value}/>
-                  </div>
-                  <div style={{ fontSize:10, color:'rgba(196,181,253,0.6)', marginTop:4 }}>{s.label}</div>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
         </div>
 

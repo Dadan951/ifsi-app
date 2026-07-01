@@ -243,45 +243,45 @@ export default function Medicaments() {
               </div>
             </div>
 
-            <div style={{ display:'flex', gap:20, marginBottom:18 }}>
-              {[
-                { n:classes.length, l:'Classes', c:'#c4b5fd' },
-                { n:drugs.length,   l:'Médicaments', c:'#fff' },
-              ].map(s => (
-                <motion.div key={s.l} initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
-                  transition={{ delay:0.1 }}>
-                  <p className="nunito" style={{ fontSize:22, fontWeight:900, color:s.c, lineHeight:1 }}>{s.n}</p>
-                  <p style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{s.l}</p>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Search */}
-            <div style={{ position:'relative', maxWidth:520 }}>
-              <svg style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'rgba(196,181,253,0.8)', pointerEvents:'none' }}
-                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input
-                ref={searchRef}
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Rechercher un médicament, une classe…"
-                style={{ width:'100%', paddingLeft:44, paddingRight: search ? 40 : 16, paddingTop:12, paddingBottom:12,
-                  borderRadius:16, border:'1.5px solid rgba(255,255,255,0.2)', outline:'none',
-                  background:'rgba(255,255,255,0.12)', backdropFilter:'blur(8px)',
-                  color:'#fff', fontSize:13, boxSizing:'border-box' }}
-              />
-              {search && (
-                <button onClick={() => setSearch('')}
-                  style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)',
-                    background:'transparent', border:'none', cursor:'pointer', color:'rgba(196,181,253,0.8)', padding:4 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
-              )}
+            {/* Search + stats sur la même ligne */}
+            <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+              <div style={{ position:'relative', flex:1 }}>
+                <svg style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'rgba(196,181,253,0.8)', pointerEvents:'none' }}
+                  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Rechercher un médicament, une classe…"
+                  style={{ width:'100%', paddingLeft:44, paddingRight: search ? 40 : 16, paddingTop:12, paddingBottom:12,
+                    borderRadius:16, border:'1.5px solid rgba(255,255,255,0.2)', outline:'none',
+                    background:'rgba(255,255,255,0.12)', backdropFilter:'blur(8px)',
+                    color:'#fff', fontSize:13, boxSizing:'border-box' }}
+                />
+                {search && (
+                  <button onClick={() => setSearch('')}
+                    style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)',
+                      background:'transparent', border:'none', cursor:'pointer', color:'rgba(196,181,253,0.8)', padding:4 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <div style={{ display:'flex', gap:16, flexShrink:0 }}>
+                {[
+                  { n:classes.length, l:'Classes', c:'#c4b5fd' },
+                  { n:drugs.length,   l:'Médicaments', c:'#fff' },
+                ].map(s => (
+                  <div key={s.l} style={{ textAlign:'center' }}>
+                    <p className="nunito" style={{ fontSize:22, fontWeight:900, color:s.c, lineHeight:1 }}>{s.n}</p>
+                    <p style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{s.l}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
