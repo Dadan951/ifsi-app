@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { API_URL, useAuth } from '../context/AuthContext';
+import { getCache, setCache } from '../utils/cache';
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const C = {
@@ -467,13 +468,25 @@ export default function History() {
   const [openId,      setOpenId]      = useState(null);
 
   useEffect(() => {
+    const cachedQ  = getCache('history_quiz');
+    const cachedFc = getCache('history_fc');
+    if (cachedQ && cachedFc) {
+      setQuizHistory(cachedQ);
+      setFcHistory(cachedFc);
+      setLoading(false);
+      return;
+    }
     Promise.all([
       axios.get(`${API_URL}/quizzes/history`,    { headers: { Authorization: `Bearer ${token}` } }),
       axios.get(`${API_URL}/flashcards/history`, { headers: { Authorization: `Bearer ${token}` } }),
     ])
       .then(([qRes, fcRes]) => {
-        setQuizHistory(qRes.data.map(h => ({ ...h, type:'quiz' })));
-        setFcHistory(fcRes.data.map(h => ({ ...h, type:'flashcard' })));
+        const q  = qRes.data.map(h => ({ ...h, type:'quiz' }));
+        const fc = fcRes.data.map(h => ({ ...h, type:'flashcard' }));
+        setQuizHistory(q);
+        setFcHistory(fc);
+        setCache('history_quiz', q);
+        setCache('history_fc',   fc);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
