@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -78,10 +78,24 @@ function useIsMobile() {
 }
 
 function ProgressChart({ data, chartTypes, setChartTypes }) {
-  const [hovered, setHovered] = useState(null);
+  const [hovered,       setHovered]       = useState(null);
+  const [containerWidth, setContainerWidth] = useState(320);
+  const containerRef = useRef(null);
   const isMobile = useIsMobile();
 
-  const items   = data.slice(-7);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // 1 barre ≈ 44px — min 5, max 14
+  const barCount = Math.max(5, Math.min(14, Math.floor(containerWidth / 44)));
+  const items   = data.slice(-barCount);
   const avg     = items.length ? Math.round(items.reduce((s, d) => s + d.pct, 0) / items.length) : 0;
   const best    = items.length ? Math.max(...items.map(d => d.pct)) : 0;
   const bestIdx = items.findIndex(d => d.pct === best);
@@ -157,7 +171,7 @@ function ProgressChart({ data, chartTypes, setChartTypes }) {
           </div>
 
           {/* Barres */}
-          <div>
+          <div ref={containerRef}>
             <div style={{ display:'flex', alignItems:'flex-end', gap:isMobile?4:5, height:isMobile?90:112, position:'relative' }}>
               <div style={{ position:'absolute', inset:0, height:'20%', background:'linear-gradient(180deg,#10b98108,transparent)', borderRadius:12, pointerEvents:'none' }}/>
               {items.map((d, i) => {
@@ -488,7 +502,7 @@ export default function History() {
     [...history]
       .filter(h => chartTypes.has(h.type))
       .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt))
-      .slice(-7),
+      .slice(-14),
   [history, chartTypes]);
 
   const filtered = useMemo(() => {
@@ -593,7 +607,7 @@ export default function History() {
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:18, gap:12, flexWrap:'wrap' }}>
                 <div>
                   <h2 className="nunito" style={{ fontSize:15, fontWeight:800, color:C.text }}>Progression</h2>
-                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {Math.min(chartData.length,7)} dernières sessions</p>
+                  <p style={{ fontSize:12, color:C.sub, marginTop:2 }}>Tes {chartData.length} dernières sessions</p>
                 </div>
               </div>
               <ProgressChart data={chartData} chartTypes={chartTypes} setChartTypes={setChartTypes}/>
