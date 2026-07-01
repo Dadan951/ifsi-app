@@ -31,6 +31,7 @@ const clay = {
 const TYPE_CFG = {
   quiz:      { label:'Quiz',       color: C.indigo,  dot:'var(--theme-primary)',   icon:'🎯' },
   flashcard: { label:'Flashcards', color: C.violet,  dot:'var(--theme-secondary)', icon:'🃏' },
+  exercise:  { label:'Exercices',  color: '#0891b2', dot:'#0891b2',               icon:'✏️' },
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -460,7 +461,7 @@ export default function History() {
   const [loading,     setLoading]     = useState(true);
 
   const [typeFilter,  setTypeFilter]  = useState('all');
-  const [chartTypes,  setChartTypes]  = useState(new Set(['quiz', 'flashcard']));
+  const [chartTypes,  setChartTypes]  = useState(new Set(['quiz', 'flashcard', 'exercise']));
   const [search,      setSearch]      = useState('');
   const [filterSem,   setFilterSem]   = useState('');
   const [sort,        setSort]        = useState('date');
@@ -563,42 +564,6 @@ export default function History() {
         {/* ── CONTENT ──────────────────────────────────────────────────────── */}
         <div style={{ padding:'24px 16px' }}>
 
-          {/* Filtre type */}
-          <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
-            {[
-              { id:'all',       label:'Tout',       count: history.length,      icon:null,   disabled:false },
-              { id:'quiz',      label:'Quiz',       count: quizHistory.length,  icon:'🎯',   disabled:false },
-              { id:'flashcard', label:'Flashcards', count: fcHistory.length,    icon:'🃏',   disabled:false },
-              { id:'exercise',  label:'Exercices',  count: 0,                   icon:'✏️',   disabled:true  },
-            ].map(t => {
-              const active = typeFilter === t.id;
-              return (
-                <motion.button key={t.id}
-                  whileHover={!t.disabled ? { scale:1.02 } : {}}
-                  whileTap={!t.disabled ? { scale:0.97 } : {}}
-                  disabled={t.disabled}
-                  onClick={() => !t.disabled && setTypeFilter(t.id)}
-                  style={{ padding:'8px 16px', borderRadius:20, border:`1.5px solid ${active ? C.indigo : C.border}`,
-                    background: active ? `${C.indigo}14` : C.card,
-                    color: t.disabled ? '#94a3b8' : active ? C.indigo : C.text,
-                    fontSize:13, fontWeight:700, cursor: t.disabled ? 'default' : 'pointer',
-                    boxShadow: active ? clay.sm : 'none',
-                    opacity: t.disabled ? 0.55 : 1,
-                    display:'flex', alignItems:'center', gap:6, transition:'all 0.18s' }}>
-                  {t.icon && <span>{t.icon}</span>}
-                  {t.label}
-                  {!t.disabled && t.count > 0 && (
-                    <span style={{ background: active ? C.indigo : C.bg, color: active ? '#fff' : C.indigo,
-                      borderRadius:12, padding:'1px 7px', fontSize:11, fontWeight:700, minWidth:18, textAlign:'center' }}>{t.count}</span>
-                  )}
-                  {t.disabled && (
-                    <span style={{ fontSize:9, background:'var(--theme-border)', color:'#94a3b8', borderRadius:8, padding:'1px 7px', fontWeight:700 }}>bientôt</span>
-                  )}
-                </motion.button>
-              );
-            })}
-          </div>
-
           {/* Graphique de progression */}
           {(chartData.length > 0 || history.length >= 2) && (
             <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.15 }}
@@ -614,8 +579,47 @@ export default function History() {
             </motion.div>
           )}
 
-          {/* Filtres texte / semestre / tri */}
-          <div style={{ display:'flex', flexWrap:'wrap', gap:10, marginBottom:16 }}>
+          {/* Filtres — type + recherche + semestre + tri */}
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16 }}>
+            {/* Pills de type */}
+            {[
+              { id:'all',       label:'Tout',       count: history.length,     icon:null,  disabled:false },
+              { id:'quiz',      label:'Quiz',       count: quizHistory.length, icon:'🎯',  disabled:false },
+              { id:'flashcard', label:'Flashcards', count: fcHistory.length,   icon:'🃏',  disabled:false },
+              { id:'exercise',  label:'Exercices',  count: 0,                  icon:'✏️',  disabled:true  },
+            ].map(t => {
+              const active = typeFilter === t.id;
+              return (
+                <motion.button key={t.id}
+                  whileHover={!t.disabled ? { scale:1.02 } : {}}
+                  whileTap={!t.disabled ? { scale:0.97 } : {}}
+                  disabled={t.disabled}
+                  onClick={() => !t.disabled && setTypeFilter(t.id)}
+                  style={{ padding:'7px 14px', borderRadius:20,
+                    border:`1.5px solid ${active ? C.indigo : C.border}`,
+                    background: active ? `${C.indigo}14` : C.card,
+                    color: t.disabled ? '#94a3b8' : active ? C.indigo : C.text,
+                    fontSize:12, fontWeight:700, cursor: t.disabled ? 'default' : 'pointer',
+                    boxShadow: active ? clay.sm : 'none',
+                    opacity: t.disabled ? 0.55 : 1,
+                    display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', flexShrink:0 }}>
+                  {t.icon && <span style={{ fontSize:11 }}>{t.icon}</span>}
+                  {t.label}
+                  {!t.disabled && t.count > 0 && (
+                    <span style={{ background: active ? C.indigo : C.bg, color: active ? '#fff' : C.indigo,
+                      borderRadius:12, padding:'1px 6px', fontSize:10, fontWeight:700 }}>{t.count}</span>
+                  )}
+                  {t.disabled && (
+                    <span style={{ fontSize:9, background:'var(--theme-border)', color:'#94a3b8', borderRadius:8, padding:'1px 6px', fontWeight:700 }}>bientôt</span>
+                  )}
+                </motion.button>
+              );
+            })}
+
+            {/* Séparateur visuel */}
+            <div style={{ width:'100%', height:0 }}/>
+
+          {/* Recherche + selects (second rang) */}
             {/* Barre de recherche — pleine largeur sur mobile */}
             <div style={{ flex:1, minWidth:0, width:'100%', position:'relative' }}>
               <svg style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:C.sub }}
