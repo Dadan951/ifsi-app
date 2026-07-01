@@ -235,10 +235,26 @@ function SwipeGame({ cards, onExit, semester, ue, chapter, prevAttempt }) {
   const [currentIndex, setCurrentIndex] = useState(() =>
     prevAttempt?.status === 'in_progress' ? Math.min(prevAttempt.currentIndex, total - 1) : 0);
   const [flipped,      setFlipped]      = useState(false);
-  const [known,        setKnown]        = useState(() => prevAttempt?.status === 'in_progress' ? (prevAttempt.known || 0) : 0);
-  const [unknown,      setUnknown]      = useState(() => prevAttempt?.status === 'in_progress' ? (prevAttempt.unknown || 0) : 0);
-  const [unknownCards, setUnknownCards] = useState(() => prevAttempt?.status === 'in_progress' ? (prevAttempt.unknownCards || []) : []);
   const [done,         setDone]         = useState(false);
+
+  // Une entrée par carte : 'known' | 'unknown' | null
+  // Reconstruit depuis prevAttempt si disponible
+  const [cardAnswers, setCardAnswers] = useState(() => {
+    const answers = new Array(total).fill(null);
+    if (prevAttempt?.status === 'in_progress') {
+      const unknownFrontsSet = new Set((prevAttempt.unknownCards || []).map(c => c.front));
+      const upTo = Math.min(prevAttempt.currentIndex || 0, total);
+      for (let i = 0; i < upTo; i++) {
+        answers[i] = unknownFrontsSet.has(cards[i].front) ? 'unknown' : 'known';
+      }
+    }
+    return answers;
+  });
+
+  // Dérivés — recalculés à chaque réponse ou saut, jamais en double
+  const known        = cardAnswers.filter(a => a === 'known').length;
+  const unknown      = cardAnswers.filter(a => a === 'unknown').length;
+  const unknownCards = cards.filter((c, i) => cardAnswers[i] === 'unknown').map(c => ({ front: c.front, back: c.back }));
   const [confirmExit,  setConfirmExit]  = useState(false);
   const [showOverview, setShowOverview] = useState(false);
   const [exitDir,      setExitDir]      = useState(null);
@@ -261,22 +277,24 @@ function SwipeGame({ cards, onExit, semester, ue, chapter, prevAttempt }) {
 
   const handleAnswer = useCallback((dir) => {
     if (!flipped) return;
-    const isKnown = dir === 'right';
-    const nk = isKnown ? known + 1 : known;
-    const nu = isKnown ? unknown : unknown + 1;
-    const nuc = isKnown ? unknownCards : [...unknownCards, { front: card.front, back: card.back }];
+    const newAnswers = [...cardAnswers];
+    newAnswers[currentIndex] = dir === 'right' ? 'known' : 'unknown';
+    setCardAnswers(newAnswers);
+    const nk  = newAnswers.filter(a => a === 'known').length;
+    const nu  = newAnswers.filter(a => a === 'unknown').length;
+    const nuc = cards.filter((c, i) => newAnswers[i] === 'unknown').map(c => ({ front: c.front, back: c.back }));
     setExitDir(dir);
-    setKnown(nk); setUnknown(nu); setUnknownCards(nuc);
     setTimeout(() => {
       const next = currentIndex + 1;
       if (next >= total) { persistProgress(0, nk, nu, nuc, 'completed'); setDone(true); }
       else { setCurrentIndex(next); persistProgress(next, nk, nu, nuc); }
     }, 300);
-  }, [flipped, currentIndex, total, known, unknown, unknownCards, card, persistProgress]);
+  }, [flipped, currentIndex, total, cardAnswers, cards, persistProgress]);
 
   const handleRestart = () => {
-    setCurrentIndex(0); setKnown(0); setUnknown(0);
-    setUnknownCards([]); setDone(false); setFlipped(false); setExitDir(null);
+    setCurrentIndex(0);
+    setCardAnswers(new Array(total).fill(null));
+    setDone(false); setFlipped(false); setExitDir(null);
     persistProgress(0, 0, 0, []);
   };
 
