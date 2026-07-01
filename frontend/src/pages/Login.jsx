@@ -528,20 +528,6 @@ export default function Login() {
           </p>
         </motion.div>
 
-        {/* ── Stats sous la carte ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-          className="flex items-center gap-8 mt-7"
-        >
-          {[['5 000+', 'Étudiants'], ['50 000+', 'Questions'], ['98 %', 'Satisfaction']].map(([n, l], i) => (
-            <div key={l} className="text-center">
-              <div className="text-sm font-bold text-cyan-400">{n}</div>
-              <div className="text-[10px] text-blue-400/55 mt-0.5">{l}</div>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </div>
   );
