@@ -85,6 +85,28 @@ router.put('/goals', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+/* ── Préférences utilisateur (thème + couleur) ──────────────────────────── */
+router.get('/preferences', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('preferences');
+    res.json(user.preferences || { colorTheme: 'violet', darkMode: false });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+router.put('/preferences', protect, async (req, res) => {
+  try {
+    const { colorTheme, darkMode } = req.body;
+    const update = {};
+    const VALID = ['violet','blue','green','orange','red','yellow'];
+    if (colorTheme && VALID.includes(colorTheme)) update['preferences.colorTheme'] = colorTheme;
+    if (typeof darkMode === 'boolean') update['preferences.darkMode'] = darkMode;
+    if (Object.keys(update).length) {
+      await User.findByIdAndUpdate(req.user._id, { $set: update });
+    }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 router.post('/register',         register);
 router.post('/verify-email',     verifyEmail);
 router.post('/resend-code',      resendCode);

@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { useAuth } from './AuthContext';
+import { API_URL } from './AuthContext';
 
 const ThemeContext = createContext();
 
@@ -57,7 +59,8 @@ function applyColorTheme(key) {
 }
 
 export function ThemeProvider({ children }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+
   const [theme, setTheme] = useState(() => localStorage.getItem('nurseprep-theme') || 'light');
   const [colorTheme, setColorTheme] = useState(() => {
     const saved = localStorage.getItem('nurseprep-color') || 'violet';
@@ -65,17 +68,67 @@ export function ThemeProvider({ children }) {
     return saved;
   });
 
+  // serverPrefs tracks what was last loaded/saved to the server.
+  // Set BEFORE calling setState so the resulting effect can detect
+  // "this change came from the server" and skip the redundant PUT.
+  const serverPrefs = useRef({ colorTheme: null, darkMode: null });
+
+  /* ── Load preferences from server on login ─────────────────────────────── */
+  useEffect(() => {
+    if (!user || !token) {
+      serverPrefs.current = { colorTheme: null, darkMode: null };
+      return;
+    }
+    axios.get(`${API_URL}/auth/preferences`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => {
+        const ct       = res.data.colorTheme || 'violet';
+        const darkMode = typeof res.data.darkMode === 'boolean' ? res.data.darkMode : false;
+
+        // Set ref BEFORE setState so the save effects see it immediately
+        serverPrefs.current = { colorTheme: ct, darkMode };
+
+        if (THEMES[ct]) {
+          applyColorTheme(ct);
+          setColorTheme(ct);
+          localStorage.setItem('nurseprep-color', ct);
+        }
+        const newTheme = darkMode ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('nurseprep-theme', newTheme);
+      })
+      .catch(() => {});
+  }, [user?._id]); // eslint-disable-line
+
+  /* ── Dark mode class + persist ─────────────────────────────────────────── */
   useEffect(() => {
     const root = document.documentElement;
     if (user && theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
     localStorage.setItem('nurseprep-theme', theme);
-  }, [theme, user]);
 
+    const isDark = theme === 'dark';
+    if (token && user && isDark !== serverPrefs.current.darkMode) {
+      serverPrefs.current.darkMode = isDark;
+      axios.put(`${API_URL}/auth/preferences`, { darkMode: isDark }, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+  }, [theme, user, token]);
+
+  /* ── Color theme + persist ─────────────────────────────────────────────── */
   useEffect(() => {
     applyColorTheme(colorTheme);
     localStorage.setItem('nurseprep-color', colorTheme);
-  }, [colorTheme]);
+
+    if (token && user && colorTheme !== serverPrefs.current.colorTheme) {
+      serverPrefs.current.colorTheme = colorTheme;
+      axios.put(`${API_URL}/auth/preferences`, { colorTheme }, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+  }, [colorTheme, token, user]);
 
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 

@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     count: { type: Number, default: 0 },
     date: { type: String, default: '' }
   },
+  preferences: {
+    colorTheme: { type: String, default: 'violet' },
+    darkMode:   { type: Boolean, default: false },
+  },
   avatar: { type: String, default: '' },
   pushSubscription: { type: mongoose.Schema.Types.Mixed, default: null },
   pushEnabled: { type: Boolean, default: false },
