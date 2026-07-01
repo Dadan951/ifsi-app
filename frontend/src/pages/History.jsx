@@ -29,9 +29,9 @@ const clay = {
 
 /* ─── Type config ────────────────────────────────────────────────────────────── */
 const TYPE_CFG = {
-  quiz:      { label:'Quiz',       color: C.indigo,  dot:'var(--theme-primary)',   icon:'🎯' },
-  flashcard: { label:'Flashcards', color: C.violet,  dot:'var(--theme-secondary)', icon:'🃏' },
-  exercise:  { label:'Exercices',  color: '#0891b2', dot:'#0891b2',               icon:'✏️' },
+  quiz:      { label:'Quiz',       color: C.indigo,  dot:'var(--theme-primary)'   },
+  flashcard: { label:'Flashcards', color: C.violet,  dot:'var(--theme-secondary)' },
+  exercise:  { label:'Exercices',  color: '#0891b2', dot:'#0891b2'                },
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -431,7 +431,6 @@ function FlashcardAccordion({ item, navigate }) {
           </div>
         ) : item.unknown === 0 ? (
           <div style={{ textAlign:'center', padding:'16px 0' }}>
-            <p style={{ fontSize:28, marginBottom:4 }}>🎉</p>
             <p style={{ fontSize:13, fontWeight:700, color:'#059669' }}>Toutes les cartes maîtrisées !</p>
           </div>
         ) : (
@@ -444,7 +443,7 @@ function FlashcardAccordion({ item, navigate }) {
             background:`linear-gradient(135deg,${C.violet},${C.pink})`,
             color:'#fff', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
             boxShadow:clay.btn(C.violet,'#6d28d9') }}>
-          <span>🃏</span> Revoir ce chapitre
+          Revoir ce chapitre
         </motion.button>
       </div>
     </motion.div>
@@ -583,10 +582,10 @@ export default function History() {
           <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16 }}>
             {/* Pills de type */}
             {[
-              { id:'all',       label:'Tout',       count: history.length,     icon:null,  disabled:false },
-              { id:'quiz',      label:'Quiz',       count: quizHistory.length, icon:'🎯',  disabled:false },
-              { id:'flashcard', label:'Flashcards', count: fcHistory.length,   icon:'🃏',  disabled:false },
-              { id:'exercise',  label:'Exercices',  count: 0,                  icon:'✏️',  disabled:true  },
+              { id:'all',       label:'Tout',       count: history.length,     disabled:false },
+              { id:'quiz',      label:'Quiz',       count: quizHistory.length, disabled:false },
+              { id:'flashcard', label:'Flashcards', count: fcHistory.length,   disabled:false },
+              { id:'exercise',  label:'Exercices',  count: 0,                  disabled:true  },
             ].map(t => {
               const active = typeFilter === t.id;
               return (
@@ -603,7 +602,6 @@ export default function History() {
                     boxShadow: active ? clay.sm : 'none',
                     opacity: t.disabled ? 0.55 : 1,
                     display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', flexShrink:0 }}>
-                  {t.icon && <span style={{ fontSize:11 }}>{t.icon}</span>}
                   {t.label}
                   {!t.disabled && t.count > 0 && (
                     <span style={{ background: active ? C.indigo : C.bg, color: active ? '#fff' : C.indigo,
@@ -658,7 +656,6 @@ export default function History() {
           {filtered.length === 0 ? (
             <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }}
               style={{ textAlign:'center', padding:'80px 24px' }}>
-              <div style={{ fontSize:48, marginBottom:12 }}>📋</div>
               <p style={{ fontWeight:700, color:C.text, fontSize:15 }}>
                 {history.length === 0 ? "Aucune session terminée pour l'instant" : 'Aucun résultat pour cette recherche'}
               </p>

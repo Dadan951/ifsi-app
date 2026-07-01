@@ -343,7 +343,6 @@ function CoursTab() {
           <motion.div key="sems" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }} transition={{ duration:0.3 }}>
             {semesters.length === 0 ? (
               <div style={{ textAlign:'center', padding:'64px 0', color:C.sub }}>
-                <div style={{ fontSize:40, marginBottom:12 }}>📚</div>
                 <p style={{ fontWeight:600 }}>Aucun cours disponible</p>
               </div>
             ) : (
@@ -685,7 +684,6 @@ function FichesTab() {
         <motion.div key="sems-f" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }} transition={{ duration:0.3 }}>
           {semesters.length === 0 ? (
             <div style={{ textAlign:'center', padding:'64px 0', color:C.sub }}>
-              <div style={{ fontSize:40, marginBottom:12 }}>📋</div>
               <p style={{ fontWeight:600 }}>Aucune fiche disponible</p>
             </div>
           ) : (
@@ -904,15 +902,15 @@ function FichesPersoUpgradeWall() {
         <p style={{ fontSize:12, color:C.sub, marginBottom:24 }}>Importez vos cours et laissez l'IA générer des fiches de révision colorées et structurées en quelques secondes.</p>
         <div style={{ background:C.card, borderRadius:18, padding:20, textAlign:'left', marginBottom:20, border:`1.5px solid ${C.border}`, boxShadow:clay.card, display:'flex', flexDirection:'column', gap:12 }}>
           {[
-            { icon:'📄', text:'Import de PDF, images et texte' },
-            { icon:'🤖', text:'Génération automatique de fiches par IA' },
-            { icon:'🎨', text:'Fiches colorées, épurées et bien structurées' },
-            { icon:'☁️', text:'Stockage de vos fichiers personnels' },
-            { icon:'⚡', text:"Jusqu'à 5 fiches générées par jour (Pro) ou 10 (Premium)" },
-          ].map((item, i) => (
+            'Import de PDF, images et texte',
+            'Génération automatique de fiches par IA',
+            'Fiches colorées, épurées et bien structurées',
+            'Stockage de vos fichiers personnels',
+            "Jusqu'à 5 fiches générées par jour (Pro) ou 10 (Premium)",
+          ].map((text, i) => (
             <div key={i} style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <div style={{ width:32, height:32, borderRadius:10, background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:16, boxShadow:clay.sm }}>{item.icon}</div>
-              <span style={{ fontSize:12, color:C.text, fontWeight:500 }}>{item.text}</span>
+              <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--theme-primary)', flexShrink:0 }}/>
+              <span style={{ fontSize:12, color:C.text, fontWeight:500 }}>{text}</span>
             </div>
           ))}
         </div>
@@ -1200,9 +1198,9 @@ export default function Cours() {
   const isPro = ['pro','premium'].includes(user?.subscription);
 
   const tabs = [
-    { id:'cours',  label:'📚 Cours' },
-    { id:'fiches', label:'📋 Fiches' },
-    { id:'perso',  label: isPro ? '✨ Fiches perso' : '🔒 Fiches perso' },
+    { id:'cours',  label:'Cours' },
+    { id:'fiches', label:'Fiches' },
+    { id:'perso',  label:'Fiches perso' },
   ];
 
   return (
@@ -1218,9 +1216,9 @@ export default function Cours() {
           <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}
             style={{ position:'relative', padding:'28px 24px 0' }}>
             <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:10 }}>
-              <div style={{ width:54, height:54, borderRadius:18, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24,
+              <div style={{ width:54, height:54, borderRadius:18, display:'flex', alignItems:'center', justifyContent:'center',
                 background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)', border:'1.5px solid rgba(255,255,255,0.25)', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', flexShrink:0 }}>
-                📚
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               </div>
               <div>
                 <h1 className="nunito" style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Cours & Fiches</h1>

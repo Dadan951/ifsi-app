@@ -348,10 +348,10 @@ export default function Profile() {
 
   const sub   = subConfig[user?.subscription] || subConfig.free;
   const stats = [
-    { label:'Quiz',       value:user?.progress?.quizCompleted      || 0, color:'var(--theme-primary)',   icon:'🧠' },
-    { label:'Flashcards', value:user?.progress?.flashcardsReviewed || 0, color:'#0891b2',                icon:'🃏' },
-    { label:'Exercices',  value:user?.progress?.exercisesCompleted || 0, color:'var(--theme-secondary)', icon:'📋' },
-    { label:'Score',      value:user?.progress?.totalScore         || 0, color:'#ea580c', icon:'⭐' },
+    { label:'Quiz',       value:user?.progress?.quizCompleted      || 0, color:'var(--theme-primary)'   },
+    { label:'Flashcards', value:user?.progress?.flashcardsReviewed || 0, color:'#0891b2'                },
+    { label:'Exercices',  value:user?.progress?.exercisesCompleted || 0, color:'var(--theme-secondary)' },
+    { label:'Score',      value:user?.progress?.totalScore         || 0, color:'#ea580c'                },
   ];
   const maxStat = Math.max(...stats.map(s => s.value), 1);
 
@@ -540,7 +540,8 @@ export default function Profile() {
                       <div key={s.label}>
                         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
                           <span style={{ fontSize:11, color:C.sub, display:'flex', alignItems:'center', gap:5 }}>
-                            <span>{s.icon}</span>{s.label}
+                            <span style={{ width:6, height:6, borderRadius:'50%', background:s.color, flexShrink:0 }}/>
+                            {s.label}
                           </span>
                           <span style={{ fontSize:12, fontWeight:700, color:s.color }}>{s.value}</span>
                         </div>
