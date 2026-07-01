@@ -425,24 +425,36 @@ export default function Quiz() {
         <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
           {/* Grid texture */}
           <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
+          {/* Orbs */}
+          <div style={{ position:'absolute', top:-48, right:-32, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.12),transparent)', filter:'blur(40px)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', bottom:-20, left:80, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.07),transparent)', filter:'blur(30px)', pointerEvents:'none' }} aria-hidden/>
           {/* Shine */}
-          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.18), transparent 60%)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.15), transparent 55%)', pointerEvents:'none' }} aria-hidden/>
 
           <div style={{ position:'relative', padding:'28px 24px 0' }}>
-            <p style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:4 }}>NursesPrep · IFSI</p>
-            <h1 className="nunito" style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:4 }}>Quiz</h1>
-            <p style={{ fontSize:13, color:'rgba(255,255,255,0.65)', marginBottom:16 }}>Testez vos connaissances par unité d'enseignement</p>
-
-            {tab === 'catalogue' && (
-              <div style={{ display:'flex', gap:20, marginBottom:20 }}>
-                {[{ n:totalQuizzes, l:'Quiz', c:'#fff' }, { n:semesters.length, l:'Semestres', c:'#c4b5fd' }].map(s => (
-                  <div key={s.l}>
-                    <p className="nunito" style={{ fontSize:22, fontWeight:900, color:s.c, lineHeight:1 }}>{s.n}</p>
-                    <p style={{ fontSize:11, color:'rgba(255,255,255,0.55)', marginTop:2 }}>{s.l}</p>
-                  </div>
-                ))}
+            {/* Icon + titre */}
+            <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+              <div style={{ width:44, height:44, borderRadius:16, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)', flexShrink:0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
               </div>
-            )}
+              <div>
+                <h1 className="nunito" style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Quiz</h1>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:2 }}>Testez vos connaissances par unité d'enseignement</p>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display:'flex', gap:20, marginBottom:20, marginTop:6 }}>
+              {[{ n:totalQuizzes, l:'Quiz', c:'#fff' }, { n:semesters.length, l:'Semestres', c:'#c4b5fd' }].map(s => (
+                <div key={s.l}>
+                  <p className="nunito" style={{ fontSize:22, fontWeight:900, color:s.c, lineHeight:1 }}>{s.n}</p>
+                  <p style={{ fontSize:11, color:'rgba(255,255,255,0.55)', marginTop:2 }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
 
             {/* Tab bar */}
             <div style={{ display:'flex', gap:2 }}>
