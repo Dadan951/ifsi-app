@@ -301,21 +301,24 @@ export default function Groups() {
 
         {/* ── HERO ── */}
         <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
-          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'24px 24px', pointerEvents:'none' }} aria-hidden/>
-          {/* Orbs */}
-          <div style={{ position:'absolute', top:-80, right:-60, width:300, height:300, borderRadius:'50%', background:'rgba(255,255,255,0.06)', pointerEvents:'none' }} aria-hidden/>
-          <div style={{ position:'absolute', bottom:-60, left:-40, width:220, height:220, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', top:-40, right:-32, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.12),transparent)', filter:'blur(40px)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', bottom:-20, left:80, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.08),transparent)', filter:'blur(32px)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.15),transparent 55%)', pointerEvents:'none' }} aria-hidden/>
 
-          <div style={{ position:'relative', maxWidth:900, margin:'0 auto', padding:'40px 24px 36px' }}>
+          <div style={{ position:'relative', padding:'28px 24px 28px' }}>
             <motion.div {...fade(0)} style={{ display:'flex', flexDirection:'column', gap:16 }}>
-              <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
+              <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:16 }}>
                 <div>
-                  <div style={{ display:'inline-flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.15)', borderRadius:99, padding:'4px 12px', marginBottom:12 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.9)', letterSpacing:'0.06em' }}>GROUPES D'ÉTUDE</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+                    <div style={{ width:44, height:44, borderRadius:16, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)', flexShrink:0 }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div>
+                      <h1 style={{ fontSize:24, fontWeight:900, color:'#fff', fontFamily:'Nunito,sans-serif', lineHeight:1.1, margin:0 }}>Groupes d'étude</h1>
+                      <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:2 }}>Collaborez et partagez avec vos camarades IFSI</p>
+                    </div>
                   </div>
-                  <h1 style={{ fontSize:26, fontWeight:900, color:'#fff', fontFamily:'Nunito,sans-serif', marginBottom:6 }}>Groupes d'étude</h1>
-                  <p style={{ fontSize:13, color:'rgba(255,255,255,0.75)', lineHeight:1.6 }}>Collaborez et partagez avec vos camarades IFSI</p>
                 </div>
                 <div style={{ display:'flex', gap:10 }}>
                   <motion.button whileHover={{scale:1.04,y:-1}} whileTap={{scale:0.97}}

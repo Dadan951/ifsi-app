@@ -1210,19 +1210,21 @@ export default function Cours() {
 
         {/* ── HERO ── */}
         <div style={{ background:'var(--theme-hero)', position:'relative', overflow:'hidden' }}>
-          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.05) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', top:-40, right:-32, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.12),transparent)', filter:'blur(40px)', pointerEvents:'none' }} aria-hidden/>
+          <div style={{ position:'absolute', bottom:-20, left:80, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle,rgba(255,255,255,0.08),transparent)', filter:'blur(32px)', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.15),transparent 55%)', pointerEvents:'none' }} aria-hidden/>
 
           <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}
             style={{ position:'relative', padding:'28px 24px 0' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:10 }}>
-              <div style={{ width:54, height:54, borderRadius:18, display:'flex', alignItems:'center', justifyContent:'center',
-                background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)', border:'1.5px solid rgba(255,255,255,0.25)', boxShadow:'0 4px 16px rgba(0,0,0,0.1)', flexShrink:0 }}>
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+              <div style={{ width:44, height:44, borderRadius:16, display:'flex', alignItems:'center', justifyContent:'center',
+                background:'rgba(255,255,255,0.18)', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)', flexShrink:0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               </div>
               <div>
-                <h1 className="nunito" style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Cours & Fiches</h1>
-                <p style={{ fontSize:12, color:'rgba(196,181,253,0.8)', marginTop:3 }}>NursesPrep · IFSI</p>
+                <h1 className="nunito" style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Cours & Fiches</h1>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:2 }}>Consultez les cours, révisez et créez vos fiches</p>
               </div>
             </div>
             <p style={{ fontSize:13, color:'rgba(196,181,253,0.7)', marginBottom:20, maxWidth:480 }}>

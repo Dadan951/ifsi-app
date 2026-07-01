@@ -305,29 +305,26 @@ export default function Annales() {
           <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 65% 15%,rgba(255,255,255,0.12),transparent 50%)', pointerEvents:'none' }} aria-hidden/>
 
           <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}
-            style={{ position:'relative', padding:'28px 24px' }}>
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+            style={{ position:'relative', padding:'28px 24px 28px' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+              <div style={{ width:44, height:44, borderRadius:16, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)', flexShrink:0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
               <div>
-                <span style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:10, fontWeight:700, padding:'3px 14px', borderRadius:20,
-                  background:'rgba(255,255,255,0.15)', color:'rgba(196,181,253,0.9)', border:'1.5px solid rgba(255,255,255,0.2)', backdropFilter:'blur(6px)', marginBottom:12 }}>
-                  📅 Annales IFSI
-                </span>
-                <h1 style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.1, marginBottom:6 }}>Annales</h1>
-                <p style={{ fontSize:13, color:'rgba(196,181,253,0.65)' }}>Sujets d'examens classés par année et semestre</p>
+                <h1 className="nunito" style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Annales</h1>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:2 }}>Sujets d'examens classés par année et semestre</p>
               </div>
-
-              {/* Stats */}
-              <div style={{ display:'flex', gap:20, alignSelf:'flex-end', paddingBottom:4 }}>
-                {[
-                  { val:annales.length, label:'Sujets', color:'#c4b5fd' },
-                  { val:years.length,   label:'Années',  color:'#a5b4fc' },
-                ].map(s => (
-                  <div key={s.label} style={{ textAlign:'center' }}>
-                    <p style={{ fontSize:22, fontWeight:900, color:s.color, fontVariantNumeric:'tabular-nums', lineHeight:1 }}>{s.val}</p>
-                    <p style={{ fontSize:10, color:'rgba(196,181,253,0.55)', marginTop:3 }}>{s.label}</p>
-                  </div>
-                ))}
-              </div>
+            </div>
+            <div style={{ display:'flex', gap:20 }}>
+              {[
+                { val:annales.length, label:'Sujets', color:'#c4b5fd' },
+                { val:years.length,   label:'Années',  color:'#a5b4fc' },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign:'center' }}>
+                  <p className="nunito" style={{ fontSize:22, fontWeight:900, color:s.color, fontVariantNumeric:'tabular-nums', lineHeight:1 }}>{s.val}</p>
+                  <p style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{s.label}</p>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>

@@ -398,29 +398,20 @@ export default function Exercises() {
           <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 70% 15%,rgba(255,255,255,0.12),transparent 50%)', pointerEvents:'none' }} aria-hidden/>
 
           <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}
-            style={{ position:'relative', padding:'28px 24px' }}>
+            style={{ position:'relative', padding:'28px 24px 28px' }}>
 
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-              <div>
-                <span style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:10, fontWeight:700, padding:'3px 14px', borderRadius:20,
-                  background:'rgba(255,255,255,0.15)', color:'rgba(186,230,253,0.9)', border:'1.5px solid rgba(255,255,255,0.2)', backdropFilter:'blur(6px)', marginBottom:12 }}>
-                  📋 Exercices cliniques
-                </span>
-                <h1 style={{ fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.1, marginBottom:6 }}>Entraîne-toi</h1>
-                <p style={{ fontSize:13, color:'rgba(186,230,253,0.65)' }}>QCM, questions ouvertes et cas cliniques — comme aux examens IFSI</p>
+            <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+              <div style={{ width:44, height:44, borderRadius:16, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.3)', flexShrink:0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
               </div>
-
-              {completedCount > 0 && (
-                <motion.div initial={{ scale:0 }} animate={{ scale:1 }} transition={{ type:'spring', stiffness:280 }}
-                  style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 16px', borderRadius:16, background:'rgba(74,222,128,0.15)', border:'1.5px solid rgba(74,222,128,0.3)', backdropFilter:'blur(8px)', flexShrink:0 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span style={{ fontSize:12, fontWeight:700, color:'#4ade80' }}>{completedCount} complété{completedCount > 1?'s':''}</span>
-                </motion.div>
-              )}
+              <div>
+                <h1 className="nunito" style={{ fontSize:24, fontWeight:900, color:'#fff', lineHeight:1.1 }}>Entraîne-toi</h1>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:2 }}>QCM, questions ouvertes et cas cliniques — comme aux examens IFSI</p>
+              </div>
             </div>
 
             {/* Stats */}
-            <div style={{ display:'flex', gap:20, marginTop:20, flexWrap:'wrap', alignItems:'center' }}>
+            <div style={{ display:'flex', gap:20, flexWrap:'wrap', alignItems:'center' }}>
               {[
                 { label:'Total',        val:exercises.length, color:'#93c5fd' },
                 { label:'QCM',          val:qcmCount,         color:'#c4b5fd' },

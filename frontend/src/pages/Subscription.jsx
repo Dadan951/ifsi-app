@@ -297,12 +297,13 @@ export default function Subscription() {
         </AnimatePresence>
 
         {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--theme-hero)', minHeight: 210 }}>
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--theme-hero)' }}>
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
           <div style={{ position: 'absolute', top: -50, right: -30, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.12),transparent)', filter: 'blur(40px)', pointerEvents: 'none' }}/>
           <div style={{ position: 'absolute', bottom: -40, left: -20, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.08),transparent)', filter: 'blur(32px)', pointerEvents: 'none' }}/>
-          <div style={{ position: 'absolute', top: '30%', left: '40%', width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.06),transparent)', filter: 'blur(28px)', pointerEvents: 'none' }}/>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.15),transparent 55%)', pointerEvents:'none' }} aria-hidden/>
 
-          <div style={{ position: 'relative', zIndex: 10, padding: '40px 20px 44px', maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ position: 'relative', zIndex: 10, padding: '28px 24px 28px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20 }}>
               <div>
                 {/* Plan actuel chip */}

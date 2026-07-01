@@ -222,8 +222,8 @@ export default function Support() {
       <main style={{ flex: 1, overflowY: 'auto', background: C.bg }}>
 
         {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--theme-hero)', minHeight: 200 }}>
-          {/* Orbs décoratifs */}
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--theme-hero)' }}>
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)', backgroundSize:'28px 28px', pointerEvents:'none' }} aria-hidden/>
           <div style={{
             position: 'absolute', top: -40, right: -20, width: 240, height: 240,
             borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.12),transparent)',
@@ -234,59 +234,39 @@ export default function Support() {
             borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.08),transparent)',
             filter: 'blur(32px)', pointerEvents: 'none',
           }}/>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 80% 20%,rgba(255,255,255,0.15),transparent 55%)', pointerEvents:'none' }} aria-hidden/>
 
-          <div style={{ position: 'relative', zIndex: 10, padding: '40px 24px 36px', maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ position: 'relative', zIndex: 10, padding: '28px 24px 28px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
 
               {/* Titre */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  style={{
-                    width: 52, height: 52, borderRadius: 16, flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)',
-                    boxShadow: '0 2px 0 rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.3) inset',
-                  }}>
-                  <svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" viewBox="0 0 24 24">
+                <div style={{ width: 44, height: 44, borderRadius: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.18)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}>
+                  <svg width="22" height="22" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" viewBox="0 0 24 24">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
-                </motion.div>
+                </div>
                 <div>
-                  <motion.h1
-                    initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    style={{ fontSize: 26, fontWeight: 800, color: '#fff', margin: 0 }}>
+                  <h1 className="nunito" style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1.1 }}>
                     Support
-                  </motion.h1>
-                  <motion.p
-                    initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.18 }}
-                    style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
+                  </h1>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
                     Notre équipe répond dans les plus brefs délais
-                  </motion.p>
+                  </p>
                 </div>
               </div>
 
               {/* Stats */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 4 }}>
                 {[
-                  { label: 'Total',    val: tickets.length, col: 'rgba(255,255,255,0.9)' },
+                  { label: 'Total',    val: tickets.length, col: '#fff' },
                   { label: 'Ouverts',  val: openCount,      col: '#6ee7b7' },
                   { label: 'En cours', val: ipCount,        col: '#fcd34d' },
                   { label: 'Résolus',  val: closedCount,    col: 'rgba(255,255,255,0.5)' },
                 ].map((s, i) => (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.07 }}
-                    style={{
-                      borderRadius: 14, padding: '8px 14px', textAlign: 'center', minWidth: 70,
-                      background: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                    }}>
-                    <p style={{ fontSize: 22, fontWeight: 800, color: s.col, margin: 0 }}>{s.val}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 1 }}>{s.label}</p>
+                  <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
+                    <p className="nunito" style={{ fontSize: 22, fontWeight: 900, color: s.col, lineHeight: 1 }}>{s.val}</p>
+                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</p>
                   </motion.div>
                 ))}
               </div>
